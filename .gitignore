@@ -137,3 +137,11 @@ dist
 
 # SvelteKit build / generate output
 .svelte-kit
+
+# Personal Notes
+tasksProject.md
+
+# Obtain quotes
+scrap.js
+scrapWiki.js
+frases_homer.csv

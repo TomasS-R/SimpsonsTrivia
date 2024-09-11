@@ -9,7 +9,7 @@ async function registerUser (username, password, role = 'user', res) {
         const userExist = await queries.userExists(username);
 
         if (userExist.rows.length > 0) {
-            return res.status(400).json({
+            return res.status(409).json({
                 success: false,
                 error: "Email already exists. Please use a different email address.",
             });
@@ -31,9 +31,10 @@ async function registerUser (username, password, role = 'user', res) {
             },
         });
     } catch (error) {
-        res.status(500).json({
+        res.status(409).json({
             success: false,
             error: error.message,
+            code: codeStatus,
         });
     }
 }

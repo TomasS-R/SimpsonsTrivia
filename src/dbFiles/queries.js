@@ -119,7 +119,7 @@ async function getScores() {
 // Funcion que consulta la bd y obtiene las preguntas de la tabla
 async function getQuestions() {
     try {
-        const result = await databaseManager.query(`SELECT * FROM ${userTables.tableNameQuestions}`);
+        const result = await databaseManager.query(`SELECT * FROM ${userTables.tableNameQuotes}`);
         return result.rows;
     } catch (e) {
         console.log(e);

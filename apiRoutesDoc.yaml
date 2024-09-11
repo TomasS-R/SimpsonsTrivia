@@ -1,0 +1,223 @@
+openapi: 3.0.0
+servers:
+  # Added by API Auto Mocking Plugin
+  - description: API Simpsons Trivia
+    url: http://localhost:3000/api-docs/
+info:
+  description: This is a simple API of Simpsons Trivia
+  version: "1.0"
+  title: Simple API Simpsons Trivia
+  contact:
+    email: tomas.saintromain@gmail.com
+  license:
+    name: Apache 2.0
+    url: 'http://www.apache.org/licenses/LICENSE-2.0.html'
+tags:
+  - name: Admins
+    description: Secured Admin-only calls
+  - name: Developers
+    description: Operations available to regular developers
+paths:
+  /login:
+    post:
+      tags:
+        - Developers
+      summary: Login users
+      operationId: loginu
+      description: Logearse con el usuario creado.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                username:
+                  type: string
+                  format: email
+                  description: Colocar el username (email) del usuario.
+                password:
+                  type: string
+                  description: Contraseña de la cuenta.
+              required:
+                - username
+                - password
+      responses:
+        '201':
+            description: Item created
+            content:
+              application/json:
+                schema:
+                  type: object
+                  properties:
+                    success:
+                      type: boolean
+                      example: true
+                    token:
+                      type: string
+                      example: "eTZ9.yaQhM*******xBby-Q"
+                    user:
+                      type: object
+                      properties:
+                        id:
+                          type: string
+                          example: "5"
+                        username:
+                          type: string
+                          example: "test.simpsons@trivia.com"
+                        role:
+                          type: string
+                          example: "user"
+        '400':
+          description: Invalid input, object invalid
+        '409':
+          description: An existing item already exists
+          content:
+              application/json:
+                schema:
+                  type: object
+                  properties:
+                    success:
+                      type: boolean
+                      example: false
+                    error:
+                      type: string
+                      example: "The email or password is not valid!"
+    
+  /register:
+    post:
+      tags:
+        - Developers
+      summary: Register users
+      operationId: registeru
+      description: Permite registrar un nuevo usuario.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                username:
+                  type: string
+                  format: email
+                  description: Colocar el email para registrar.
+                password:
+                  type: string
+                  description: Crear una contraseña.
+              required:
+                - username
+                - password
+      responses:
+        '200':
+          description: User successfully registered
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+                  user:
+                    type: object
+                    properties:
+                      id:
+                        type: string
+                        example: "6"
+                      username:
+                        type: string
+                        example: "test.simpsons@trivia.com"
+                      role:
+                        type: string
+                        example: "user"
+        '400':
+          description: Invalid input, object invalid
+        '409':
+          description: email already exists
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: false
+                  error:
+                    type: string
+                    example: "Email already exists. Please use a different email address."
+
+  /users:
+    get:
+      tags:
+        - Developers
+      summary: Get users
+      operationId: getUsers
+      description: Devuelve la información de los usuarios.
+      #parameters:
+      responses:
+        '200':
+          description: Información del usuario obtenida exitosamente
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+                  data:
+                    type: array
+                    items:
+                        type: object
+                        properties:
+                          username:
+                            type: string
+                            example: "test.simpsons@trivia.com"
+                          role:
+                            type: string
+                            example: "user"
+        '404':
+          description: Usuers not found
+  
+  /scores:
+    get:
+      tags:
+        - Developers
+      summary: Get scores
+      operationId: getScores
+      description: Devuelve los puntajes de los usuarios.
+      responses:
+        '200':
+          description: Puntajes de los usuarios obtenida exitosamente
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+        '201':
+          description: Puntajes de los usuarios obtenida exitosamente sin datos
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+                  data:
+                    type: array
+                    items:
+                        type: object
+                        properties:
+                          score:
+                            type: string
+                            example: ""
+                          username:
+                            type: string
+                            example: ""
+        '404':
+          description: Scores not found

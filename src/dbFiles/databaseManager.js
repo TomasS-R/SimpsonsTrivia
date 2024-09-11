@@ -37,7 +37,7 @@ class DatabaseManager {
                 }
             });
         } else if (!shouldConnect) {
-            console.log('Not connected to PostgreSQL, if you want to connect use connectToPostgres(true) in app.js file');
+            console.log('Not connected to PostgreSQL, if you want to connect use True in variable CONNECTPOSTGRES file .env');
         }
         return this.pgPool;
     }
