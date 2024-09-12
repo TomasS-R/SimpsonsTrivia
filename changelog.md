@@ -1,10 +1,15 @@
 # Changelog
 
+# Version 0.3.2: -- 11/09/2024 --
+### Agregado o modificado
+   - Se elimino el archivo node.js.yaml
+   - Se corrigió el flujo de actions
+
 # Version 0.3.1: -- 11/09/2024 --
 ### Agregado o modificado
    - Se agrego el archivo node.js.yaml
 
-# Version 0.3.0: -- 11/09/2024
+# Version 0.3.0: -- 11/09/2024 --
 ### Agregado o modificado
    - Se corrigió el archivo readme
 
