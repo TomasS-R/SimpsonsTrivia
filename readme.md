@@ -18,11 +18,7 @@
 
 </div>
 
-<div style="display: flex; align-items: center; justify-content: center;">
-
-<img src="./media/homerDonut.png" width="300" height="300">
-
-</div>
+<div align="center"><img src="./media/homerDonut.png" width="300" height="300"></div>
 
 <div align= "center" >
 
@@ -109,11 +105,10 @@ npm run start
 
 ## Variables de entorno 💡
 
-<details close><summary><h3>Base de datos</h3></summary>
+<summary><h3>Base de datos</h3></summary>
 
 > [!IMPORTANT]
 > Al correr este proyecto puedes agregar las siguientes variables de entorno al archivo .env (debes crear este archivo, o cambiarle el nombre al archivo .env.template) ya sea que lo corras de forma local o en la nube ☁️ si completas los campos debes cambiar la variable `CONNECTPOSTGRES` y colocarla en `True` ya que si no, no tomara las variables de la Base de datos.
-</details>
 
 Variables de entorno para la conexion con postgress
 
@@ -125,35 +120,31 @@ Variables de entorno para la conexion con postgress
 | DATABASEPORT| - | El puerto que te provee|
 | DATABASENAME| postgress | El nombre que te provee|
 
-<details close><summary><h3>Puerto</h3> <h5>(donde correra la aplicacion)</h5></summary>
+<summary><h3>Puerto</h3> <h5>(donde correra la aplicacion)</h5></summary>
 
 > [!NOTE]
 > Por defecto si no tiene valor correra en el puerto 3000
-</details>
 
 `PORT=`
 
-<details close><summary><h3>Host</h3> <h5>(donde se aloja la aplicacion)</h5></summary>
+<summary><h3>Host</h3> <h5>(donde se aloja la aplicacion)</h5></summary>
 
 > [!NOTE]
 > Por defecto tiene 'localhost:' debes cambiarlo al subirlo a la nube
-</details>
 
 `HOST`
 
-<details close><summary><h3>JWT</h3> <h5>(Seguridad login)</h5></summary>
+<summary><h3>JWT</h3> <h5>(Seguridad login)</h5></summary>
 
 > [!NOTE]
 > JWT_SECRET es para generar un json web token este lo debes generar tu mismo, puedes combinar letras y numeros o usar un generador de contraseñas
-</details>
 
 `JWT_SECRET=`
 
-<details close><summary><h3>CONNECTPOSTGRES</h3></h3> <h5>(conexion a base de datos)</h5></summary>
+<summary><h3>CONNECTPOSTGRES</h3></h3> <h5>(conexion a base de datos)</h5></summary>
 
 > [!NOTE]
 > Por defecto si no tiene valor asignado esta en `False`, en caso de haber cargado las variables colocarlo en `True`
-</details>
 
 `CONNECTPOSTGRES=`
 

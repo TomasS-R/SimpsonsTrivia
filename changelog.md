@@ -1,5 +1,9 @@
 # Changelog
 
+# Version 0.3.0: -- 11/09/2024
+### Agregado o modificado
+   - Se corrigió el archivo readme
+
 ## Version 0.2.0: -- 11/09/2024 --
 ### Agregado o modificado
    - Mas informacion en el archivo readme.
