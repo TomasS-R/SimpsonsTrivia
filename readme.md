@@ -11,7 +11,7 @@
 [![Actions](https://img.shields.io/static/v1?style=for-the-badge&message=Actions&color=555&logo=githubactions&logoColor=3333&label=)](https://docs.github.com/en/actions)
 [![Supabase](https://img.shields.io/static/v1?style=for-the-badge&message=Supabase&color=555&logo=supabase&logoColor=3333&label=)](https://supabase.com/)
 [![Render](https://img.shields.io/static/v1?style=for-the-badge&message=Render&color=555&logo=Render&logoColor=3333&label=)](https://render.com/)
-[![Jest](https://img.shields.io/static/v1?style=for-the-badge&message=Jest&color=555&logo=jest&logoColor=3333&label=)](https://jest.com/)
+[![Docker](https://img.shields.io/static/v1?style=for-the-badge&message=Docker&color=555&logo=Docker&logoColor=3333&label=)](https://docker.com/)
 
 ![OpenSource](https://img.shields.io/badge/-open%20source-informational?style=for-the-badge)
 ![Free](https://img.shields.io/badge/-free-success?style=for-the-badge)
@@ -100,7 +100,7 @@ nodemon --env-file .env src/routes/routes.js
 ```
 ### O tambien puedes usar:
 ``` bash
-npm run start
+npm run dev
 ```
 
 ## Variables de entorno 💡
@@ -148,6 +148,13 @@ Variables de entorno para la conexion con postgress
 
 `CONNECTPOSTGRES=`
 
+<summary><h3>NODE_ENV</h3></h3> <h5>(estado de desarrollo)</h5></summary>
+
+> [!NOTE]
+> Dependiendo si se desplega en dev va a seguir por defecto en desarrollo, si no va a estar en produccion.
+
+`NODE_ENV=`
+
 ### Testing
 
 Para realizar testing del proyecto ejecutar el siguiente comando:
@@ -156,6 +163,26 @@ Para realizar testing del proyecto ejecutar el siguiente comando:
 npm test
 ```
 Esto ejecutara los tests que se encuentran dentro de la carpeta tests.
+
+### Dockerfile construccion 🐳
+Para construir la imagen en modo desarrollo:
+``` bash 
+docker build -t my-trivia-node-app --target dev .
+```
+Para construir la imagen en modo producción:
+``` bash 
+docker build -t my-trivia-node-app --target prod .
+```
+
+### Ejecutar dockerfile
+``` bash 
+docker run -p 3000:3000 my-trivia-node-app 
+```
+
+Para construir el docker-compose para modo producción:
+``` bash 
+docker-compose up --build
+```
 
 # 📚 Mucha mas Documentacion
 
@@ -175,4 +202,4 @@ Esto ejecutara los tests que se encuentran dentro de la carpeta tests.
 
 # 📝 Licencia
 
-#### Este proyecto está bajo licencia. Consulte el archivo [Licencia](license) para más detalles.
+#### Este proyecto está bajo licencia. Consulte el archivo [Licencia](license.txt) para más detalles.

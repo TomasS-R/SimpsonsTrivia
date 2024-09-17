@@ -1,5 +1,13 @@
 # Changelog
 
+# Version 0.3.3: -- --
+### Agregado o modificado
+   - Se agrego la variable de entorno NODE_ENV al archivo [.env.template](.env.template)
+   - Se creo el archivo [dockerfile](./Dockerfile)
+   - Se creo el archivo [docker-compose.yml](./docker-compose.yml)
+   - Mejorado la logica en [app.js](./src/app.js)
+   - Mas informacion sobre docker en el [readme](readme.md)
+
 # Version 0.3.2: -- 11/09/2024 --
 ### Agregado o modificado
    - Se elimino el archivo node.js.yaml

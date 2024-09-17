@@ -1,0 +1,26 @@
+services:
+  app:
+    build:
+      context: .
+      target: prod
+    ports:
+      - "3000:3000"
+    environment:
+      - NODE_ENV=production
+    env_file:
+      - .env
+    restart: unless-stopped
+
+  # dev:
+  #   build:
+  #     context: .
+  #     target: dev
+  #   ports:
+  #     - "3000:3000"
+  #   environment:
+  #     - NODE_ENV=development
+  #   env_file:
+  #     - .env
+  #   volumes:
+  #     - ./src:/app/src
+  #   command: npm run dev

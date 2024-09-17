@@ -1,0 +1,20 @@
+# Ignorar la carpeta de dependencias locales
+node_modules
+npm-debug.log
+yarn-error.log
+
+# Ignorar archivos de configuración locales
+.DS_Store
+
+# Ignorar carpetas de desarrollo
+.git
+.gitignore
+.vscode
+.idea
+coverage
+logs
+tmp
+
+# Ignorar archivos y carpetas innecesarios
+docker-compose.yml
+Dockerfile

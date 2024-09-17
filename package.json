@@ -1,11 +1,12 @@
 {
   "name": "proyecto-devops",
-  "version": "0.3.2",
+  "version": "0.3.3",
   "description": "Proyecto universitario para devops",
   "main": "../src/routes/routes.js",
   "scripts": {
     "test": "jest",
-    "start": "nodemon --env-file .env src/routes/routes.js"
+    "dev": "nodemon --env-file .env src/routes/routes.js",
+    "start": "node --env-file .env src/routes/routes.js"
   },
   "author": "Tomás Saint Romain",
   "license": "MIT",

@@ -6,21 +6,38 @@ const express = require('express');
 const app = express();
 app.use(express.json());
 
-// Verifica si el host es localhost y si el puerto es diferente a 3000
-const isProductionHost = (process.env.HOST && process.env.HOST.replace(/:$/, '') !== 'localhost');
-const isProductionPort = process.env.PORT && process.env.PORT !== '3000';
+// Determinar el entorno
+const isProduction = process.env.NODE_ENV === 'production';
 
-const PORT = isProductionPort ? process.env.PORT : 3000;
-const HOST = isProductionHost ? process.env.HOST : 'localhost:';
+// Configuración del puerto y host
+const PORT = process.env.PORT || 3000;
+//const HOST = isProduction ? process.env.HOST : 'localhost';
+const HOST = process.env.NODE_ENV === 'production' ? '0.0.0.0' : 'localhost';
+
 
 // Colores para mensajes en la terminal
 const RESET = '\x1b[0m';
 const RED = '\x1b[31m';
 const GREEN = '\x1b[32m';
+const YELLOW = '\x1b[33m';
 const BOLD = '\x1b[1m';
 
 // Verifica si la conexión a postgres está habilitada
-const connectionps = process.env.CONNECTPOSTGRES === 'False' ? false : true;
+const connectionps = process.env.CONNECTPOSTGRES === 'True' ? true : (process.env.CONNECTPOSTGRES === undefined ? false : false);
+
+async function createDatabaseTables() {
+    const tables = [
+        { name: userTables.tableNameUsers, columns: userTables.columnsUsers },
+        { name: userTables.tableNameCharacter, columns: userTables.columnsCharacter },
+        { name: userTables.tableNameScores, columns: userTables.columnsScores },
+        { name: userTables.tableNameQuotes, columns: userTables.columnsQuotes },
+        { name: userTables.tableNameQuotesUsers, columns: userTables.columnsQuotesUsers }
+    ];
+
+    for (const table of tables) {
+        await createTables(table.name, table.columns);
+    }
+}
 
 async function configureApp() {
     try {
@@ -28,28 +45,23 @@ async function configureApp() {
         await databaseManager.connectToPostgres(connectionps);
 
         if (databaseManager.isPostgresConnected()) {
-            // Crear las tablas en la base de datos
-            // Tabla usuarios
-            await createTables(userTables.tableNameUsers, userTables.columnsUsers);
-            // Tabla personajes
-            await createTables(userTables.tableNameCharacter, userTables.columnsCharacter);
-            // Tabla puntajes
-            await createTables(userTables.tableNameScores, userTables.columnsScores);
-            // Tabla preguntas
-            await createTables(userTables.tableNameQuotes, userTables.columnsQuotes);
-            // Tabla frases creadas por los usuarios
-            await createTables(userTables.tableNameQuotesUsers, userTables.columnsQuotesUsers);
+            await createDatabaseTables();
+            console.log(`${GREEN}${BOLD}✅ Tablas de la base de datos creadas con éxito.${RESET}`);
+        } else {
+            console.log(`${YELLOW}${BOLD}⚠️  La conexión a PostgreSQL está deshabilitada.${RESET}`);
         }
+
         // Mostrar mensajes en la terminal según el entorno
-        if (isProductionHost == true) {
+        if (isProduction) {
             console.log(`${RED}${BOLD}⚠️  Advertencia: ¡Estás en modo producción!${RESET}`);
-            app.listen(PORT, () => console.log(`Server running on url: http://${HOST}`));
+            app.listen(PORT, () => console.log(`${GREEN}${BOLD}🚀 Servidor en producción corriendo!`));
         } else {
             console.log(`${GREEN}${BOLD}🔧 Estás en modo desarrollo.${RESET}`);
-            app.listen(PORT, () => console.log(`Server running on port ${PORT} url: http://${HOST}${PORT}`));
+            app.listen(PORT, () => console.log(`${GREEN}${BOLD}🚀 Servidor de desarrollo corriendo en: http://localhost:${PORT}${RESET}`));
         }
     } catch (error) {
-        console.log(`${RED}${BOLD}Error: ${error.message}${RESET}`);
+        console.error(`${RED}${BOLD}❌ Error: ${error.message}${RESET}`);
+        process.exit(1);
     }
 }
 
