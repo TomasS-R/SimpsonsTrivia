@@ -66,3 +66,16 @@ jobs:
             DATABASENAME=${{ secrets.DATABASENAME }}
             JWT_SECRET=${{ secrets.JWT_SECRET }}
             CONNECTPOSTGRES=${{ secrets.CONNECTPOSTGRES }}
+  ci:
+    runs-on: ubuntu-latest
+    needs: push_to_docker_hub
+    steps:
+
+      - name: Deploy
+        # Only run this step if the branch is master
+        if: github.ref == 'refs/heads/master'
+        env:
+          #Example url for deploy https://api.render.com/deploy/srv-XXYYZZ?key=AABBCC&imgURL=docker.io%2Flibrary%2Fnginx%401.24
+          deploy_url: ${{ secrets.RENDER_DEPLOY_HOOK_URL }}&imgURL=docker.io/tomisr/simpsons-trivia:${{ github.sha }}
+        run: |
+          curl "$deploy_url"

@@ -1,6 +1,10 @@
 # Changelog
 
-# Version 0.3.3: -- --
+# Version 0.3.4: -- 18/09/2024 --
+### Agregado o modificado
+   - Agregado deploy automatico a render (Actions) al realizar un commit hacia github [node.js.yml](.github/workflows/node.js.yml)
+
+# Version 0.3.3: -- 17/09/2024 --
 ### Agregado o modificado
    - Se agrego la variable de entorno NODE_ENV al archivo [.env.template](.env.template)
    - Se creo el archivo [dockerfile](./Dockerfile)
