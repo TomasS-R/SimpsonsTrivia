@@ -13,9 +13,9 @@ app.get([routeapi+'/', '/'], (req, res) => {
 // Ruta de health check
 app.get(routeapi + '/healthcheck', (req, res) => {
     res.status(200).json({
-        exito: true,
-        mensaje: 'La API está funcionando correctamente',
-        marcaDeTiempo: new Date().toISOString()
+        success: true,
+        message: 'La API está funcionando correctamente',
+        timestamp: new Date().toISOString()
     });
 });
 
