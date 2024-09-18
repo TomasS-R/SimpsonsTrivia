@@ -6,7 +6,7 @@
   "scripts": {
     "test": "jest",
     "dev": "nodemon --env-file .env src/routes/routes.js",
-    "start": "node --env-file .env src/routes/routes.js"
+    "start": "node src/routes/routes.js"
   },
   "author": "Tomás Saint Romain",
   "license": "MIT",

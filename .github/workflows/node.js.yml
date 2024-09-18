@@ -58,3 +58,11 @@ jobs:
           push: true
           tags: ${{ secrets.DOCKER_USER }}/simpsons-trivia:${{ github.sha }}
           labels: ${{ steps.meta.outputs.labels }}
+          build-args: |
+            DATABASEUSER=${{ secrets.DATABASEUSER }}
+            DATABASEPASS=${{ secrets.DATABASEPASS }}
+            DATABASEHOST=${{ secrets.DATABASEHOST }}
+            DATABASEPORT=${{ secrets.DATABASEPORT }}
+            DATABASENAME=${{ secrets.DATABASENAME }}
+            JWT_SECRET=${{ secrets.JWT_SECRET }}
+            CONNECTPOSTGRES=${{ secrets.CONNECTPOSTGRES }}

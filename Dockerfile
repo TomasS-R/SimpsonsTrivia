@@ -28,6 +28,24 @@ RUN npm prune --production
 #
 FROM node:20-alpine AS prod
 
+# Definir argumentos que se pasarán durante la construcción
+ARG DATABASEUSER
+ARG DATABASEPASS
+ARG DATABASEHOST
+ARG DATABASEPORT
+ARG DATABASENAME
+ARG JWT_SECRET
+ARG CONNECTPOSTGRES
+
+# Establecer las variables de entorno
+ENV DATABASEUSER=$DATABASEUSER
+ENV DATABASEPASS=$DATABASEPASS
+ENV DATABASEHOST=$DATABASEHOST
+ENV DATABASEPORT=$DATABASEPORT
+ENV DATABASENAME=$DATABASENAME
+ENV JWT_SECRET=$JWT_SECRET
+ENV CONNECTPOSTGRES=$CONNECTPOSTGRES
+
 # Establecer NODE_ENV en production
 ENV NODE_ENV=production
 ENV PORT=3000
@@ -38,8 +56,6 @@ WORKDIR /app
 COPY --from=build /app/package*.json ./
 COPY --from=build /app/node_modules ./node_modules
 COPY --from=build /app/src ./src
-
-COPY .env ./
 
 # Exponer el puerto en el que la aplicación escucha
 EXPOSE ${PORT}
