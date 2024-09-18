@@ -6,7 +6,7 @@ let tasks = [];
 const routeapi = "/triviasimpsons/api/v1";
 
 app.get([routeapi+'/', '/'], (req, res) => {
-    res.send('English:<br>Welcome to the Simpsons Trivia API, you can test the api if you want, go to /triviasimpsons/api/login if you have user and password or /triviasimpsons/api/register to create a new user <br><br>Spanish:<br>Bienvenido a la API Trivia de los Simpsons, puedes probar la api si quieres, ve a /triviasimpsons/api/login si tienes un usuario y una contraseña o dirigete a /triviasimpsons/api/register para crear un nuevo usuario');
+    res.send(`English:<br>Welcome to the Simpsons Trivia API, you can test the api if you want, go to ${routeapi}/login if you have user and password or ${routeapi}/register to create a new user <br><br>Spanish:<br>Bienvenido a la API Trivia de los Simpsons, puedes probar la api si quieres, ve a ${routeapi}/login si tienes un usuario y una contraseña o dirigete a ${routeapi}/register para crear un nuevo usuario`);
 });
 
 app.post(routeapi+'/login', triviaControll.loginUserReq);

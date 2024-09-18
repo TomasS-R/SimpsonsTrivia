@@ -1,5 +1,9 @@
 # Changelog
 
+# Version 0.3.5: -- 18/09/2024 --
+### Agregado o modificado
+   - Arreglado descripcion de la ruta home en [routes.js](./src/routes/routes.js)
+
 # Version 0.3.4: -- 18/09/2024 --
 ### Agregado o modificado
    - Agregado deploy automatico a render (Actions) al realizar un commit hacia github [node.js.yml](.github/workflows/node.js.yml)
