@@ -1,5 +1,9 @@
 # Changelog
 
+# Version 0.3.7: -- 18/09/2024 --
+### Agregado o modificado
+   - Creado la ruta de health check para verificar el estado de la api [routes.js](./src/routes/routes.js)
+
 # Version 0.3.6: -- 18/09/2024 --
 ### Agregado o modificado
    - Arregladas las versiones de las acciones debido a warnings en el deploy hacia render en el archivo [node.js.yml](.github/workflows/node.js.yml)
