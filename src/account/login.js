@@ -2,10 +2,10 @@ const queries = require('../dbFiles/queries');
 const jwt = require('jsonwebtoken');
 const bcryptjs = require('bcryptjs');
 
-async function loginUser(username, password, res){
+async function loginUser(email, password, res){
     try {
         // Verificar si el usuario existe
-        const result = await queries.userExists(username);
+        const result = await queries.userExists(email);
 
         if (result.rows.length === 0) {
             return res.status(400).json({
@@ -26,7 +26,7 @@ async function loginUser(username, password, res){
         }
         // Generar el token JWT
         const token = jwt.sign(
-            { id: user.id, username: user.username, role: user.role },
+            { id: user.id, email: user.email, role: user.role },
             process.env.JWT_SECRET,
             { expiresIn: '1h' }
         );
@@ -36,6 +36,7 @@ async function loginUser(username, password, res){
             token: token,
             user: {
                 id: user.id,
+                email: user.email,
                 username: user.username,
                 role: user.role
             }

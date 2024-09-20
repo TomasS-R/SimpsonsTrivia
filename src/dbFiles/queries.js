@@ -99,7 +99,7 @@ async function verifyTable(tableName) {
 // Funcion que consulta la bd y obtiene los usuarios de la tabla
 async function getUsers() {
     try {
-        const result = await databaseManager.query(`SELECT username, role FROM ${userTables.tableNameUsers}`);
+        const result = await databaseManager.query(`SELECT id, username, role FROM ${userTables.tableNameUsers}`);
         return result.rows;
     } catch (e) {
         console.log(e);
@@ -127,9 +127,9 @@ async function getQuestions() {
 }
 
 // Funcion que crea un usuario en la bd
-async function createUser(username, hashedPassword, role, created_at) {
+async function createUser(username, email, hashedPassword, role, created_at) {
     try {
-        const result = await databaseManager.query('INSERT INTO users_trivia (username, password_hash, role, created_at) VALUES ($1, $2, $3, $4) RETURNING *', [username, hashedPassword, role, created_at]);
+        const result = await databaseManager.query('INSERT INTO users_trivia (username, email, password_hash, role, created_at) VALUES ($1, $2, $3, $4, $5) RETURNING *', [username, email,hashedPassword, role, created_at]);
         return result;
     } catch (e) {
         console.log(e);
@@ -137,12 +137,13 @@ async function createUser(username, hashedPassword, role, created_at) {
 }
 
 // Valida si existe el usuario en la bd
-async function userExists(username) {
+async function userExists(email) {
     try {
-        const result = await databaseManager.query('SELECT * FROM users_trivia WHERE username = $1', [username]);
+        const result = await databaseManager.query('SELECT * FROM users_trivia WHERE email = $1', [email]);
         return result;
     } catch (e) {
         console.log(e);
+        throw e;
     }
 }
 

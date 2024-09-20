@@ -11,22 +11,24 @@ function validateEmail(email) {
 // Funcion para registrar un usuario
 async function registerUserReq (req, res) {
   try {
-      // El username es el email
-      const { username, password, role } = req.body;
+      const { email, username, password, role } = req.body;
 
-      if (!username) {
-          return res.status(400).json({ success: false, error: "The request needs the 'email' field in the 'username' field!" });
+      if (!email) {
+        return res.status(400).json({ success: false, error: "The request needs the 'email' field!" });
       }
-      else if (!validateEmail(username)) {
-          return res.status(400).json({ success: false, error: "The email is not valid!" });
+      else if (!validateEmail(email)) {
+        return res.status(400).json({ success: false, error: "The email is not valid!" });
+      }
+      else if (!username) {
+        return res.status(400).json({ success: false, error: "The request needs the 'username' field!" });
       }
       else if (!password) {
-          return res.status(400).json({ success: false, error: "The request needs the 'password' field!" });
+        return res.status(400).json({ success: false, error: "The request needs the 'password' field!" });
       }
-      else if (!username || !password) {
-          return res.status(400).json({ success: false, error: "The request need 'username' and 'password' fields!" });
+      else if (!username || !password || !email) {
+        return res.status(400).json({ success: false, error: "The request need 'email', 'username' and 'password' fields!" });
       }
-      accountRegister.registerUser(username, password, role, res);
+      accountRegister.registerUser(username, email, password, role, res);
   }
   catch (e) {
       console.log(e);
@@ -36,26 +38,26 @@ async function registerUserReq (req, res) {
 // Funcion para loguear un usuario
 async function loginUserReq (req, res) {
   try {
-      const { username, password } = req.body;
+      const { email, password } = req.body;
       const fields = Object.keys(req.body);
 
       // Comprueba que solo se envien 2 campos, usuario y password
       if (fields.length > 2) {
         return res.status(400).json({ success: false, error: "The request has more than 2 fields!" });
       }
-      else if (!username) {
-          return res.status(409).json({ success: false, error: "The request needs the 'email' field in the 'username' field!" });
+      else if (!email) {
+          return res.status(409).json({ success: false, error: "The request needs the 'email' field!" });
       }
-      else if (!validateEmail(username)) {
+      else if (!validateEmail(email)) {
           return res.status(409).json({ success: false, error: "The email is not valid!" });
       }
       else if (!password) {
           return res.status(409).json({ success: false, error: "The request needs the 'password' field!" });
       }
-      else if (!username || !password) {
-          return res.status(409).json({ success: false, error: "The request need 'username' and 'password' fields!" });
+      else if (!email || !password) {
+          return res.status(409).json({ success: false, error: "The request need 'email' and 'password' fields!" });
       }
-      accountLogin.loginUser(username, password, res);
+      accountLogin.loginUser(email, password, res);
   }
   catch (e) {
       console.log(e);

@@ -3,10 +3,10 @@ const bcryptjs = require('bcryptjs');
 const queries = require('../dbFiles/queries');
 
 // Funcion para registrar un usuario
-async function registerUser (username, password, role = 'user', res) {
+async function registerUser (username, email, password, role = 'user', res) {
     try {
         // Valida si el usuario ya existe
-        const userExist = await queries.userExists(username);
+        const userExist = await queries.userExists(email);
 
         if (userExist.rows.length > 0) {
             return res.status(409).json({
@@ -18,7 +18,7 @@ async function registerUser (username, password, role = 'user', res) {
         const hashedPassword = await bcryptjs.hash(password, 10);
 
         const created_at = new Date();
-        const result = await queries.createUser(username, hashedPassword, role, created_at);
+        const result = await queries.createUser(username, email, hashedPassword, role, created_at);
         const user = result.rows[0];
 
         res.status(201).json({
@@ -26,15 +26,16 @@ async function registerUser (username, password, role = 'user', res) {
             data: {
                 id: user.id,
                 username: user.username,
+                email: user.email,
                 role: user.role,
                 created_at: user.created_at,
             },
         });
     } catch (error) {
-        res.status(409).json({
+        res.status(500).json({
             success: false,
-            error: error.message,
-            code: codeStatus,
+            error: "An error occurred while registering the user." + error.message,
+            code: 500,
         });
     }
 }

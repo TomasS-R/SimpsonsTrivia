@@ -1,5 +1,9 @@
 # Changelog
 
+# Version 0.3.8: -- 19/09/2024 --
+### Agregado o modificado
+   - Modificado el registro y el login: a partir de esta actualizacion el usuario que se registre debera colocar username, email y password para poder ingresar. Al momento de mostrar los usuarios se mostrara el username para no revelar datos sensibles como puede ser el email.
+
 # Version 0.3.7: -- 18/09/2024 --
 ### Agregado o modificado
    - Creado la ruta de health check para verificar el estado de la api [routes.js](./src/routes/routes.js)

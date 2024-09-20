@@ -4,7 +4,8 @@ const tableNameUsers = 'users_trivia';
 
 const columnsUsers = [
     {name: 'id', type: 'bigserial', primaryKey: true, identity: true},
-    {name: 'username', type: 'text', notNull: true, unique: true},
+    {name: 'username', type: 'text', notNull: true},
+    {name: 'email', type: 'text', notNull: true, unique: true},
     {name: 'password_hash', type: 'text', notNull: true},
     {name: 'role', type: 'varchar(50)', default: "'user'"},
     {name: 'created_at', type: 'timestamptz', notNull: true},
