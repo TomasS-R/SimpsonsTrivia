@@ -30,14 +30,14 @@ class DatabaseManager {
             // Intentar realizar una consulta simple para verificar la conexión
             this.pgPool.query('SELECT 1', (err, res) => {
                 if (err) {
-                    console.error('Error connecting to PostgreSQL:', err);
+                    console.error('😞 Error connecting to PostgreSQL:', err);
                     this.pgPool = null;
                 } else {
-                    console.log('Connected to PostgreSQL');
+                    console.log('😄 Connected to PostgreSQL');
                 }
             });
         } else if (!shouldConnect) {
-            console.log('Not connected to PostgreSQL, if you want to connect use True in variable CONNECTPOSTGRES file .env');
+            console.log('💬 Not connected to PostgreSQL, if you want to connect use True in variable CONNECTPOSTGRES file .env');
         }
         return this.pgPool;
     }

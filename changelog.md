@@ -1,5 +1,12 @@
 # Changelog
 
+# Version 0.3.9: -- 20/09/2024 --
+### Agregado o modificado
+   - Mejorado los logs de la conexion a la base de datos agregados emojis para una mejora visual
+   - Creado flujo de preguntas con respuestas
+   - Se agrego la ruta /random/quote la cual contiene una frase, el id de la frase y 4 opciones de respuestas (3 incorrectas + 1 correcta).
+   - Agregado 1 test nuevo en [queries.test.js](./tests/queries.test.js) el cual realiza las comprobaciones de si el procedimiento random quote es correcto
+
 # Version 0.3.8: -- 19/09/2024 --
 ### Agregado o modificado
    - Modificado el registro y el login: a partir de esta actualizacion el usuario que se registre debera colocar username, email y password para poder ingresar. Al momento de mostrar los usuarios se mostrara el username para no revelar datos sensibles como puede ser el email.

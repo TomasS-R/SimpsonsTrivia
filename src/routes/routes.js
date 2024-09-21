@@ -2,7 +2,6 @@ const appfile = require('../app');
 const app = appfile.app;
 const triviaControll = require('../controllers/triviaControllers');
 
-let tasks = [];
 const routeapi = "/triviasimpsons/api/v1";
 
 app.get([routeapi+'/', '/'], (req, res) => {
@@ -19,6 +18,7 @@ app.get(routeapi + '/healthcheck', (req, res) => {
     });
 });
 
+// Login
 app.post(routeapi+'/login', triviaControll.loginUserReq);
 
 // Registro
@@ -33,6 +33,9 @@ app.get(routeapi+'/scores', triviaControll.getUsersScores);
 // Ver preguntas
 app.get(routeapi+'/questions', triviaControll.getQuestionsTrivia);
 
+// Obtener una frase aleatoria con 4 respuestas
+app.get(routeapi+'/random/quote', triviaControll.getQuote);
+
 // Middleware para manejar rutas no encontradas (404)
 app.use((req, res, next) => {
     res.status(404).json({
@@ -42,39 +45,11 @@ app.use((req, res, next) => {
     });
 });
 
-// Crear pregunta
-// app.post(routeapi+'/questions',);
-
 // Actualizar pregunta
 // app.put(routeapi+'/questions/:id',);
 
 // Eliminar pregunta
 // app.delete(routeapi+'/questions/:id',);
 
-// Enviar respuesta
-// app.post(routeapi+'/questions/:id/answer',);
-
-// PUT /task/:id para actualizar una tarea por ID
-app.put('/task/:id', (req, res) => {
-    const id = req.params.id;
-    const task = tasks.find(t => t.id === id);
-    if (task){
-        task.name = req.body.name;
-        res.status(200).json(task);
-    } else {
-        res.status(404).send('Task not found');
-    }
-});
-
-// DELETE /task/:id para eliminar una tarea por ID
-app.delete('/task/:id', (req, res) => {
-    const id = parseInt(req.params.id);
-    const taskindex = tasks.findIndex(t => t.id === id);
-
-    if (taskindex !== -1){
-        tasks.splice(taskindex, 1);
-        res.status(204).send();
-    } else {
-        res.status(404).send('Task not found');
-    }
-});
+// Enviar respuesta a una pregunta específica
+// app.post(routeapi+'/questions/:id/answer', triviaControll.answerQuestion);

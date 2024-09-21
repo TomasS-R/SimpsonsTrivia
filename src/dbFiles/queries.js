@@ -41,48 +41,48 @@ async function createTables(tableName, columns) {
             try {
                 const resCreateTable = await databaseManager.query(createTableQuery);
                 if (resCreateTable.error) {
-                    console.log("Error to create the table "+ tableName+": ",resCreateTable.error);
+                    console.log("❌ Error to create the table "+ tableName+": ",resCreateTable.error);
                 } else {
-                    console.log("Table "+tableName+" created successfully");
+                    console.log("✅ Table "+tableName+" created successfully");
                 }
 
                 // Habilitar la seguridad a nivel de fila en la tabla supabase
                 const enableRLSQuery = `ALTER TABLE ${tableName} ENABLE ROW LEVEL SECURITY`;
                 const resEnableRLS = await databaseManager.query(enableRLSQuery);
                 if (resEnableRLS.error) {
-                    console.log("Error to create the Row level security: ",resEnableRLS.error);
+                    console.log("❌📜 Error to create the Row level security: ",resEnableRLS.error);
                 } else {
-                    console.log('Row level security enabled');
+                    console.log('📜 Row level security enabled');
                 }
 
                 // Add primary key to id
                 const addPrimaryKeyQuery = `ALTER TABLE ${tableName} ADD CONSTRAINT ${tableName}_pkey PRIMARY KEY (id)`;
                 const resPK = await databaseManager.query(addPrimaryKeyQuery);
                 if (resPK.error) {
-                    console.log("Error to create the Row level security: ",resPK.error);
+                    console.log("❌🔑 Error to create the Row level security: ",resPK.error);
                 } else {
-                    console.log('Primary key added');
+                    console.log('🔑 Primary key added');
                 }
 
                 // Agregar las claves foraneas a las tablas que tengan la referencia
                 for (const foreignKeyQuery of foreignKeyQueries) {
                     const resFK = await databaseManager.query(foreignKeyQuery);
                     if (resFK.error) {
-                        console.log("Error to add foreign key: ", resFK.error);
+                        console.log("❌🗝️ Error to add foreign key: ", resFK.error);
                     } else {
-                        console.log('Foreign key added');
+                        console.log('🗝️ Foreign key added');
                     }
                 }
 
             } catch (error) {
-                console.log("Error to create the table: ",error);
+                console.log("⛔ Error to create the table: ",error);
             }
         
         } else {
-            console.log("Table " +tableName+ " already exists");
+            console.log("✅ Table " +tableName+ " already exists");
         }
     } catch (e) {
-        console.log("Error to entablish comunication to supabase:",e);
+        console.log("📵 Error to entablish comunication to supabase:",e);
     }
 }
 
@@ -147,6 +147,24 @@ async function userExists(email) {
     }
 }
 
+// Funcion que obtiene una pregunta aleatoria
+async function getRandomQuestion() {
+    try {
+        const result = await databaseManager.query(`
+            SELECT q.id, q.quote, c.name as correct_character,
+                   (SELECT array_agg(c2.name) FROM ${userTables.tableNameCharacter} c2 WHERE c2.id != q.character_id ORDER BY RANDOM() LIMIT 3) as incorrect_options
+            FROM ${userTables.tableNameQuotes} q
+            JOIN ${userTables.tableNameCharacter} c ON q.character_id = c.id
+            ORDER BY RANDOM()
+            LIMIT 1
+        `);
+        return result.rows[0];
+    } catch (e) {
+        console.log(e);
+        throw e;
+    }
+}
+
 module.exports = {
     createTables,
     verifyTable,
@@ -155,4 +173,5 @@ module.exports = {
     getQuestions,
     createUser,
     userExists,
+    getRandomQuestion,
 }

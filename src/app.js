@@ -11,7 +11,6 @@ const isProduction = process.env.NODE_ENV === 'production';
 
 // Configuración del puerto y host
 const PORT = process.env.PORT || 3000;
-//const HOST = isProduction ? process.env.HOST : 'localhost';
 const HOST = process.env.NODE_ENV === 'production' ? '0.0.0.0' : 'localhost';
 
 
@@ -57,7 +56,7 @@ async function configureApp() {
             app.listen(PORT, () => console.log(`${GREEN}${BOLD}🚀 Servidor en producción corriendo!`));
         } else {
             console.log(`${GREEN}${BOLD}🔧 Estás en modo desarrollo.${RESET}`);
-            app.listen(PORT, () => console.log(`${GREEN}${BOLD}🚀 Servidor de desarrollo corriendo en: http://localhost:${PORT}${RESET}`));
+            app.listen(PORT, () => console.log(`${GREEN}${BOLD}🚀 Servidor de desarrollo corriendo en: http://${HOST}:${PORT}${RESET}`));
         }
     } catch (error) {
         console.error(`${RED}${BOLD}❌ Error: ${error.message}${RESET}`);

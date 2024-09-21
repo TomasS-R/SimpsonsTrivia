@@ -111,6 +111,43 @@ async function getQuestionsTrivia (req, res) {
     }
 };
 
+async function getQuote(req, res) {
+    try {
+        const question = await queries.getRandomQuestion();
+        
+        if (!question) {
+            return res.status(404).json({ success: false, error: "No questions available" });
+        }
+
+        // Mezclar las opciones
+        const allOptions = [question.correct_character, ...question.incorrect_options];
+        // Selecciona 4 opciones de la BD 3 erroneas y 1 correcta
+        if (allOptions.length > 4) {
+            allOptions.splice(4);
+        } else if (allOptions.length < 4) {
+            console.error("Not enough options for question ID:", question.id);
+            return res.status(500).json({ success: false, error: "Not enough options available" });
+        }
+
+        const shuffledOptions = allOptions.sort(() => Math.random() - 0.5);
+
+        res.status(200).json({
+            success: true,
+            data: {
+                id: question.id,
+                quote: question.quote,
+                options: shuffledOptions
+            }
+        });
+
+    } catch (error) {
+        res.status(500).json({
+            success: false,
+            error: error.message,
+        });
+    }
+}
+
 module.exports = {
     validateEmail,
     registerUserReq,
@@ -118,4 +155,5 @@ module.exports = {
     getUsersList,
     getUsersScores,
     getQuestionsTrivia,
+    getQuote,
 };
