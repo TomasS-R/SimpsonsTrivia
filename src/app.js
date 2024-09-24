@@ -2,6 +2,7 @@ const databaseManager = require('./dbFiles/databaseManager');
 const { createTables } = require('./dbFiles/queries');
 const userTables = require('./dbFiles/creatingTables/userTables');
 const express = require('express');
+const os = require('os');
 
 const app = express();
 app.use(express.json());
@@ -53,7 +54,7 @@ async function configureApp() {
         // Mostrar mensajes en la terminal según el entorno
         if (isProduction) {
             console.log(`${RED}${BOLD}⚠️  Advertencia: ¡Estás en modo producción!${RESET}`);
-            app.listen(PORT, () => console.log(`${GREEN}${BOLD}🚀 Servidor en producción corriendo!`));
+            app.listen(PORT, () => console.log(`${GREEN}${BOLD}🚀 Servidor en producción corriendo en ${os.hostname()}${RESET}`));
         } else {
             console.log(`${GREEN}${BOLD}🔧 Estás en modo desarrollo.${RESET}`);
             app.listen(PORT, () => console.log(`${GREEN}${BOLD}🚀 Servidor de desarrollo corriendo en: http://${HOST}:${PORT}${RESET}`));

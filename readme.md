@@ -52,13 +52,17 @@
 
 ### Se usaron diferentes herramientas las cuales son:
 
-- **Servidor:** Node, Express, Nodemon, NPM 
+- **Servidor:** Node, Express, NPM, Axios
+
+- **Local:** Nodemon
 
 - **Base de datos:** Supabase (Postgres)
 
 - **Testing:** Jest
 
 - **Host:** Render
+
+- **Documentacion:** Swagger
 
 </details>
 
@@ -69,6 +73,8 @@
 - [x] Acceder a los diferentes endpoints
 
 - [x] Consultar todos los personajes
+
+- [x] Consultar que frase pertenece a que personaje
 
 - [ ] Posibilidad de jugar, sumar puntos (ranking)
 
@@ -170,7 +176,7 @@ npm test
 ```
 Esto ejecutara los tests que se encuentran dentro de la carpeta tests.
 
-### Dockerfile construccion 🐳
+## Dockerfile construccion 🐳
 Para construir la imagen en modo desarrollo:
 ``` bash 
 docker build -t my-trivia-node-app --target dev .
@@ -180,9 +186,13 @@ Para construir la imagen en modo producción:
 docker build -t my-trivia-node-app --target prod .
 ```
 
-### Ejecutar dockerfile
+### Ejecutar dockerfile 
 ``` bash 
 docker run -p 3000:3000 my-trivia-node-app 
+```
+#### Si quieres que detecte las variables de entorno desde tu pc ejecuta
+``` bash 
+docker run --env-file .env -p 3000:3000 my-trivia-node-app 
 ```
 
 Para construir el docker-compose para modo producción:
@@ -194,7 +204,7 @@ docker-compose up --build
 
 #### En este archivo podras encontrar todo el instructivo relaccionado al proyecto en si.
 
-#### Para mas info del proyecto y comprender mejor el codigo dirigirse a la documantacion correspondiente ->  (proximamente)
+#### Para mas info del proyecto y comprender mejor el codigo dirigirse a la documantacion correspondiente -> (proximamente)
 
 # 🤩 Te gusto el proyecto?
 
