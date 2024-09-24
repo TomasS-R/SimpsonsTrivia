@@ -1,6 +1,7 @@
 const appfile = require('../app');
 const app = appfile.app;
 const triviaControll = require('../controllers/triviaControllers');
+const { swaggerDocument, swaggerUi } = require('./swaggerDocs');
 
 const routeapi = "/triviasimpsons/api/v1";
 
@@ -10,13 +11,7 @@ app.get([routeapi+'/', '/'], (req, res) => {
 });
 
 // Ruta de health check
-app.get(routeapi + '/healthcheck', (req, res) => {
-    res.status(200).json({
-        success: true,
-        message: 'La API está funcionando correctamente',
-        timestamp: new Date().toISOString()
-    });
-});
+app.get(routeapi + '/healthcheck', triviaControll.healthCheck);
 
 // Login
 app.post(routeapi+'/login', triviaControll.loginUserReq);
@@ -34,7 +29,16 @@ app.get(routeapi+'/scores', triviaControll.getUsersScores);
 app.get(routeapi+'/questions', triviaControll.getQuestionsTrivia);
 
 // Obtener una frase aleatoria con 4 respuestas
-app.get(routeapi+'/random/quote', triviaControll.getQuote);
+app.get(routeapi+'/random-quote', triviaControll.getQuote);
+
+// Obtener frases por el id personaje
+app.get(routeapi+'/quotesbycharacter/:characterId', triviaControll.getQuotesByCharacter);
+
+// Obtener personajes
+app.get(routeapi+'/characters', triviaControll.getCharacters);
+
+// Rutas de la API documentada con Swagger usando el archivo apiRoutesDoc.yaml
+app.use(routeapi + '/docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument));
 
 // Middleware para manejar rutas no encontradas (404)
 app.use((req, res, next) => {

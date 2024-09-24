@@ -1,5 +1,20 @@
 # Changelog
 
+# Version 0.4.0: -- /09/2024 --
+### Agregado o modificado
+   - Estado de la api en vivo: a partir de esta version en el archivo [Readme](./readme.md) se podra visualizar el estado de la api, si esta activa o esta caida.
+   - Corregida la ruta /random-quote
+   - Agregada la documentacion via swagger
+   - Se movio el archivo [apiRoutesDoc](./src/routes/apiRoutesDoc.yaml) dentro de la carpeta [routes](./src/routes)
+   - Se creo el archivo [swaggerDocs](./src/routes/swaggerDocs.js) el cual contiene las librerias para correr la documentacion y la conexion con los archivos respectivos.
+   - Se agregaron las dependencias swagger-ui-express y yamljs al proyecto en el archivo [package](./package.json)
+   - Agregada la ruta /quotesbycharacter/:characterId (solicita el id del personaje) se agrego una nueva funcion en [triviaControllers](./src/controllers/triviaControllers.js) y en [queries](./src/dbFiles/queries.js)
+   - Sa agregaron las funciones para obtener los personajes
+   - Agregada la ruta /characters para obtener todos los personajes con su respectivo id
+
+### Eliminado
+   - Se quito un test repetido
+
 # Version 0.3.9: -- 20/09/2024 --
 ### Agregado o modificado
    - Mejorado los logs de la conexion a la base de datos agregados emojis para una mejora visual

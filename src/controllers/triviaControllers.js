@@ -148,6 +148,97 @@ async function getQuote(req, res) {
     }
 }
 
+async function healthCheck(req, res) {
+    res.status(200).json({
+        success: true,
+        message: 'La API está funcionando correctamente',
+        timestamp: new Date().toISOString()
+    });
+}
+
+async function getQuotesByCharacter(req, res) {
+    try {
+        const characterId = parseInt(req.params.characterId);
+        
+        if (isNaN(characterId)) {
+            return res.status(400).json({
+                success: false,
+                message: 'Character ID must be a number'
+            });
+        }
+
+        const result = await queries.getQuotesByCharacter(characterId);
+        
+        if (!result) {
+          return res.status(404).json({
+              success: false,
+              message: `Character with ID ${characterId} does not exist`
+          });
+        }
+
+        if (result.quotes.length === 0) {
+          return res.status(404).json({
+            success: false,
+            message: `No quotes found for character ${result.character.name}`
+          });
+        }
+
+        // Convertir el array de quotes en un objeto con el indice como clave
+        const quotesObject = result.quotes.reduce((acc, quote, index) => {
+          acc[index + 1] = {
+              id: quote.id,
+              quote: quote.quote
+          };
+          return acc;
+      }, {});
+
+        res.json({
+          success: true,
+          data: {
+            character: result.character.name,
+            quotes: quotesObject
+          }
+        });
+    } catch (error) {
+        console.error('Error getting quotes by character:', error);
+        res.status(500).json({
+          success: false,
+          message: 'Error getting quotes by character'
+        });
+    }
+};
+
+const getCharacters = async (req, res) => {
+    try {
+      const characters = await queries.getCharacters();
+      console.log(characters);
+      
+      if (characters.length === 0) {
+        return res.status(404).json({
+            success: false,
+            message: "No characters found"
+        });
+      }
+
+      const charactersArray = characters.map(character => ({
+        id: character.id,
+        name: character.name
+      }));
+
+      res.status(200).json({
+        success: true,
+        data: charactersArray
+      });
+    } catch (error) {
+      console.error('Error getting characters:', error);
+      res.status(500).json({
+        success: false,
+        message: "Error getting characters",
+        error: error.message
+      });
+    }
+};
+
 module.exports = {
     validateEmail,
     registerUserReq,
@@ -156,4 +247,7 @@ module.exports = {
     getUsersScores,
     getQuestionsTrivia,
     getQuote,
+    healthCheck,
+    getQuotesByCharacter,
+    getCharacters
 };

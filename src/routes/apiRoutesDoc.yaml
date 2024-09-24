@@ -2,7 +2,7 @@ openapi: 3.0.0
 servers:
   # Added by API Auto Mocking Plugin
   - description: API Simpsons Trivia
-    url: http://localhost:3000/api-docs/
+    url: http://https://simpsons-trivia.onrender.com/docs/
 info:
   description: This is a simple API of Simpsons Trivia
   version: "1.0"

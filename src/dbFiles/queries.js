@@ -165,6 +165,50 @@ async function getRandomQuestion() {
     }
 }
 
+// Función que obtiene las frases de un personaje específico
+async function getQuotesByCharacter(characterId) {
+    try {
+        const characterResult = await databaseManager.query(`
+            SELECT id, name
+            FROM ${userTables.tableNameCharacter}
+            WHERE id = $1
+        `, [characterId]);
+
+        // Si no se encuentra el personaje, se retorna null
+        if (characterResult.rows.length === 0) {
+            return null;
+        }
+
+        // Se obtiene el nombre del personaje
+        const character = characterResult.rows[0];
+
+        // Se obtiene las frases del personaje
+        const quotesResult = await databaseManager.query(`
+            SELECT id, quote
+            FROM ${userTables.tableNameQuotes}
+            WHERE character_id = $1
+        `, [characterId]);
+
+        return {
+            character: character,
+            quotes: quotesResult.rows
+        };
+    } catch (e) {
+        console.log("Error al obtener frases por personaje:", e);
+        throw e;
+    }
+}
+
+// Funcion que obtiene los personajes de la bd
+async function getCharacters() {
+    try {
+        const result = await databaseManager.query(`SELECT id, name FROM ${userTables.tableNameCharacter}`);
+        return result.rows;
+    } catch (e) {
+        console.log(e);
+    }
+}
+
 module.exports = {
     createTables,
     verifyTable,
@@ -174,4 +218,6 @@ module.exports = {
     createUser,
     userExists,
     getRandomQuestion,
+    getQuotesByCharacter,
+    getCharacters
 }

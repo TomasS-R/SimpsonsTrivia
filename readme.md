@@ -28,9 +28,15 @@
 
 # 🤓 Objetivo
 
-### Implementar diferentes herramientas en un proyecto que contemple el correcto funcionamiento de un servicio en la nube.
+### Implementar diferentes herramientas en un proyecto que contemple el correcto funcionamiento del servicio, el cual sea alojado en la nube.
 
-### Esto nos va a servir para poder controlar y verificar el funcionamiento del mismo asi como tambien analizar las metricas, los testeos entre tantas otras cosas
+### Esto nos va a servir para poder controlar y verificar el funcionamiento del mismo asi como tambien analizar las metricas, los testeos, manejo de CI/CD, creacion y configuracion de archivos docker.
+
+# 🔑 Acceso a la api - ![API Status](https://img.shields.io/endpoint?url=https://check-api-status-simpsons.tomas-saintromain.workers.dev/)
+
+### Podes acceder a la api a travez del siguiente [link](https://simpsons-trivia.onrender.com/)
+
+#### En la documentacion podras encontrar mas informacion sobre que rutas estan disponibles para consultar y/o realizar solicitudes.
 
 # 🙋‍♂️ Preguntas y Respuestas
 
