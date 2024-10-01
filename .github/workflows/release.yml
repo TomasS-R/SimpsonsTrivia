@@ -18,7 +18,7 @@ jobs:
 
       # 2. Extraer la sección correspondiente del CHANGELOG.md
       - name: Extract changelog section
-        id: changelog
+        id: extract_changelog
         run: |
           # Obtener la versión del tag (remover "refs/tags/")
           VERSION=${GITHUB_REF/refs\/tags\//}
@@ -36,3 +36,7 @@ jobs:
           body: $(cat RELEASE_NOTES.md)  # Contenido extraído del changelog
           draft: true
           prerelease: false
+          
+      - name: Set release notes output
+        id: changelog
+        run: echo "::set-output name=body::$(< RELEASE_NOTES.md)"
