@@ -1,21 +1,13 @@
 # Changelog
 
-## Version 0.4.9d: - 2024-09-30 -
+## Version 0.5.0: - 2024-09-30 -
 
 ### Modificado
-   - Commit de correccion del archivo [release](.github/workflows/release.yml)
+   - Se corrigio el error que se producia al iniciar la aplicacion al ejecutar node src/app.js y hacia que se cayera a los minutos de haber realizado el deploy. Archivo [package](package.json).
+   - Configuracion de passport mejorada y arreglada en [passportConfig](./src/account/passportConfig.js).
+   - Inicializado passport al correr la aplicacion en [app](./src/app.js).
 
-## Version 0.4.9a: - 2024-09-30 -
-
-### Modificado
-   - Commit de correccion del archivo [release](.github/workflows/release.yml)
-
-## Version 0.4.9c: - 2024-09-30 -
-
-### Modificado
-   - Commit de correccion del archivo [release](.github/workflows/release.yml)
-
-## Version 0.4.9b: - 2024-09-30 -
+## Version 0.4.9d, 0.4.9b, 0.4.9a y 0.4.9c: - 2024-09-30 -
 
 ### Modificado
    - Commit de correccion del archivo [release](.github/workflows/release.yml)
@@ -25,12 +17,7 @@
 ### Modificado
    - Nombre del archivo changelog a CHANGELOG
 
-## Version 0.4.8: - 2024-09-30 -
-
-### Modificado
-   - Commit de correccion del archivo [release](.github/workflows/release.yml)
-
-## Version 0.4.7: - 2024-09-30 -
+## Version 0.4.8, 0.4.7, 0.4.5 y 0.4.4: - 2024-09-30 -
 
 ### Modificado
    - Commit de correccion del archivo [release](.github/workflows/release.yml)
@@ -40,16 +27,6 @@
 ### Modificado
    - Commit de correccion del archivo [release](.github/workflows/release.yml)
    - Ruta host del servidor
-
-## Version 0.4.5: - 2024-09-30 -
-
-### Modificado
-   - Commit de correccion del archivo [release](.github/workflows/release.yml)
-
-## Version 0.4.4: - 2024-09-30 -
-
-### Modificado
-   - Commit de correccion de releases
 
 ## Version 0.4.3: - 2024-09-30 -
 

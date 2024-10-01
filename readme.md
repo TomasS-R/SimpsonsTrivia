@@ -113,7 +113,7 @@ npm install
 
 ### Correr el proyecto en local:
 ``` bash
-nodemon --env-file .env src/routes/routes.js
+nodemon --env-file=.env src/app.js
 ```
 ### O tambien puedes usar:
 ``` bash

@@ -5,6 +5,12 @@ const ExtractJWT = require('passport-jwt').ExtractJwt;
 const bcrypt = require('bcryptjs');
 const queries = require('../dbFiles/queries');
 
+// Verifica si JWT_SECRET está definido
+if (!process.env.JWT_SECRET) {
+  console.error('JWT_SECRET is not defined, please configure this envoirment variable.');
+  process.exit(1);
+}
+
 passport.use(new LocalStrategy({
     usernameField: 'email',
     passwordField: 'password'
@@ -42,3 +48,5 @@ passport.use(new JWTStrategy({
     }
   }
 ));
+
+module.exports = passport;
