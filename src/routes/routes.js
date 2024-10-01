@@ -12,7 +12,8 @@ const routeapi = "/triviasimpsons/api/v1";
 app.use(routeapi, securityRoutes.apiLimiter);
 
 app.get([routeapi+'/', '/'], (req, res) => {
-    const LinkDocs = `<a href="${appfile.hostname}${routeapi}/docs">${appfile.hostname}${routeapi}/docs</a>`
+    const hostname = appfile.hostname || req.get('host');
+    const LinkDocs = `<a href="${hostname}${routeapi}/docs">${hostname}${routeapi}/docs</a>`
     res.send(`English:<br>Welcome to the Simpsons Trivia API, you can test the api if you want, go to ${LinkDocs} to see all the routes
         <br><br>Spanish:<br>Bienvenido a la API Trivia de los Simpsons, puedes probar la api si quieres, ve a ${LinkDocs} para ver todas las rutas disponibles`);
 });
