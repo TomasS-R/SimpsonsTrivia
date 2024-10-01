@@ -1,5 +1,11 @@
 # Changelog
 
+## Version 0.4.3: - 2024-09-30 -
+
+### Modificado
+   - Archivo de [release](.github/workflows/release.yml).
+   - La ruta al ingresar a la home de la api.
+
 ## Version 0.4.2: - 2024-09-30 -
 
 > [!IMPORTANT]
