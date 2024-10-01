@@ -1,5 +1,10 @@
 # Changelog
 
+## Version 0.4.4: - 2024-09-30 -
+
+### Modificado
+   - Commit de correccion de releases
+
 ## Version 0.4.3: - 2024-09-30 -
 
 ### Modificado
