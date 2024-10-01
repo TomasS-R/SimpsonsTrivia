@@ -4,12 +4,15 @@ const userTables = require('./dbFiles/creatingTables/userTables');
 const express = require('express');
 const cors = require('cors');
 const passport = require('passport');
+const { setupRoutes } = require('../src/routes/routes');
+const securityRoutes = require('../src/routes/securityRoutes')
 
 const app = express();
 app.use(cors());
 app.use(express.json());
 
 app.use(passport.initialize());
+app.use(securityRoutes.apiLimiter);
 
 // Determinar el entorno
 const isProduction = process.env.NODE_ENV === 'production';
@@ -18,6 +21,9 @@ const isProduction = process.env.NODE_ENV === 'production';
 const PORT = process.env.PORT || 3000;
 const HOST = isProduction ? '0.0.0.0' : 'localhost';
 const hostname = isProduction ? process.env.URLHOST : `http://localhost:${PORT}`;
+
+// Importa y configura las rutas
+setupRoutes(app, hostname);
 
 // Colores para mensajes en la terminal
 const RESET = '\x1b[0m';
@@ -71,7 +77,11 @@ async function configureApp() {
 
 configureApp();
 
+process.on('SIGINT', () => {
+    console.log('Shutting out the aplication...');
+    process.exit(0);
+});
+
 module.exports = {
     app,
-    hostname
 };

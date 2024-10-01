@@ -1,5 +1,16 @@
 # Changelog
 
+## Version 0.5.3: - 2024-10-01 -
+
+### Modificado
+   - Modificado el archivo [app.js](./src/app.js) para su correcto deploy.
+   - Reconfigurado el archivo [routes](./src/routes/routes.js) para un mejor manejo y evitar problemas en el deploy
+
+## Version 0.5.2: - 2024-10-01 -
+
+### Modificado
+   - Redeploy en render
+
 ## Version 0.5.1: - 2024-10-01 -
 
 ### Modificado
