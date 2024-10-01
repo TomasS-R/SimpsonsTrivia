@@ -1,6 +1,6 @@
 {
   "name": "proyecto-devops",
-  "version": "0.4.9",
+  "version": "0.4.9b",
   "description": "Proyecto universitario para devops",
   "main": "../src/routes/routes.js",
   "scripts": {

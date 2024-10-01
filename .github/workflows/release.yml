@@ -32,8 +32,8 @@ jobs:
           echo "Extracted content:"
           echo "${{ steps.extract_changelog.outputs.CHANGELOG_CONTENT }}"
 
-      - name: Debug - Show CHANGELOG.md content
-        run: cat CHANGELOG.md
+      - name: Debug - Show changelog.md content
+        run: cat changelog.md
 
       - name: Create GitHub release
         uses: actions/create-release@v1
