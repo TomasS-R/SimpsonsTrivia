@@ -14,16 +14,19 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       # 1. Clonar el repositorio
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
 
       # 2. Extraer la sección correspondiente del CHANGELOG.md
       - name: Extract changelog section
         id: extract_changelog
         run: |
           # Obtener la versión del tag (remover "refs/tags/")
-          VERSION=${GITHUB_REF/refs\/tags\//}
-          # Extraer la sección del changelog para esa versión
+          VERSION=${GITHUB_REF#refs/tags/v}
+          echo "Extracting changelog for version $VERSION"
           sed -n "/## Version $VERSION:/,/^## Version/p" CHANGELOG.md | sed '$d' > RELEASE_NOTES.md
+          echo "RELEASE_NOTES<<EOF" >> $GITHUB_ENV
+          cat RELEASE_NOTES.md >> $GITHUB_ENV
+          echo "EOF" >> $GITHUB_ENV
 
       # 3. Crear el release en GitHub con la sección extraída del changelog
       - name: Create GitHub release
@@ -33,11 +36,6 @@ jobs:
         with:
           tag_name: ${{ github.ref }}  # El nombre del tag (por ejemplo, v1.0.1)
           release_name: Release ${{ github.ref }}  # Nombre del release
-          body: |
-            $(cat RELEASE_NOTES.md)  # Contenido extraído del changelog
+          body: ${{ env.RELEASE_NOTES }}  # Contenido extraído del changelog
           draft: true
           prerelease: false
-          
-      - name: Set release notes output
-        id: changelog
-        run: echo "::set-output name=body::$(< RELEASE_NOTES.md)"
