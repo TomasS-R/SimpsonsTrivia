@@ -1,6 +1,7 @@
 const queries = require('../dbFiles/queries');
 const accountRegister = require('../account/register');
 const accountLogin = require('../account/login');
+const rolesManager = require('../account/roles/rolesManager')
 
 // Funcion para validar el email
 function validateEmail(email) {
@@ -11,7 +12,8 @@ function validateEmail(email) {
 // Funcion para registrar un usuario
 async function registerUserReq (req, res) {
   try {
-      const { email, username, password, role } = req.body;
+      const { email, username, password } = req.body;
+      const defaultRole = rolesManager.getDefaultRole();
 
       if (!email) {
         return res.status(400).json({ success: false, error: "The request needs the 'email' field!" });
@@ -25,18 +27,69 @@ async function registerUserReq (req, res) {
       else if (!password) {
         return res.status(400).json({ success: false, error: "The request needs the 'password' field!" });
       }
-      else if (!username || !password || !email) {
-        return res.status(400).json({ success: false, error: "The request need 'email', 'username' and 'password' fields!" });
-      }
-      accountRegister.registerUser(username, email, password, role, res);
+      accountRegister.registerUser(username, email, password, defaultRole, res);
   }
   catch (e) {
       console.log(e);
   }
 };
 
+// Función para que un usuario con rol superior cambie el rol de otro usuario
+async function changeUserRole(req, res) {
+  try {
+    const { userId } = req.params;
+    const { newRole } = req.body
+    const changerRole = req.user.role; // El rol del usuario que intenta hacer el cambio
+
+    if (!userId) {
+      return res.status(400).json({ success: false, error: "User ID is required" });
+    }
+
+    if (!newRole || !rolesManager.isValidRole(newRole)) {
+      return res.status(400).json({ success: false, error: "Invalid new role" });
+    }
+
+    // Obtener el usuario cuyo rol se va a cambiar
+    const userToChange = await queries.getUserById(userId);
+    if (!userToChange) {
+      return res.status(404).json({ success: false, error: "User not found" });
+    }
+
+    // Verificar si el usuario que hace el cambio tiene un rol superior al usuario a cambiar
+    if (rolesManager.getRoleHierarchy(changerRole) < rolesManager.getRoleHierarchy(userToChange.role)) {
+      return res.status(403).json({ success: false, error: "You don't have permission to change this user's role" });
+    }
+
+    // Verificar si el usuario que hace el cambio tiene un rol superior al nuevo rol
+    if (rolesManager.getRoleHierarchy(changerRole) < rolesManager.getRoleHierarchy(newRole)) {
+      return res.status(403).json({ success: false, error: "You don't have permission to assign this role" });
+    }
+
+    // Obtener rol actual
+    const currentRole = await queries.getUserRole(userId);
+
+    // Cambiar el rol del usuario
+    const newRoleUser = await queries.changeUserRole(userId, newRole);
+
+    res.status(200).json({ 
+      success: true, 
+      message: `User role updated successfully!`,
+      user: {
+        id: newRoleUser.id,
+        name: newRoleUser.username,
+        email: newRoleUser.email,
+        previousRole: currentRole.role,
+        newRole: newRoleUser.role
+      }
+    });
+  } catch (e) {
+    console.log(e);
+    res.status(500).json({ success: false, error: "An error occurred while changing the user role" });
+  }
+}
+
 // Funcion para loguear un usuario
-async function loginUserReq (req, res) {
+async function loginUserReq (req, res, next) {
   try {
       const { email, password } = req.body;
       const fields = Object.keys(req.body);
@@ -54,13 +107,11 @@ async function loginUserReq (req, res) {
       else if (!password) {
           return res.status(409).json({ success: false, error: "The request needs the 'password' field!" });
       }
-      else if (!email || !password) {
-          return res.status(409).json({ success: false, error: "The request need 'email' and 'password' fields!" });
-      }
-      accountLogin.loginUser(email, password, res);
+      await accountLogin.loginUser(req, res, next);
   }
   catch (e) {
       console.log(e);
+      next(e);
   }
 };
 
@@ -196,6 +247,7 @@ async function getQuotesByCharacter(req, res) {
           success: true,
           data: {
             character: result.character.name,
+            totalQuotes: result.totalQuotes,
             quotes: quotesObject
           }
         });
@@ -211,7 +263,6 @@ async function getQuotesByCharacter(req, res) {
 const getCharacters = async (req, res) => {
     try {
       const characters = await queries.getCharacters();
-      console.log(characters);
       
       if (characters.length === 0) {
         return res.status(404).json({
@@ -243,6 +294,7 @@ module.exports = {
     validateEmail,
     registerUserReq,
     loginUserReq,
+    changeUserRole,
     getUsersList,
     getUsersScores,
     getQuestionsTrivia,

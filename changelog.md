@@ -1,5 +1,36 @@
 # Changelog
 
+## Version 0.4.2: - 2024-09-30 -
+
+> [!IMPORTANT]
+> A partir de esta actualizacion se trabajara en obtener metricas usando sentry y se mejorara la seguridad de la api para hacerla mas robusta en cuestiones de seguridad.
+
+### Agregado
+   - Dependencias eslint, @eslint/js, globals, express-rate-limit, passport, passport-jwt y passport-local en [package](./package.json)
+   - Se creo el archivo [eslint](eslint.config.mjs) el cual contiene la configuracion de eslint para el proyecto.
+   - Instalada la dependencia CORS para realizar solicitudes sin problema.
+   - Configurado CORS en el archivo [app](./src/app.js).
+   - El comando npm lint al archivo [Workflows](./.github/workflows/node.js.yml).
+   - Mas de 350 [frases](./src/scrapQuotes/quotes_simpson.csv) añadidas al archivo.
+   - Archivo [passportConfig](./src/account/passportConfig.js) para la autenticacion y proteccion de rutas.
+   - Se limitaron la cantidad de solicitudes a realizar para controlar mejor la seguridad de la api.
+   - Se crearon las funciones [getUserByEmail](./src/dbFiles/queries.js) y [getUserById](./src/dbFiles/queries.js) para la autenticacion mediante passport.
+   - Archivo [securityRoutes](./src/routes/securityRoutes.js) para manejar la seguridad de las rutas adecuadamente.
+   - Medidas de fuerza bruta y limites de intentos a las rutas para evitar colapsar la api.
+   - Archivo [release](.github/workflows/release.yml) que se encarga de hacer una release automaticamente cuando el commit contiene un tag asignado, el workflow se encarga de colocar la ultima version del changelog en la release.
+   - URLHOST en las variables de entorno del archivo [env](.env).
+   - Sistema de roles, se creo un sistema basado en roles para poder acceder a diferentes puntos de los endpoints, el sistema es jerarquico y se implementaron medidas de seguridad adicionales a las rutas.
+   - Archivo [rolesManager](./src/account/roles/rolesManager.js) clase que se encarga de manejar los roles, asi como tambien las comprobaciones y jerarquia.
+   - Archivo [roleMiddleware](./src/account/roles/roleMiddleware.js) se encarga de comprobar si el usuario tiene o no los permisos necesarios para poder realizar consultas/cambios.
+
+### Modificado
+   - Ahora al solicitar las frases por personaje mostrara la cantidad total de frases que tiene ese determinado personaje.
+   - Readme correcciones varias y agregados nueva info
+   - Se modificaron los archivos los cuales eslint sugeria arreglos o configuraciones adicionales
+   - Se arreglaron nombres de personajes
+   - Se optimizo el archivo [Docker](./Dockerfile)
+   - Se mejoro el archivo de la documentacion de [swagger](./src/routes/apiRoutesDoc.yaml)
+
 ## Version 0.4.1: - 2024-09-24 -
 ### Modificado
    - Se mejoro el changelog siguiendo las recomendaciones de [Keepachangelog](https://keepachangelog.com/es-ES)

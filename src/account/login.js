@@ -1,55 +1,55 @@
-const queries = require('../dbFiles/queries');
+const passport = require('passport');
 const jwt = require('jsonwebtoken');
-const bcryptjs = require('bcryptjs');
 
-async function loginUser(email, password, res){
-    try {
-        // Verificar si el usuario existe
-        const result = await queries.userExists(email);
-
-        if (result.rows.length === 0) {
-            return res.status(400).json({
+async function loginUser(req, res, next) {
+    passport.authenticate('local', {session: false}, (err, user, info) => {
+        if (err) {
+            console.error('Error in the authentication:', err);
+            return res.status(500).json({
                 success: false,
-                error: "User not found",
+                error: 'Internal server error',
+            });
+        }
+        
+        if (!user) {
+            return res.status(401).json({
+                success: false,
+                error: info ? info.message : 'Invalid credentials',
             });
         }
 
-        const user = result.rows[0];
-
-        // Validar la contraseña
-        const validPassword = await bcryptjs.compare(password, user.password_hash);
-        if (!validPassword) {
-            return res.status(400).json({
-                success: false,
-                error: "Invalid password",
-            });
-        }
-        // Generar el token JWT
-        const token = jwt.sign(
-            { id: user.id, email: user.email, role: user.role },
-            process.env.JWT_SECRET,
-            { expiresIn: '1h' }
-        );
-
-        res.status(200).json({
-            success: true,
-            token: token,
-            user: {
-                id: user.id,
-                email: user.email,
-                username: user.username,
-                role: user.role
+        req.login(user, {session: false}, (err) => {
+            if (err) {
+                console.error('Error in req.login:', err);
+                return res.status(500).json({
+                    success: false,
+                    error: 'Error to login',
+                });
             }
-        });
 
-    }
-    catch (e) {
-        console.log(e);
-        res.status(500).json({
-            success: false,
-            error: e.message,
+            const token = jwt.sign(
+                { id: user.id, email: user.email, role: user.role },
+                process.env.JWT_SECRET,
+                { expiresIn: '1h' }
+            );
+
+            const responseData = {
+                success: true,
+                user: {
+                    id: user.id,
+                    email: user.email,
+                    username: user.username,
+                    role: user.role
+                }
+            };
+
+            if (user.role === 'admin') {
+                responseData.token = token;
+            }
+
+            return res.status(200).json(responseData)
         });
-    }
+    })(req, res, next);
 }
 
 module.exports = {

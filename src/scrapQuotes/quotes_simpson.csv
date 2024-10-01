@@ -1,7 +1,7 @@
 "id","quote","character_id"
 1,"¡Que elegancia la de Francia!",2
 2,"¡Estúpido y Sensual Flanders!",2
-3,"¡¿Alguien quiere pensar en los niños, por favor?!",3
+3,"¡¿Alguien quiere pensar en los niños?!",3
 4,"¡No vives de ensalada!",2
 5,"¡Por favor, no me comas! Tengo mujer e hijos. ¡Cómetelos a ellos!",2
 6,"Para mentir se necesitan dos personas: una que mienta y otra que crea",2
@@ -13,7 +13,7 @@
 12,"¡No se rían de mí, pueden tener un hijo igual!",5
 13,"Oye, oye, despacio, cerebrito",6
 14,"Lisa, cuando no te gusta tu trabajo, no haces huelga. Simplemente vas todos los días y haces todo de mala gana",2
-15,"Yo si estaba en onda Pero luego cambiaron la onda Ahora la onda que traigo no es onda, Y la onda de onda me parece muy mala onda. Y te va a pasar a ti…",7
+15,"Yo si estaba en onda Pero luego cambiaron la onda Ahora la onda que traigo no es onda, Y la onda de onda me parece muy mala onda. Y te va a pasar a ti...",7
 16,"¿Qué te pasó, viejo? Antes eras chévere",1
 17,"No lloren por mí, yo ya estoy muerto",8
 18,"Te amo cerveza y a ti Marge que me das cerveza",2
@@ -30,7 +30,7 @@
 29,"¡Milhouse, dile a Bart que venga aquí!",2
 30,"Pequeño demonio",2
 31,"Perfectirijillo",10
-32,"Es como si no llevará nada puesto",10
+32,"Es como si no llevará nada puesto... nada puesto... NADA PUESTO...",10
 33,"¡Me quiero volver chango!",2
 34,"Ja, ja!",11
 35,"Ya te ví, Homero, es muy bonito",12
@@ -54,7 +54,7 @@
 53,"Casi me muero",19
 54,"Creí que eramos amigos",19
 55,"Alabado, es la grosería más fuerte que he oído",10
-56,"Soy intelectual, muy inteligente, ay que bonito soy",2
+56,"Soy intelectual, muy inteligente, soy intelectual, muy inteligente, ¡Ay que bonito soy! ",2
 57,"A ver, a ver, ¿qué pasó?",21
 58,"Olvídelo amigo, olvídelo amigo",2
 59,"Eres cruel pero justo",2
@@ -72,7 +72,7 @@
 71,"Pero no soy malo, trabajo mucho y quiero mucho a mis hijos. Por qué voy a pasar la mitad del domingo oyendo que me voy a ir al infierno.",2
 72,"Retiren la piedra de la vergüenza… y pónganle la piedra del triunfo",25
 73,"Dile que chupe limón",26
-74,"Hola, soy el señor Bolainas y vendo de… eh… un lugar muy lejano",27
+74,"Hola, soy el señor Bolainas y vengo de… eh… un lugar muy lejano",27
 75,"Simpson usted es diabólico",28
 76,"Faltó el bebé, faltó el ciego",6
 77,"¿Cómo lo supo?",2
@@ -111,254 +111,893 @@
 110,"Me dijo algo malo ¿qué fue? ¿qué fue?, Me dijo lento. Me dijeron lento.",2
 111,"Esto se va a poner feo",2
 112,"Matanga dijo la changa",2
-113, "Ahh, soy un pastelito horneado de canela",2
-114, "¡Matanga!",2
-115, "¡Ahhhh! ¿que se le va a hacer?",2
-116, "¡Eso digo yo... pero así está la cosa!",2
-117, "He llegado a odiar mi propia creación, ahora se cómo se siente Dios",2
-118, "¡Qué bien, a cenar!; la pausa perfecta entre el trabajo y la ebriedad",2
-119, "!Alá, Jesús, Buda... los amo a todos!",2
-120, ¡Qué suerte Marge!, nuestros hijos son cada vez más inteligentes, si tenemos otro podría construir una máquina del tiempo para viajar al pasado y no tener hijos",2
-121, ¡Que feo canta que no hay Dragon ball Z!,2
-122, "Por favor, no me coma señor extraterrestre, tengo una esposa y tres hijos..., cómaselos a ellos",2
-123, "¿Un Gym?¿Qué es un gym? ¡Ah, un gym!",2
-124, "Moe, sírveme algo fuerte como para olvidar que las odio (a sus cuñadas), pero no tanto como para creer que las quiero",2
-125, "Ese molino deja de funcionar pero mi cerebro no... lo hace",2
-126, "En mi familia somos 5 personas: Marge, Bart, la niña Bart, la que nunca habla y el tipo gordo, como lo desprecio",2
-127, ,
-128, ,
-129, ,
-130, ,
-131, ,
-132, "No voy a ignorar a papá por el resto de mi vida; sólo lo voy a ignorar por el resto de su vida",2
-133, "¡Oh, no! la madre de mis hijos con la razón de mis hijos!",2
-134, "¡Ella conoce mi única debilidad, ser débil!",2
-135, ,
-136, ,
-137, ,
-138, ,
-139, ,
-140, ,
-141, ,
-142, ,
-143, "A diferencia del amor, el respeto no se compra",2
-144, "Marge, eres tan hermosa como la Princesa Leia y tan inteligente como Yoda",2
-145, "Marge, cuando tú no puedes acabarte un sándwich, yo me como ese sándwich",2
-146, "Lisa, ya sé que soy tu papá, pero cuando crezca quiero ser como tú",2
-147, ,
-148, ,
-149, ,
-150, ,
-151, ,
-152,"¡D'oh!",2
-153,"¡Ya-hoo!",2
-154,"¡Eres un...!",2
-155,"¡Estúpido Flanders!",2
-156,"¡Me aburro!",2
-157,"¡Vete a tu cuarto!",2
-158,"*****: Oyee, ¿significa que seré un fracasado?. *****: SI, hijo. UN FRACASADO ESPECTACULAR",2
-159,"Hmmmm chocolate... Hmmmm cola invisible... Hmmmm la rosca prohibida... Hmmmm sacrilegioso... Hmmmm croquetas... Hmmmm merengue... Hmmmm lo que sea!",2
-160,"Marge...yo soy distinto a otros hombres... por eso compras mis pantalones en un tienda especial.",2
-161,"La televisión da mucho y pide poco.",2
+113,"Ahh, soy un pastelito horneado de canela",2
+114,"¡Matanga!",2
+115,"¡Ahhhh! ¿que se le va a hacer?",2
+116,"¡Eso digo yo... pero así está la cosa!",2
+117,"He llegado a odiar mi propia creación, ahora se cómo se siente Dios",2
+118,"¡Qué bien, a cenar!; la pausa perfecta entre el trabajo y la ebriedad",2
+119,"!Alá, Jesús, Buda... los amo a todos!",2
+120,"¡Qué suerte Marge!, nuestros hijos son cada vez más inteligentes, si tenemos otro podría construir una máquina del tiempo para viajar al pasado y no tener hijos",2
+121,"¡Que feo canta que no hay Dragon ball Z!",2
+122,"Por favor, no me coma señor extraterrestre, tengo una esposa y tres hijos..., cómaselos a ellos",2
+123,"¿Un Gym? ¿Qué es un gym? ¡Ah, un gym!",2
+124,"Moe, sírveme algo fuerte como para olvidar que las odio (a sus cuñadas), pero no tanto como para creer que las quiero",2
+125,"Ese molino deja de funcionar pero mi cerebro no... lo hace",2
+126,"En mi familia somos 5 personas: Marge, Bart, la niña Bart, la que nunca habla y el tipo gordo, como lo desprecio",2
+127,"¡Ay, caramba!",1
+128,"No voy a ignorar a papá por el resto de mi vida; sólo lo voy a ignorar por el resto de su vida",2
+129,"Multiplicate por cero.",1
+130,"¡Oh, no! la madre de mis hijos con la razón de mis hijos!",2
+131,"¡De pelos!",1
+132,"¡Ella conoce mi única debilidad, ser débil!",2
+133,"Cowabunga",1
+134,"A diferencia del amor, el respeto no se compra",2
+135,"¡Yo no fui!",1
+136,"Marge, eres tan hermosa como la Princesa Leia y tan inteligente como Yoda",2
+137,"¡Besa mi trasero amarillo!",1
+138,"Marge, cuando tú no puedes acabarte un sándwich, yo me como ese sándwich",2
+139,"Cómete mis pantalones",1
+140,"Lisa, ya sé que soy tu papá, pero cuando crezca quiero ser como tú",2
+141,"Upss...!!!",1
+142,"¡D'oh!",2
+143,"Tope!",1
+144,"¡Ya-hoo!",2
+145,"!Changos!",1
+146,"¡Eres un...!",2
+147,"!Órale!",1
+148,"¡Estúpido Flanders!",2
+149,"Apestas como mi trasero ( a Bob Patiño).",1
+150,"¡Me aburro!",2
+151,"Este es el tipo que nos creo",1
+152,"¡Vete a tu cuarto!",2
+153,"Así tienes más de donde agarrar.",1
+154,"*****: Oyee, ¿significa que seré un fracasado?. *****: SI, hijo. UN FRACASADO ESPECTACULAR",2
+155,"Los ricos no son felices. Desde el día en que nacen, hasta el día en que mueren, creen que son felices. Más créeme... no lo son.",4
+156,"Hmmmm chocolate... Hmmmm cola invisible... Hmmmm la rosca prohibida... Hmmmm sacrilegioso... Hmmmm croquetas... Hmmmm merengue... Hmmmm lo que sea!",2
+157,¡Mmmhhh! (con acento de enfadado),5
+158,"Marge...yo soy distinto a otros hombres... por eso compras mis pantalones en un tienda especial.",2
+159,"¡Bart, deja de molestar a Satanás!",5
+160,"La televisión da mucho y pide poco.",2
+161,"Central, aquí el ***** ***** en persecución de las mujeres rebeldes. Estoy en una carretera… eh… parece de asfalto… eh… pues hay árboles, arbustos y está directo bajo el sol… ahora.",6
 162,"Si Bart es El Barto, ¡yo puedo ser El Homo!",2
-162,"Bart, Lisa, aquí hay 50 dólares: vayan al cine, luego a casa de sus tías Patty y Selma y quédense ahí hasta que los llame",2
+162,"¡¡¡¡¡Matlock!!!!!",7
 163,"Papá, te quiero, pero eres un viejo mañoso y no le caes bien a nadie",2
-164,"¡Hola, cinta (caminadora)! ¿Qué opinas de ESTA inclinación?",2
+164,"No se ofenda señora pero usted no sabe ni papa. (a Helen Alegria)",2
 165,"¡Ay, no, no, no... si no lo veo no es ilegal!",2
-166,"Marge, voy a la Taberna; lleva a los niños con los vecinos, voy a volver jala'o",2
+166,"Porque lo importante es que un hombre te... ¿cómo es que llegaron huellas de puerco al techo?",5
 167,"Bart, con esos 10.000 dólares seríamos millonarios y podríamos comprar todo tipo de cosas útiles como... ¿amor?",2
-168,"Ya me conoces, Marge, me gusta la cerveza fría, la tele fuerte y los homosexuales, ¡Locas, locas... siiiii!",2
+168,"Aquí Papá Oso, envíen un boletín de sospechoso varón huyendo en un… auto de cierta marca, con dirección hacia… eh… donde venden hamburguesas. El sospechoso no tiene sombrero, repito, sin sombrero.",6
 169,"Tuve que llevar a la niñera a su casa y vi que se habia sentado en la jalea, asi que la tome, solo pensar en la jalea, quisiera tener ahora mismo una Dho Dho, Dho, Dho",2
-170,,
-171,,
-172,,
-173,,
-174,,
-175,,
-176,,
-177,,
-178,,
-179,,
-180,"Lisa, los vampiros son seres inventados, como los duendes, los gremlins y los esquimales",2
-181,"Tres simples palabras: Soy un homosexual",2
-182,"¡Muñeca preciosa, Bienvenida a Botadero!...Poblacion: TÚ",2
-183,"Para variar las cosas... tú harás todo el trabajo",2
-184,"Al menos no está lloviendo...¿Ves cómo no llueve? Solo estamos en la calle.",2
-185,"Ese perro tiene la cola peluda!",2
-186,"¡Estupido como un ZORRO!",2
+170,"¿Tú no eres la gorila del zoológico?",4
+171,"Amm disculpe profesor cerebron!, yo llevo 10 años trabajando en una planta nuclear y eh yo creo que se como funciona un acelerador de protones",2
+172,"¡Es hora de que Marge se luzca!",5
+173,"Lisa, los vampiros son seres inventados, como los duendes, los gremlins y los esquimales",2
+174,"¿A caso mi agrietado rostro les recuerda el lugubre aspecto de la muerte?",7
+175,"Tres simples palabras: Soy un homosexual",2
+176,"Cemento Fresco, no hay letrero más bello… bueno, sólo Alto Voltaje.",1
+177,"¡Muñeca preciosa, Bienvenida a Botadero!...Poblacion: TÚ",2
+178,"No se alarmen, continúen nadando desnudos... ¡oh vamos! ¡Continúen! ¡oh! ¡aaah! ¡está bien, Lou, dispara!",6
+179,"Para variar las cosas... tú harás todo el trabajo",2
+180,"Me han llamado feo, algo feo, bastante feo... pero nunca feo feo.",4
+181,"Al menos no está lloviendo...¿Ves cómo no llueve? Solo estamos en la calle.",2
+182,"La justicia ya no funciona. Pero mientras todo el mundo grabe así a todo el mundo, la justicia prevalecerá.",5
+183,"Ese perro tiene la cola peluda!",2
+184,"(Por los altoparlantes del estadio de Springfield) Hoy hemos aprendido que la guerra nunca es la solución. ****: Excepto para todos los problemas de Estados Unidos",1
+185,"¡Estupido como un ZORRO!",2
+186,"...El Señor nos dejó ser viejos por una razón: ¡Para ver los defectos en todo lo que Él hace!",7
 187,"¡Jaque mate doña cama elástica!",2
-188,"Ya no es puerco araña, ahora es puerco potter",2
-189,"... no lo sé, haría falta alguien como yo para hacerlo.... ¿Como yo?... ¡Yo soy un como yo!",2
-190,"Marge, ¡son las tres de la mañana! ¿Me haces un emparedado?",2
-191,"¡Ha, ha, ha.... todos los presidentes son iguales... son neo-liberales!",2
-192,"Operadora, deme el numero para el 911",2
-193,"Desearía que Dios estuviera vivo para ver esto",2
-194,"Lisa, cuando una persona como yo tiene tantos golpes en la cabeza, la cordura... Eh, ¿cómo decirte?... Oh, te amo, Bart",
-195,"Que los blancos tienen nombre como Lenny y los negros tienen nombres como Carl",2
-196,"Lo único que puede hacer más delicioso al tocino es ver como se hace",2
+188,"¡Buuurp! (eructo)",8
+189,"Marge, ¡son las tres de la mañana! ¿Me haces un emparedado?",2
+190,"Estamos eliminando los juegos. Las personas beben menos cuando se divierten.",4
+191,"Operadora, deme el numero para el 911",2
+192,"¿Sabes, Bart? Tu tío Arturo solía decir: Primero dispara y luego los revisas. Un día decidió poner su teoria en práctica. Tuvieron que llamar 60 alguaciles para someterlo y nunca mas volveré a hablar al respecto.",5
+193,"Lisa, cuando una persona como yo tiene tantos golpes en la cabeza, la cordura... Eh, ¿cómo decirte?... Oh, te amo, Bart",2
+194,"Recuerda, hijo, si te sangra la nariz es porque te metes el dedo demasiado, ...o demasiado poco.",6
+195,"Lo único que puede hacer más delicioso al tocino es ver como se hace",2
+196,"¿Besarte? ¡Papá, sólo soy tu hijo!",1
 197,"Lisa... en esta casa obedecemos la leyes de la ¡Termodinámica!",2
-198,,
-199,,
-200,,
-201,,
-202,,
-203,,
-204,,
-205,,
-206,,
-207,,
-208,,
-209,,
-210,,
-211,,
-212,,
-213,,
-214,,
-215,,
-216,,
-217,,
-218,,
-219,,
-220,,
-221,,
-222,,
-223,,
-224,,
-225,,
-226,,
-227,,
-228,,
-229,,
-230,,
-231,,
-232,,
-233,,
-234,,
-235,,
-236,,
-237,,
-238,,
-239,,
-240,,
-241,,
-242,,
-243,,
-244,,
-245,,
-246,,
-247,,
-248,,
-249,,
-250,,
-251,,
-252,,
-253,,
-254,,
-255,,
-256,,
-257,,
-258,,
-259,,
-260,,
-261,,
-262,,
-263,,
-264,,
-265,,
-266,,
-267,,
-268,,
-269,,
-270,,
-271,,
-272,,
-273,,
-274,,
-275,,
-276,,
-277,,
-278,,
-279,,
-280,,
-281,,
-282,,
-283,,
-284,,
-285,,
-286,,
-287,,
-288,,
-289,,
-290,,
-291,,
-292,,
-293,,
-294,,
-295,,
-296,,
-297,,
-298,,
-299,,
-300,,
-301,,
-302,,
-303,,
-304,,
-305,,
-306,,
-307,,
-308,,
-309,,
-310,,
-311,,
-312,,
-313,,
-314,,
-315,,
-316,,
-317,,
-318,,
-319,,
-320,,
-321,,
-322,,
-323,,
-324,,
-325,,
-326,,
-327,,
-328,,
-329,,
-330,,
-331,,
-332,,
-333,,
-334,,
-335,,
-336,,
-337,,
-338,,
-339,,
-340,,
-341,,
-342,,
-343,,
-344,,
-345,,
-346,,
-347,,
-348,,
-349,,
-350,,
-351,,
-352,,
-353,,
-354,,
-355,,
-356,,
-357,,
-358,,
-359,,
-360,,
-361,,
-362,,
+198,"¿Cómo puedes tener una casa sin armas? ¿Qué tal si entra un oso o algo así?",7
+199,"Por eso no le hago caso a mi cerebro",2
+200,"Sólo tenía una muñeca inflable... y ella también me abandonó. No debí usar helio.",4
+201,"¡No oigo, no oigo, soy de palo tengo orejas de pescado!",2
+202,"Homero, ¿quieres venir conmigo a un club? Ahí aceptan a los solteros con clase como yo (eructa)",8
+203,"¡Si, si.... así haría si le hiciera.....!",2
+204,"Papá, es difícil no hacer caso a la TV; pasa más horas educándonos que tú!",1
+205,"¿La profesora de Bart se llama Krabappel? Yo le decía Clavados. ¿POR QUÉ NADIE ME LO DIJO? ¡Debo haber parecido un idiota!",2
+206,"¡Ay, Bart... has caso a tu corazón.... no a las voces en tu cabeza....! ¡Como cierto tío tuyo hizo una mañana de Diciembre!",5
+207,"¡Oh gloria de las glorias, oh mundo misterioso que acabo de descubrir! ¡Me lleva la cachetada!",2
+208,"Discúlpame, nena, digo nenita, digo nenota, digo nenota gigante.",4
+209,"¡A lo hecho, pecho!",2
+210,"Con el policía Nº1 de la ciudad haciendo su trabajo, no tienen nada por qué preocuparse. Ahora, ¿dónde puse mi arma? ¡Ah, si. La dejé cuando me serví pastel!",6
+211,"Y todo se lo debo a este simpático felino",2
+212,"Lisa, tu tienes la inteligencia para llegar hasta donde quieras. Y cuando llegues, yo estaré contigo para pedirte prestado.",1
+213,"La vida es un fracaso tras otro hasta que empiezas a desear que Flanders se muera",2
+214,"¡No Lisa, Milhouse no cuenta!",5
+215,"Soy ***** Simpson, o como muchos me han llamado: El Cochinote",2
+216,"Querido Sr. Presidente: Hay demasiados estados hoy en día, por favor elimíne tres. No soy un viejo maniático.",7
+217,"Tranquilos, sé lo que hay que hacer en estos casos...JUMANJIIII!!!!!",2
+218,"(En su casa) ¡Yo creía que tenía más cosas!",8
+219,"Si algo hemos aprendido de los Picapiedra es que los pelícanos sirven para mezclar cemento",2
+220,"Ahora te toca a tí, nena, pero mídete.",4
+221,"Lisa lloró, yo lloré y Maggie rió. Todo fue una confusión",2
+222,"Perdone maestro, ¿pero que nos va enseñar un tío foca como usted de karate?",1
+223,"Apu no es felíz. Nos mintió con la canción. ¡Ay, me choca que la gente haga eso!",2
+224,"¡Maggie, no mastiques con la boca abierta!",5
+225,"Marge, niños, les prometo que todo va a salir bien. Vayan arriba, empaquen sus maletas. Vamos a comenzar una nueva vida...Bajo el mar",2
+226,"Bueno, bueno, miren quién está aquí: 'El Sr. que no da soborno'. Seguro lo ayudaremos. ¡Sólo siéntese y espere al Oficial 'Me-Importa-Un-Sorbete'!",6
+227,"¿Ah, si? ¿Y si era tan listo por qué se murió?",2
+228,"¿Mi primer nombre?… ¿mi primer nombre?… Bueno, cuando estoy confundido siempre veo mi ropa interior. Aquí está la respuesta a todas las preguntas importantes...",7
+229,"¡Ya, pierdan, perdedores, para que podamos volver a casa!",2
+230,"Escuchen, muchachos. La policía de Springfield me ha dicho que el 91% de todos los accidentes de tráfico son causados por ustedes seis",4
+231,"Hay tanto que no sé de Astrofísica. Hubiera leído el libro del paralítico ese",2
+232,"(Homero le roba la cerveza) ¡No disfrutarás de esa cerveza! ¡Sólo te traerá desgracia! ¡Te sabrá insípada y lamentarás este día! Su espumosa calidad se convertirá en tu boca en veneno.",8
+233,"¿Cuándo voy a aprender? La solución a todos los problemas de la vida no está en el fondo de una botella. ¡Está en la Televisión!",2
+234,"Homero, Homeroooo, tienen mis pastillas.. ¡Homero... Homero, tengo frío!",7
+235,"Y la verdad es un trabajo muy duro, pero cuando veo esas sonrisas en sus caritas, sé que estan pensando en lanzarme algo los desgraciados.",2
+236,"Yo no fui, nadie me vio, nadie puede probarlo.",1
+237,"Si algo es difícil y duro de hacer, entonces no merece la pena hacerlo",2
+238,"Pero hija, ¿para que quieres un pony? Ya tienes un limonero, y ni siquiera juegas con él...",5
+239,"Marge mi reina (Marge con vestido de reina), Lisa mi pequeña princesita ( Lisa vestida de princesa) ¡... y como olvidar el niño rata!.",2
+240,"Ahora en serio...¡Págame!",4
+241,"¡Se roban las hamburguesas.... MALDITA RATA.... YA TE TENGO.... TOMA.... TOMA!",2
+242,"Así sea conquistando una niña o rompiendo una nuez, la clave es PERSEVERANCIA. Sigue intentando y nunca te rindas. ¡Bueno, ya, maldita nuez! ¿Alguna más quiere dar problemas?",6
+243,"Aparta tu pico de mi corazón y tu figura del dintel de mi puerta.",2
+244,"Homero...¿no quieres una cerveza?",4
+245,"Maldito cacharro",2
+246,"Dicen que la mayor tragedia para un padre es que su hijo muera. Yo nunca he entendido por qué, francamente yo le vería el lado positivo.",7
+247,"Claro que si DINERO. Tu sabes que el Dinero no es todo en el Dinero",2
+248,"No te prometo que lo intentaré, pero intentaré intentarlo.",1
+249,"(A Marge reclamar que perdió 40 dolares por no ir a trabajar comparado con lo poco que ganó vendiendo azúcar de puerta en puerta) ¡Marge, no me humilles delante del dinero!",2
+250,"Espero que esto le haya enseñado a sus niños una lección: los niños nunca aprenden.",6
+251,"Siempre he creído en la existencia de Dios.... ahora se... ¡que soy YO!",2
+252,"¡La gente como tú da mala fama a los sobrios!",8
+253,"¡Ah, por eso Dios es el mejor personaje de ficción!",2
+254,"Tal vez la muerte ponga fin a tus protestas",5
+255,"¿Mi... perdior.... cerebro? ¡Oh!",2
+256,"Uh, no, ha marcado un número equivocado. Este es el 9-1... 2.",6
+257,"¡Ay, esto es de locos, creo que mi daño se cerebró!...",2
+258,"Si te hace sentir mejor, puede que se la esté tirando ahora. (Homer se pone a llorar) No, si ahora el malo voy a ser yo.",4
+259,"¡Bueno, cerebro, yo no te agrado y tu no me agradas!... ¡Sacame de esta y podré seguirte matando con cerveza! (Cerebro: ¡Trato hecho!)",2
+260,"!Yo te ayudo, hijo... aún estoy lleno de bríos y pujanza... últimamente más pujanza que nada!",7
+261,"¡Por el alcohol.... CAUSA y SOLUCION de todos los problemas de la vida!",2
+262,"Muy bien. ¡Salga con manos en alto, dos tazas de café, un aromatizante de singo Capricornio, y algo con coco arriba!",6
+263,"No sabes como es eso Marge, yo soy el que va todos los dias ahí a romperse el alma, ¡y no estoy fuera de lugar!, ¡tu estas fuera de lugar, todo el maldito sistema esta fuera de lugar! (Imitando a Jack Nicholson) ¿Quieres la verdad?, ¡¿Quieres la verdad?!, ¡Tu no puedes manejar la verdad! Porque cuando te agachas para tocar la cara de lo que fue tu mejor amigo y ves que es solo basura... uno... no sabe que hacer. ¡Olvídalo, Marge... este es el BARRIO CHINO!",2
+264,"¡¡¡Necesito un trago!!!",8
+265,"(Imitando a Al Pacino) En América, quien tiene el azúcar tiene el poder. Luego viene el dinero; luego vienen las mujeres...",2
+266,"¡Cómo me gustaría ser adulto para poder violar las normas!",1
+267,"Cuando tenía 17 años yo bebía buena cerveza (sollozo) ¡Bebía buena cerveza que compraba con identificación falsa!",2
+268,"Ella no tuvo en cuenta el poder impresionante del Jefe de Policía. ¿Ahora, dónde puse mi placa? ¡Oye, aquel pato la agarró!",6
+269,"Los Santos fueron una basofia, he visto basofias en mi vida pero esta basofia fue la más basofia entre las basofias.... ¡bueno, ya me voy porque me están oyendo los ñoños!",2
+270,"Soy mitad troll y mitad elfo, escoge tu veneno",4
+271,"(Al leer en un anuncio DIE) ¡Ay, muerte en Ingles! (Se completa el anuncio como DIET) ¿DIETA?...¡UAAAAAAAAAUGH!",2
+272,"Homero...Ya puse a dormir a los niños.",5
+273,"Bart, Lisa, aquí hay 50 dólares: vayan al cine, luego a casa de sus tías Patty y Selma y quédense ahí hasta que los llame",2
+274,"Ellos sólo salen por las noches. O en este caso, de día.",6
+275,"¡Hola, cinta (caminadora)! ¿Qué opinas de ESTA inclinación?",2
+276,"Ella es como un paquete de leche pasada. Dulce por fuera, venenosa por dentro.",1
+277,"Marge, voy a la Taberna; lleva a los niños con los vecinos, voy a volver jala'o",2
+278,"¡Tengo ganas de vengarme y de hacer pis! Antes sólo era de vengarme.",7
+279,"Ya no es puerco araña, ahora es puerco potter",2
+280,"(Cuando cae al río) ¡Cariño, ya he llegado!",8
+281,"... no lo sé, haría falta alguien como yo para hacerlo.... ¿Como yo?... ¡Yo soy un como yo!",2
+282,"Voy a probar el sistema de citas rápidas... (se va y vuelve enseguida) ... me han rechazado 68 veces.",4
+283,"¡Ha, ha, ha.... todos los presidentes son iguales... son neo-liberales!",2
+284,"Llegar a ser un policía no es algo que sucede de la noche a la mañana. Toma todo un duro fin de semana de instrucción conseguir la insignia.",6
+285,"Desearía que Dios estuviera vivo para ver esto",2
+286,"En un momento asi, solo se puede reir.",5
+287,"Que los blancos tienen nombre como Lenny y los negros tienen nombres como Carl",2
+288,"Ah, morir no es tan malo, volveré a ver a mis antepasados: a papá, a la planta que nunca regué..",8
+289,"Ya me conoces, Marge, me gusta la cerveza fría, la tele fuerte y los homosexuales, ¡Locas, locas... siiiii!",2
+290,"Ese Tony es un cáncer en esta ciudad. Él es el cáncer y yo… eh… ¿qué cura eso?…",6
+291,"¡No, en la policía dijeron que estaba muy gordo, en el ejercito me dijeron que era muy tonto!",2
+292,"Preguntale a Lisa, ella es el cerebro... yo soy el otro que no es el cerebro",1
+293,"A-tó-mico.... se dice A-tó-mico...",2
+294,"Homero, hijo, eres tan tonto como un burro sólo que más feo.",7
+295,"¡Mono..... D´oh!",2
+296,"Si lo tomas rápido, no es robar",4
+297,"Cama arri-ba, cama aba-jo",2
+298,"¡Oh, por Dios! ¿Las personas no podrían hacer justicia por mano propia? ¡No podemos estar vigilando toda la ciudad!",6
+299,"¡Salvame Jebus!",2
+300,"No puedes esconderte de mi, paso 23 horas diarias aqui.",5
+301,"¡Ha, ha, ha... no lo puedo creer... ese niño tiene senos!",2
+302,"Oiga, ¿puedo vomitar en su baño? Prometo comprarle algo.",8
+303,"Mmm... avena a la *****",2
+304,"No lo sé, no sé por qué lo hice, no sé por qué me divertí, y no sé por qué volvería a hacerlo...",1
+305,"Algunos dicen que me paresco a Elvis Presley",2
+306,"Bien, su historia es muy interesante señor Pelmazo, eh digo Simpson, así que voy a transcribirla en mi maquina de escribir invisible… mh mmh mmmh lalala…",6
+307,"Maldito perro pulgoso",
+308,"Nadie se le escapa a Moe. No ha nacido quién.",4
+309,"¡Perro de la calle!",2
+310,"El césped de hoy pica más que el césped de mi época.",7
+311,"(Cuando Marge le dice a ***** que es el más gordo de la familia) No me lo digas tan directo",2
+312,"Lee la placa, hijo: ¡Los sobornos son sólo en efectivo!",6
+313,"Marge, ¡no siento las piernas! ¡NO SIENTO LAS PIERNAAAAAAAS!",2
+314,"¿Quién iba a pensar que una ballena pesara tanto?" (teniendo una ballena en la espalda).",4
+315,"¿Por que me comí ese cachito de manzana?",2
+316,"Whoah, alguien huele agrio… ¡oh, soy yo!",8
+317,"Lisa... creo que llegó el momento de decirte... que eres adoptada y no te quiero... ¡BART!",2
+318,"Vive deprisa, muere joven y deja un cadáver obeso.",1
+319,"Hace mucho tiempo que no estoy con una persona que no sabe que soy un cerdo egoísta",2
+320,"Prefiero tener un esposo gordito, a un ex muy, muy sexy.",5
+321,"Calma calma, que no panda el cúnico, para encontrar a Flanders, ay que pensar como Flanders",2
+322,"¡Buenas, Policía! ¡Ay Dios, si esta no es la casa estamos en problemas!",6
+323,"¡Para nada, maestro, yo voy a seguir Rockeando por siempre... FOREVER... FOREVER...!",
+324,"Andando, nos han descubierto. Hay que devolverla al acuario.",4
+325,"Mi cerebro es igual a una computadora",2
+326,"Hijo, si alguna vez viajas atrás en el tiempo, procura no tocar nada",7
+327,"Esto es más triste que lo que callamos las mujeres",2
+328,"Si yo hice algo malo y nadie me atrapó, ¿eso me hace bueno?",1
+329,"Marge, con ese dinero seriamos ricos, ¡Más ricos que los del doblaje!",2
+330,"Oh, Eddie, ¿tú también has soñado con frases al revés y cartas ardiendo?",6
+331,"Lisa, tu tienes lo que se llama, ¡el trasero Simpson! comienzas con un enorme círculo aqui, dos círculos mas pequeños aqui, dos grandes círculos sexys como ojos, y un elegante atuendo, ¡Ay que bien luzco! por alguna razón mi cabello y mi oreja forman una M y una G.",2
+332,"¿Porqué dijiste gay primero?",4
+333,"Bart, cuando yo era niño quería un futbolito electrico más que nada en el mundo... mis padres me lo comprarón y fui el niño más feliz del mundo",2
+334,"¡Tú eres el más gordo de nosotros! (refiriendose a Homero)",5
+335,"¿Sabes hijo? Cuando yo tenía tu edad me moría por un guante profesional y mis papás no me lo dieron. Así que dejé de respirar hasta que me puse morado y mi cabeza golpeó contra el suelo.... ¡Los doctores temían que hubiera daño cerebral! -BART: Papá... ¿y que tiene que ver esta historia? -*****: ¡Me gustan las historias!",2
+336,"¡Maldita TV! ¡Arruinó mi imaginación y mi capacidad de... de... ¡Ay, bueno! (enciende una TV portatil).. Jajaja.",1
+337,"Me mata verla asi (a Lisa) y si hay algo que no soporto, es que me maten",2
+338,"Dicen que el alcohol borra la memoria… de lo demás no me acuerdo.",8
+339,"Marge, déjame entrar... ¡Ay, aquí hay grillos!",2
+340,"Vaya, vaya que tenemos aqui",6
+341,"¡BART QUIERES UN PEDAZO DE PASTEL ANTES DE DORMIR! come una rebanada antes de que se enfrie... ¿NO QUIERES VER MI NUEVA SIERRA Y MASCARA?¡",2
+342,"¡Bueno! Yo nunca pensé que podría destruir un avión alemán, pero el año pasado vi que me equivocaba.",7
+343,"¿Si... rectór...? ¡Tiene cara de sapo!",2
+344,"No hay nada mejor que la cerveza para darle a uno esa falsa sensación de bienestar.",8
+345,"Disimula y ve despacio hacie el pastel",2
+346,"Yo creia que buscarse en Google significaba otra cosa.",5
+347,"Marge va a denunciar lo de las drogas... Marge: no tenemos drogas. *****: no claro que no...",2
+348,"¿Sabes que yo inventé los besos?",7
+349,"Todo para ti es cruel... si me cuelgo de su trompa es cruel... si le grito en las orejas es cruel.... ¡PUES PERDÓNAME POR SER TAN CRUEL!",2
+350,"Maestra, si uno es muy bueno pero tiene una tremenda pelea y contrae gangrena en la pierna y tienen que amputarla, ¿la pierna espera en el cielo?.",1
+351,"Es que estoy muy dulce y sabrosito.",2
+352,"¡Oh, no! ¡Elecciones! ¿Es uno de esos días en que cierran las tabernas, no es cierto?",8
+353,"¡Bueno, ya..... ¿de a cuanto es el sablazo?",2
+354,"Giren una orden de arresto para uosdmis y remoh, ahh debe ser griego! Detective: es homero simpson jefe, lo leyo al revez. Ahhh cancelen la orden, pero que me compren unas rosquillas rellenas Detective: eh jefe, es su billetera",6
+355,"¿Y yo que puedo hacer? Tan solo soy un..... em...... hombre.",2
+356,"Homero, no me arrepiento de haberte tenido, y siempre estuve orgulloso... de que no fueras un enano.",7
+357,"Bart, tengo que decirte algo; anoche me senté sobre tu tortuga y la maté, algún día me lo agradecerás",2
+358,"Es alambre de púas. Lo llamábamos el piquete. Ya no dejan usarlo.",4
+359,"¡Pues perdoname por tener enormes defectos que no puedo corregir!",2
+360,"Mi amigo se llama Billetín... Ha visto algún billetín por aquí...?",6
+361,"¡Cuando nos casamos me dijiste que ¡te encantaba mi forma de ser y que nunca cambiara!",2
+362,"¡¡Hasta la vista Habram!!",1
+363,"Yo creo que Milhouse es El Barto...",2
+364,"Homero, me dijiste que no ibas a usar al muñeco para fingir tu muerte.",5
+365,"Olvídalo Marge... ya vivimos juntos, ¿Para qué trabajar juntos? Como dice la Biblia, no mortificaréis a tu esposo en su... eh... actividad.",2
+366,"Lo he oído todo, lo he visto todo, lo he hecho todo. Sólo que no recuerdo nada.",7
+367,"No me importaría estar encerrado, siempre y cuando tenga suficiente cerveza en la nevera.",2
+368,"Yo sudo sangre.",4
+369,"(en Italia): ¿Opera, aquí también tienen eso?",2
+370,"El hombre que busco en realidad, guiño, es don soborno, guiño guiño",6
+371,"1, 2 y 3... salen los toreros por el redondel",2
+372,"Dios justiciero, gracias por el puchero",1
+373,"Voy al ra-to... voy al ra-to",
+374,"Sabes, tu me recuerdas un poema del que ya no me acuerdo, una canción que nunca existió, y un lugar al que no creo que haya ido nunca.",7
+375,"¡Soy ***** el ma-lo... soy ***** el ma-lo!",2
+376,"Jamás podre ir a París",5
+377,"Mi amigo el brujo, fue y me dijo como hacer BOM BOM BOM BOM",2
+378,"Yo difiero.",4
+379,"Nacho, nacho men, yo quiero ser, un nacho men",
+380,"Yo dí un discurso un día. Estaba muy nervioso y usé un truco: imaginé a todos en ropa interior. Al juez, al jurado, a mi abogado, a todos. ¿Si funcionó? Soy un hombre libre, ¿no?",8
+381,"¡Oh Margie! Llegaste y me diste un pavoooo... en mis vacaciones.... ¡Que rico!",
+382,"Yo soy un viejo, odio todo menos mi programa de entrevistas... Y YA VA A EMPEZAR",7
+383,"Patito, patito color de café si tu no me quieres yo ya se porqué; no me presumas que yo ya sé que eres un patito color de café",2
+384,"Te ayudo a maldecir? Changos, maldición",1
+385,"Estaba la pajara pinta, a la sombra del verde limón, con el pico picaba la rama, con las alas recoge la flor",2
+386,"¿Qué? ¿Tres semanas a base de vino? ¡Me volveré loco!",8
+387,"El matrimonio es igual que una naranja! Primero esta la piel, luego la dulce, dulce pulpa",2
+388,"Todos tenemos secretiilos (tapando una grieta en el suelo donde se ve a un hombre).",4
+389,"Sono sono sono, me llaman del bar de moe, en ese buen lugar, me gusta beber alcohol. Cuando bebo cerveza no entiendo, porque todo da vueltas y vueltas",2
+390,"Estoy en una portada.",5
+391,"Que si, que no, el macalacachimba. Que no, que si, el chafirete ¡uh! el chafirete",2
+392,"¡Enseña los dientes raton! ¡Uy, con estas frases puedo quitarle el trabajo a Schwarzenegger!",1
+393,"Usted es una mujer muy guapota ¿sabe? Si yo no estuviera casado saldría con usted ¡así! (golpea y se sube la cerveza)... Perdóneme por favor, no le vaya a decir a Marge la amo tanto que... Oh miren 10 centavos",2
+394,"¡Ya no recuerdo la ultima vez que me sentí así de joven!... ¡No!... ¡Ya no me acuerdo!",7
+395,"Oh margo, llegaste a mi vida volando y te quite las alas oh margoooo",
+396,"No lloren por mí..ya estoy muerto..",8
+397,"Ay!!! resvaladilla super divertida",2
+398,"(Cuando es el cumpleaños de huesos) Perrito lindo, felicidades.",5
+399,"¡Toma esto vil engendro!",2
+400,"¡Homero eres torpe como una piedra y feo como una blasfemia! Si un extraño ofrece llevarte ¡Te subes!",7
+401,"Acelero, freno, claxon, acelero, freno, claxon, claxon, claxon, recto, acelero, acelero, acelero",2
+402,"La buena piedra, nada le gana",1
+403,"Para iniciar presione una tecla cualquiera, ¿cual es cualquiera? veo la ESC, CTRL, PGUP, no tiene tecla cualquiera, tanta computacion me dio sed, creo que aqui hay cerbeza TAB",2
+404,"Moe: ***** no robes cerveza mientra no estoy",8
+405,"No duermo, payaso me come",1
+406,"Es la primera vez que estoy en primera fila desde el día de mi boda.",4
+407,"Cuando yo muera quiero reencarnar en Mariposa.... ¡porque nadie sospecharia de una mariposa...!",1
+408,"¿Hay escaleras? (Roger Meyers Jr.: Solo una) ¡Paso!",7
+409,"Jajaja acabo de rechazar a Skinner",1
+410,"Acaso crees que soy un ebrio miserable y cochino? ¡oh algien dejo cerveza en el cenicero!",8
+411,"Sea lo que sea ira directo al cafe de Skinner",1
+412,"El garage, ¿por qué no el 'garash'?..Oh lalá con el messié franchute este...",4
+413,"Una huelga, ¿Eh? (sonido fuerte) ¡Au tengo los huesos fragiles... pero si siempre tomo mucha...!  ¿Leche?",1
+414,"Tu eres un mozalbete engreido, sin experiencia en la vida, con educación de 4o grado.... ¡Hijo, pudiste llegar a Teniente!",7
+415,"Mira lo que le hice a tu foto ¡gustirinjiyo! ¡gustirinjiyo! ¡que gustirinjiyo!",1
+416,"Oh se me paro el corazon"..."oh ahi esta",8
+417,"¡¿Donde esta mi elefante?!",1
+418,"Lisa ya pediste tus regalos de cumpleaños y Navidad con ese peral que te conseguimos y ya ni siquiera juegas con él...",5
+419,"Enseñamela (muestramela) mamá...",1
+420,,
+421,"Muero por ver el show de Krusty el payaso",1
+422,"¿Porqué rayos me despertaron? Soñaba que era "La Reina del oeste" y tenía un revolver de plata.",7
+423,"...yo me borro, viejo.",1
+424,"aaaah ya no soporto estar otro segundo en este domo waooaoa",8
+425,"Es re-cursi: Los coodrilos me mordieron la nariz.",1
+426,"¡No vas a hacer tú la operación! (de Huesos).",5
+427,"Podremos lograrlo Lisa, si juntamos tu inteligencia y mi capacidad para embaucar gente inteligente....",1
+428,,
+429,"¡Maldita tarjeta del demonio....! ¡Ah.... NO ME DES ESA ESTÚPIDA TARJETA!",1
+430,"Oye Apu, ¿tienes cereal para enfermos de sifilis?",4
+431,"Soy mas agudo que hermoso.",1
+432,"Me llamo ***** y soy alcoholico. Lisa: señor **** esto es una reunion de exploradoras. Es eso o es que no pueden admitir que tienen problemas?, no lloren por mi... ya estoy muerto.",8
+433,"¡Hola vejete, ¿que dicen las voces, eh?!",1
+434,"Bueno, lo cierto es que si usé vestido buena parte de los 40's..... ¡OH, QUE DISEÑADORES HABÍA!",7
+435,"Sé como te sientes, Lisa. La vida no es justa. Ningún niño debería vivir mas que su mascota.",1
+436,,
+437,"¡Milhouse, ¿como es que alguien que usa lentes puede ser tan tonto?!",1
+438,"Te informo que pude casarme con Mel Patiño",5
+439,"¡Lista, bonita y embustera..... mucho mejor que aquella jirafona insípida!",1
+440,"No me llevaras Parca.",7
+441,"Papá.... no me lo tomes a mal, pero tu expresión no me da muchas esperanzas.",1
+442,,
+443,"Su nombre es Gordov, la mascota oficial de los próximos juegos invernales, representa el espíritu ruso de pereza y alcoholismo.....",1
+444,"Bart: Esta el Sr.Partes?, de nombre Mis. *****:Espere voy a ver, Sr Partes, Don Mis, no hay nadie que haya visto mis partes aquí (Risas). Escuchame escupitajo, un día de estos te voy a pillar y te voy a grabar mi nombre en la ingle con las pinzas de hielo.",4
+445,"No me averguenza, que sepan todos que eres mi abuelo.",1
+446,"¡Creo que el sistema métrico es el arma del diablo! ¡Mi auto corre en centímetros la hora y así es que me gusta que corra!",7
+447,"Vuelva a su tejido Skinner.",1
+448,,
+449,"Donde pone el ojo pone la bala.",1
+450,"Mmm... quiero nena pero no puedo (hablar con Homero por su plan de engordar para no ir a trabajar) Tu padre es muy sensible a veces ¿Recuerdas cuando me reí de su gorra de Sherlock Holmes? Lloró una semana y cerró su agencia de detectives...",5
+451,"Oye, mira cuantas cosas Lisa! Super!, matriculas con nombres BARCLAY, BARRY, BERT, BORT, ¡Ay quien va a llamarse BORT!",1
+452,"¡Se han robado mi alma!",7
+453,"Huesos, juegas a la pelota? (le enseña la bola) Ay! antes haciamos buen equipo, pero ya no quiere jugar desde que llego esa Maldita Perra!",1
+454,,
+455,"Homero ¿Estas ahi?",5
+456,"¿Yo estoy igual, estoy igual?",7
+457,"¡Bartolomeo J. Simpson!",5
+458,,
+459,"¿Sabes, Lisa? Cuando conoci a tu padre era soéz, vulgar y cochino. Pero ahora es una persona diferente... (Lisa: ¡Pero *****....!) ¡Es una persona diferente, Lisa",5
+460,,
+461,"(Buscando a los niños en un bosque) "¡La punta de plastico de una de las agujetas de los tennis de Bart!" (ante la mirada de incredulidad de todos) "¡UNA MADRE LAS RECONOCE!",5
+462,,
+463,"A veces siento que la familia me vuelve loca y quiero ¡estallar!",5
+464,"Ajajajaj jajajaj jajajaja el concurso se acabo, denle a ese hombre los 10 mil dolares... jajajaja pero la bola, su ingle hahajaja funciona a muchos niveles",2
+465,,
+466,,
+467,,
+468,,
+469,,
+470,,
+471,,
+472,,
+473,,
+474,,
+475,,
+476,,
+477,,
+478,,
+479,,
+480,,
+481,,
+482,,
+483,,
+484,,
+485,,
+486,,
+487,,
+488,,
+489,,
+490,,
+491,,
+492,,
+493,,
+494,,
+495,,
+496,,
+497,,
+498,,
+499,,
+500,,
+501,,
+502,,
+503,,
+504,,
+505,,
+506,,
+507,,
+508,,
+509,,
+510,,
+511,,
+512,,
+513,,
+514,,
+515,,
+516,,
+517,,
+518,,
+519,,
+520,,
+521,,
+522,,
+523,,
+524,,
+525,,
+526,,
+527,,
+528,,
+529,,
+530,,
+531,,
+532,,
+533,,
+534,,
+535,,
+536,,
+537,,
+538,,
+539,,
+540,,
+541,,
+542,,
+543,,
+544,,
+545,,
+546,,
+547,,
+548,,
+549,,
+550,,
+551,,
+552,,
+553,,
+554,,
+555,,
+556,,
+557,,
+558,,
+559,,
+560,,
+561,,
+562,,
+563,,
+564,,
+565,,
+566,,
+567,,
+568,,
+569,,
+570,,
+571,,
+572,,
+573,,
+574,,
+575,,
+576,,
+577,,
+578,,
+579,,
+580,,
+581,,
+582,,
+583,,
+584,,
+585,,
+586,,
+587,,
+588,,
+589,,
+590,,
+591,,
+592,,
+593,,
+594,,
+595,,
+596,,
+597,,
+598,,
+599,,
+600,,
+601,,
+602,,
+603,,
+604,,
+605,,
+606,,
+607,,
+608,,
+609,,
+610,,
+611,,
+612,,
+613,,
+614,,
+615,,
+616,,
+617,,
+618,,
+619,,
+620,,
+621,,
+622,,
+623,,
+624,,
+625,,
+626,,
+627,,
+628,,
+629,,
+630,,
+631,,
+632,,
+633,,
+634,,
+635,,
+636,,
+637,,
+638,,
+639,,
+640,,
+641,,
+642,,
+643,,
+644,,
+645,,
+646,,
+647,,
+648,,
+649,,
+650,,
+651,,
+652,,
+653,,
+654,,
+655,,
+656,,
+657,,
+658,,
+659,,
+660,,
+661,,
+662,,
+663,,
+664,,
+665,,
+666,,
+667,,
+668,,
+669,,
+670,,
+671,,
+672,,
+673,,
+674,,
+675,,
+676,,
+677,,
+678,,
+679,,
+680,,
+681,,
+682,,
+683,,
+684,,
+685,,
+686,,
+687,,
+688,,
+689,,
+690,,
+691,,
+692,,
+693,,
+694,,
+695,,
+696,,
+697,,
+698,,
+699,,
+700,,
+701,,
+702,,
+703,,
+704,,
+705,,
+706,,
+707,,
+708,,
+709,,
+710,,
+711,,
+712,,
+713,,
+714,,
+715,,
+716,,
+717,,
+718,,
+719,,
+720,,
+721,,
+722,,
+723,,
+724,,
+725,,
+726,,
+727,,
+728,,
+729,,
+730,,
+731,,
+732,,
+733,,
+734,,
+735,,
+736,,
+737,,
+738,,
+739,,
+740,,
+741,,
+742,,
+743,,
+744,,
+745,,
+746,,
+747,,
+748,,
+749,,
+750,,
+751,,
+752,,
+753,,
+754,,
+755,,
+756,,
+757,,
+758,,
+759,,
+760,,
+761,,
+762,,
+763,,
+764,,
+765,,
+766,,
+767,,
+768,,
+769,,
+770,,
+771,,
+772,,
+773,,
+774,,
+775,,
+776,,
+777,,
+778,,
+779,,
+780,,
+781,,
+782,,
+783,,
+784,,
+785,,
+786,,
+787,,
+788,,
+789,,
+790,,
+791,,
+792,,
+793,,
+794,,
+795,,
+796,,
+797,,
+798,,
+799,,
+800,,
+801,,
+802,,
+803,,
+804,,
+805,,
+806,,
+807,,
+808,,
+809,,
+810,,
+811,,
+812,,
+813,,
+814,,
+815,,
+816,,
+817,,
+818,,
+819,,
+820,,
+821,,
+822,,
+823,,
+824,,
+825,,
+826,,
+827,,
+828,,
+829,,
+830,,
+831,,
+832,,
+833,,
+834,,
+835,,
+836,,
+837,,
+838,,
+839,,
+840,,
+841,,
+842,,
+843,,
+844,,
+845,,
+846,,
+847,,
+848,,
+849,,
+850,,
+851,,
+852,,
+853,,
+854,,
+855,,
+856,,
+857,,
+858,,
+859,,
+860,,
+861,,
+862,,
+863,,
+864,,
+865,,
+866,,
+867,,
+868,,
+869,,
+870,,
+871,,
+872,,
+873,,
+874,,
+875,,
+876,,
+877,,
+878,,
+879,,
+880,,
+881,,
+882,,
+883,,
+884,,
+885,,
+886,,
+887,,
+888,,
+889,,
+890,,
+891,,
+892,,
+893,,
+894,,
+895,,
+896,,
+897,,
+898,,
+899,,
+900,,
+901,,
+902,,
+903,,
+904,,
+905,,
+906,,
+907,,
+908,,
+909,,
+910,,
+911,,
+912,,
+913,,
+914,,
+915,,
+916,,
+917,,
+918,,
+919,,
+920,,
+921,,
+922,,
+923,,
+924,,
+925,,
+926,,
+927,,
+928,,
+929,,
+930,,
+931,,
+932,,
+933,,
+934,,
+935,,
+936,,
+937,,
+938,,
+939,,
+940,,
+941,,
+942,,
+943,,
+944,,
+945,,
+946,,
+947,,
+948,,
+949,,
+950,,
+951,,
+952,,
+953,,
+954,,
+955,,
+956,,
+957,,
+958,,
+959,,
+960,,
+961,,
+962,,
+963,,
+964,,
+965,,
+966,,
+967,,
+968,,
+969,,
+970,,
+971,,
+972,,
+973,,
+974,,
+975,,
+976,,
+977,,
+978,,
+979,,
+980,,
+981,,
+982,,
+983,,
+984,,
+985,,
+986,,
+987,,
+988,,
+989,,
+990,,
+991,,
+992,,
+993,,
+994,,
+995,,
+996,,
+997,,
+998,,
+999,,
+1000,,
+

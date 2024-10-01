@@ -2,9 +2,10 @@ const databaseManager = require('./dbFiles/databaseManager');
 const { createTables } = require('./dbFiles/queries');
 const userTables = require('./dbFiles/creatingTables/userTables');
 const express = require('express');
-const os = require('os');
+const cors = require('cors');
 
 const app = express();
+app.use(cors());
 app.use(express.json());
 
 // Determinar el entorno
@@ -12,8 +13,8 @@ const isProduction = process.env.NODE_ENV === 'production';
 
 // Configuración del puerto y host
 const PORT = process.env.PORT || 3000;
-const HOST = process.env.NODE_ENV === 'production' ? '0.0.0.0' : 'localhost';
-
+const HOST = isProduction ? '0.0.0.0' : 'localhost';
+const hostname = isProduction ? process.env.URLHOST : `http://localhost:${PORT}`;
 
 // Colores para mensajes en la terminal
 const RESET = '\x1b[0m';
@@ -69,4 +70,5 @@ configureApp();
 
 module.exports = {
     app,
+    hostname
 };

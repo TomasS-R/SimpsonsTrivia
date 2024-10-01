@@ -16,6 +16,7 @@ async function createTables(tableName, columns) {
                 let columnDef = `${column.name} ${column.type}`;
                 
                 if (column.primaryKey) {
+                    // eslint-disable-next-line no-undef
                     primaryKeyColumn = column.name;
                 }
                 if (column.unique) {
@@ -133,6 +134,7 @@ async function createUser(username, email, hashedPassword, role, created_at) {
         return result;
     } catch (e) {
         console.log(e);
+        throw e;
     }
 }
 
@@ -189,8 +191,12 @@ async function getQuotesByCharacter(characterId) {
             WHERE character_id = $1
         `, [characterId]);
 
+        // Se obtiene el total de frases
+        const totalQuotes = quotesResult.rows.length;
+
         return {
             character: character,
+            totalQuotes: totalQuotes,
             quotes: quotesResult.rows
         };
     } catch (e) {
@@ -209,6 +215,67 @@ async function getCharacters() {
     }
 }
 
+// Función para obtener un usuario por email
+async function getUserByEmail(email) {
+    try {
+        const result = await databaseManager.query(`
+            SELECT id, username, email, password_hash as password, role 
+            FROM ${userTables.tableNameUsers} 
+            WHERE email = $1
+        `, [email]);
+        return result.rows[0] || null;
+    } catch (e) {
+        console.error("Error getting user by email:", e);
+        throw e;
+    }
+}
+
+// Función para obtener un usuario por ID
+async function getUserById(id) {
+    try {
+        const result = await databaseManager.query(`
+            SELECT id, username, email, role 
+            FROM ${userTables.tableNameUsers} 
+            WHERE id = $1
+        `, [id]);
+        return result.rows[0] || null;
+    } catch (e) {
+        console.error("Error getting user by ID:", e);
+        throw e;
+    }
+}
+
+async function changeUserRole(userId, newRole) {
+    try {
+      const result = await databaseManager.query(
+        `UPDATE ${userTables.tableNameUsers} SET role = $1 WHERE id = $2 RETURNING *`,
+        [newRole, userId]);
+      if (result.rows.length === 0) {
+        throw new Error('User not found');
+      }
+      return result.rows[0];
+    } catch (error) {
+      console.error('Error changing user role:', error);
+      throw error;
+    }
+}
+
+async function getUserRole(userId) {
+    try {
+      const result = await databaseManager.query(`
+        SELECT role 
+        FROM ${userTables.tableNameUsers} 
+        WHERE id = $1`, [userId]);
+      if (result.rows.length === 0) {
+        throw new Error('Role not found');
+      }
+      return result.rows[0];
+    } catch (error) {
+      console.error('Error obtain user role:', error);
+      throw error;
+    }
+}
+
 module.exports = {
     createTables,
     verifyTable,
@@ -219,5 +286,9 @@ module.exports = {
     userExists,
     getRandomQuestion,
     getQuotesByCharacter,
-    getCharacters
+    getCharacters,
+    getUserByEmail,
+    getUserById,
+    changeUserRole,
+    getUserRole
 }

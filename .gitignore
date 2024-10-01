@@ -142,6 +142,4 @@ dist
 tasksProject.md
 
 # Obtain quotes
-scrap.js
-scrapWiki.js
-frases_homer.csv
+frases.csv

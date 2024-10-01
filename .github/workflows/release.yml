@@ -1,0 +1,35 @@
+# Este workflow se ejecutará cuando haya un push de un tag que comience con "v" (por ejemplo, v1.0.0)
+name: Release
+
+on:
+  push:
+    tags:
+      - 'v*'
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    steps:
+      # 1. Clonar el repositorio
+      - uses: actions/checkout@v2
+
+      # 2. Extraer la sección correspondiente del CHANGELOG.md
+      - name: Extract changelog section
+        id: changelog
+        run: |
+          # Obtener la versión del tag (remover "refs/tags/")
+          VERSION=${GITHUB_REF/refs\/tags\//}
+          # Extraer la sección del changelog para esa versión
+          sed -n "/## Version $VERSION:/,/^## Version/p" CHANGELOG.md | sed '$d' > RELEASE_NOTES.md
+
+      # 3. Crear el release en GitHub con la sección extraída del changelog
+      - name: Create GitHub release
+        uses: actions/create-release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}  # Token para autenticar el release
+        with:
+          tag_name: ${{ github.ref }}  # El nombre del tag (por ejemplo, v1.0.1)
+          release_name: Release ${{ github.ref }}  # Nombre del release
+          body: $(cat RELEASE_NOTES.md)  # Contenido extraído del changelog
+          draft: false
+          prerelease: false

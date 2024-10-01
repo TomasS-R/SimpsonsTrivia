@@ -30,6 +30,7 @@ jobs:
     - run: npm ci
     - run: npm run build --if-present
     - run: npm test
+    - run: npm run lint
     
   push_to_docker_hub:
     name: Push Docker image to Docker Hub

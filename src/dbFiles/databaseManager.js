@@ -28,7 +28,7 @@ class DatabaseManager {
             });
 
             // Intentar realizar una consulta simple para verificar la conexión
-            this.pgPool.query('SELECT 1', (err, res) => {
+            this.pgPool.query('SELECT 1', (err) => {
                 if (err) {
                     console.error('😞 Error connecting to PostgreSQL:', err);
                     this.pgPool = null;

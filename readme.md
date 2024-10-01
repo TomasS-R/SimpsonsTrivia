@@ -1,20 +1,23 @@
 <div align="center">
 
-# Trivia Simpsons 🍩
+# Trivia Simpsons ES latam 🍩
 
 [![NodeJS](https://img.shields.io/badge/node-V20.9.0-success?color=yellow&logo=node.js&style=for-the-badge)](https://nodejs.org/)
 [![Npm](https://img.shields.io/badge/npm-V10.1.0-success?color=red&label=npm&logo=npm&style=for-the-badge)](https://www.npmjs.com/)
 [![Nodemon](https://img.shields.io/badge/nodemon-V3.1.4-success?color=76d04b&label=nodemon&logo=nodemon&style=for-the-badge)](https://www.nodemon.io/)
 [![Jest](https://img.shields.io/badge/jest-V29.7.0-success?color=c21325&label=Jest&logo=Jest&style=for-the-badge)](https://www.npmjs.com/)
 [![Express](https://img.shields.io/badge/express-V4.20.0-success?color=0d1117&label=express&logo=express&style=for-the-badge)](https://expressjs.com/)
+[![ESLint](https://img.shields.io/badge/eslint-V9.11.1-success?color=4B32C3&label=ESLint&logo=eslint&style=for-the-badge)](https://eslint.org/)
 
 [![Actions](https://img.shields.io/static/v1?style=for-the-badge&message=Actions&color=555&logo=githubactions&logoColor=3333&label=)](https://docs.github.com/en/actions)
 [![Supabase](https://img.shields.io/static/v1?style=for-the-badge&message=Supabase&color=555&logo=supabase&logoColor=3333&label=)](https://supabase.com/)
 [![Render](https://img.shields.io/static/v1?style=for-the-badge&message=Render&color=555&logo=Render&logoColor=3333&label=)](https://render.com/)
 [![Docker](https://img.shields.io/static/v1?style=for-the-badge&message=Docker&color=555&logo=Docker&logoColor=3333&label=)](https://docker.com/)
+[![Sentry](https://img.shields.io/static/v1?style=for-the-badge&message=Sentry&color=555&logo=Sentry&logoColor=3333&label=)](https://sentry.com/)
 
 ![OpenSource](https://img.shields.io/badge/-open%20source-informational?style=for-the-badge)
 ![Free](https://img.shields.io/badge/-free-success?style=for-the-badge)
+![License](https://img.shields.io/badge/license%20MIT-9370DB?style=for-the-badge)
 
 </div>
 
@@ -34,7 +37,7 @@
 
 # 🔑 Acceso a la api - ![API Status](https://img.shields.io/endpoint?url=https://check-api-status-simpsons.tomas-saintromain.workers.dev/)
 
-### Podes acceder a la api a travez del siguiente [link](https://simpsons-trivia.onrender.com/)
+### Podes acceder a la api a traves del siguiente [link](https://simpsons-trivia.onrender.com/)
 
 #### En la documentacion podras encontrar mas informacion sobre que rutas estan disponibles para consultar y/o realizar solicitudes.
 
@@ -42,7 +45,7 @@
 
 <details close><summary><h2>De que trata el proyecto? 🤔</h2></summary>
 
-### El proyecto contempla la creacion de una trivia usando una frases de los simpsons, la idea es adivinar la mayor cantidad de personajes en base a las frases brindadas en cada ronda.
+### El proyecto contempla la creacion de una trivia usando frases de los simpsons, la idea es adivinar la mayor cantidad de personajes en base a las frases brindadas en cada ronda.
 
 ### El mismo cuenta con una base de datos que almacena la informacion de los jugadores/participantes.
 
@@ -54,7 +57,7 @@
 
 - **Servidor:** Node, Express, NPM, Axios
 
-- **Local:** Nodemon
+- **Local:** Nodemon, EsLint
 
 - **Base de datos:** Supabase (Postgres)
 
@@ -75,6 +78,8 @@
 - [x] Consultar todos los personajes
 
 - [x] Consultar que frase pertenece a que personaje
+
+- [x] Consultar el estado de la api en health check
 
 - [ ] Posibilidad de jugar, sumar puntos (ranking)
 
@@ -167,6 +172,13 @@ Variables de entorno para la conexion con postgress
 
 `NODE_ENV=`
 
+<summary><h3>URLHOST</h3></h3> <h5>(la url donde esta tu proyecto alojado)</h5></summary>
+
+> [!NOTE]
+> En mi caso lo coloque en render por lo que estara apuntando a https://simpsons-trivia.onrender.com pero debes colocar el tuyo segun la url que te entregue el proveedor.
+
+`URLHOST=`
+
 ### Testing
 
 Para realizar testing del proyecto ejecutar el siguiente comando:
@@ -199,6 +211,13 @@ Para construir el docker-compose para modo producción:
 ``` bash 
 docker-compose up --build
 ```
+
+## Ejecutar EsLint 👷‍♂️
+#### Si quieres comprobar el estado del proyecto ejecuta el siguiente comando
+``` bash 
+npm run lint
+```
+#### El mismo mostrara los errores varios (si es que hay).
 
 # 📚 Mucha mas Documentacion
 

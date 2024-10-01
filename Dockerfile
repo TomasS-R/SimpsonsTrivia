@@ -1,54 +1,40 @@
-# 
 ## Stage dev 💻
-#
 FROM node:20-alpine AS dev
-
 WORKDIR /app
 
 COPY package*.json ./
 
-RUN npm install
+# Instalar dependencias y limpiar cache de npm
+RUN npm ci && npm cache clean --force
 
 COPY . .
 
 EXPOSE 3000
-
 CMD ["npm", "run", "dev"]
 
-# 
 ## Stage build 🛠️
-#
 FROM dev AS build
 
 # Limpiar dependencias de desarrollo e instalar solo las de producción
-RUN npm prune --production
+RUN npm ci --only=production && npm cache clean --force
 
-# 
 ## Stage prod 🚀
-#
 FROM node:20-alpine AS prod
 
 # Definir argumentos que se pasarán durante la construcción
-ARG DATABASEUSER
-ARG DATABASEPASS
-ARG DATABASEHOST
-ARG DATABASEPORT
-ARG DATABASENAME
-ARG JWT_SECRET
-ARG CONNECTPOSTGRES
+ARG DATABASEUSER DATABASEPASS DATABASEHOST DATABASEPORT DATABASENAME JWT_SECRET CONNECTPOSTGRES
 
 # Establecer las variables de entorno
-ENV DATABASEUSER=$DATABASEUSER
-ENV DATABASEPASS=$DATABASEPASS
-ENV DATABASEHOST=$DATABASEHOST
-ENV DATABASEPORT=$DATABASEPORT
-ENV DATABASENAME=$DATABASENAME
-ENV JWT_SECRET=$JWT_SECRET
-ENV CONNECTPOSTGRES=$CONNECTPOSTGRES
-
-# Establecer NODE_ENV en production
-ENV NODE_ENV=production
-ENV PORT=3000
+ENV DATABASEUSER=$DATABASEUSER \
+    DATABASEPASS=$DATABASEPASS \
+    DATABASEHOST=$DATABASEHOST \ 
+    DATABASEPORT=$DATABASEPORT \
+    DATABASENAME=$DATABASENAME \
+    JWT_SECRET=$JWT_SECRET \
+    CONNECTPOSTGRES=$CONNECTPOSTGRES \
+    # Establecer NODE_ENV en production
+    NODE_ENV=production \
+    PORT=3000
 
 WORKDIR /app
 

@@ -1,11 +1,13 @@
 openapi: 3.0.0
 servers:
-  # Added by API Auto Mocking Plugin
-  - description: API Simpsons Trivia
-    url: http://https://simpsons-trivia.onrender.com/docs/
+  - description: API Simpsons Trivia server
+    url: https://simpsons-trivia.onrender.com/triviasimpsons/api/v1
+  - description: API Simpsons Trivia localhost
+    url: http://localhost:3001/triviasimpsons/api/v1
+
 info:
   description: This is a simple API of Simpsons Trivia
-  version: "1.0"
+  version: "1.2"
   title: Simple API Simpsons Trivia
   contact:
     email: tomas.saintromain@gmail.com
@@ -13,84 +15,260 @@ info:
     name: Apache 2.0
     url: 'http://www.apache.org/licenses/LICENSE-2.0.html'
 tags:
-  - name: Admins
+  - name: Public
+    description: Publicly accessible endpoints
+  - name: Authentication
+    description: User authentication and registration
+  - name: Admin
     description: Secured Admin-only calls
-  - name: Developers
-    description: Operations available to regular developers
+
 paths:
-  /login:
-    post:
+  /:
+    get:
       tags:
-        - Developers
-      summary: Login users
-      operationId: loginu
-      description: Logearse con el usuario creado.
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              type: object
-              properties:
-                username:
-                  type: string
-                  format: email
-                  description: Colocar el username (email) del usuario.
-                password:
-                  type: string
-                  description: Contraseña de la cuenta.
-              required:
-                - username
-                - password
+        - Public
+      summary: Welcome message
+      operationId: welcomeMessage
+      description: Display a welcome message for the Simpsons Trivia API.
       responses:
-        '201':
-            description: Item created
-            content:
-              application/json:
-                schema:
-                  type: object
-                  properties:
-                    success:
-                      type: boolean
-                      example: true
-                    token:
-                      type: string
-                      example: "eTZ9.yaQhM*******xBby-Q"
-                    user:
+        '200':
+          description: Welcome message
+          content:
+            text/html:
+              schema:
+                type: string
+                example: "Welcome to the Simpsons Trivia API..."
+
+  /healthcheck:
+    get:
+      tags:
+        - Public
+      summary: Health check
+      operationId: healthCheck
+      description: Check the health status of the API.
+      responses:
+        '200':
+          description: API is healthy
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  message:
+                    type: string
+                  timestamp:
+                    type: string
+                    format: date-time
+
+  /users:
+    get:
+      tags:
+        - Admin
+      summary: Get users list
+      operationId: getUsersList
+      description: Retrieve information about all users (Admin only).
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Successfully retrieved user information
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  data:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        id:
+                          type: integer
+                        username:
+                          type: string
+                        role:
+                          type: string
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/ForbiddenError'
+
+  /scores:
+    get:
+      tags:
+        - Admin
+      summary: Get user scores
+      operationId: getUsersScores
+      description: Retrieve user scores (Admin only).
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Successfully retrieved user scores
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  data:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        score:
+                          type: integer
+                        username:
+                          type: string
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/ForbiddenError'
+
+  /quote/questions:
+    get:
+      tags:
+        - Public
+      summary: Get trivia questions
+      operationId: getQuestionsTrivia
+      description: Retrieve a list of trivia questions.
+      responses:
+        '200':
+          description: Successfully retrieved trivia questions
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  data:
+                    type: array
+                    items:
                       type: object
                       properties:
                         id:
                           type: string
-                          example: "5"
-                        username:
+                        quote:
                           type: string
-                          example: "test.simpsons@trivia.com"
-                        role:
+                        data:
                           type: string
-                          example: "user"
-        '400':
-          description: Invalid input, object invalid
-        '409':
-          description: An existing item already exists
+
+  /quote/random:
+    get:
+      tags:
+        - Public
+      summary: Get a random quote with 4 answers
+      operationId: getQuote
+      description: Retrieve a random quote with 4 possible answers.
+      responses:
+        '200':
+          description: Successfully retrieved a random quote
           content:
-              application/json:
-                schema:
-                  type: object
-                  properties:
-                    success:
-                      type: boolean
-                      example: false
-                    error:
-                      type: string
-                      example: "The email or password is not valid!"
-    
-  /register:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  data:
+                    type: object
+                    properties:
+                      id:
+                        type: integer
+                      quote:
+                        type: string
+                      options:
+                        type: array
+                        items:
+                          type: string
+
+  /quotes/bycharacter/{characterId}:
+    get:
+      tags:
+        - Public
+      summary: Get quotes by character
+      operationId: getQuotesByCharacter
+      description: Retrieve quotes for a specific character.
+      parameters:
+        - in: path
+          name: characterId
+          required: true
+          schema:
+            type: integer
+          description: The ID of the character
+      responses:
+        '200':
+          description: Successfully retrieved quotes for the character
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  data:
+                    type: object
+                    properties:
+                      character:
+                        type: string
+                      totalQuotes:
+                        type: integer
+                      quotes:
+                        type: object
+                        additionalProperties:
+                          type: object
+                          properties:
+                            id:
+                              type: integer
+                            quote:
+                              type: string
+        '400':
+          description: Invalid character ID
+        '404':
+          description: Character not found or no quotes available
+
+  /characters:
+    get:
+      tags:
+        - Public
+      summary: Get characters
+      operationId: getCharacters
+      description: Retrieve a list of Simpsons characters.
+      responses:
+        '200':
+          description: Successfully retrieved characters
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  data:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        id:
+                          type: integer
+                        name:
+                          type: string
+        '404':
+          description: No characters found
+
+  /login:
     post:
       tags:
-        - Developers
-      summary: Register users
-      operationId: registeru
-      description: Permite registrar un nuevo usuario.
+        - Authentication
+      summary: Login user
+      operationId: loginUserReq
+      description: Login with a created user account.
       requestBody:
         required: true
         content:
@@ -98,14 +276,68 @@ paths:
             schema:
               type: object
               properties:
-                username:
+                email:
                   type: string
                   format: email
-                  description: Colocar el email para registrar.
+                  description: The email of the user.
                 password:
                   type: string
-                  description: Crear una contraseña.
+                  description: The account password.
               required:
+                - email
+                - password
+      responses:
+        '200':
+          description: User successfully logged in
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  token:
+                    type: string
+                  user:
+                    type: object
+                    properties:
+                      id:
+                        type: integer
+                      username:
+                        type: string
+                      role:
+                        type: string
+        '400':
+          description: Invalid input
+        '409':
+          description: Login failed
+
+  /register:
+    post:
+      tags:
+        - Authentication
+      summary: Register user
+      operationId: registerUserReq
+      description: Register a new user.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                email:
+                  type: string
+                  format: email
+                  description: Email to register.
+                username:
+                  type: string
+                  description: Username for the account.
+                password:
+                  type: string
+                  description: Create a password.
+              required:
+                - email
                 - username
                 - password
       responses:
@@ -118,46 +350,51 @@ paths:
                 properties:
                   success:
                     type: boolean
-                    example: true
                   user:
                     type: object
                     properties:
                       id:
-                        type: string
-                        example: "6"
+                        type: integer
                       username:
                         type: string
-                        example: "test.simpsons@trivia.com"
                       role:
                         type: string
-                        example: "user"
         '400':
-          description: Invalid input, object invalid
+          description: Invalid input
         '409':
-          description: email already exists
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  success:
-                    type: boolean
-                    example: false
-                  error:
-                    type: string
-                    example: "Email already exists. Please use a different email address."
+          description: Email already exists
 
-  /users:
-    get:
+  /users/{userId}/role:
+    patch:
       tags:
-        - Developers
-      summary: Get users
-      operationId: getUsers
-      description: Devuelve la información de los usuarios.
-      #parameters:
+        - Admin
+      summary: Change user role
+      operationId: changeUserRole
+      description: Change the role of a specific user (Admin only).
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: userId
+          required: true
+          schema:
+            type: integer
+          description: The ID of the user
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                newRole:
+                  type: string
+                  description: The new role to assign to the user.
+              required:
+                - newRole
       responses:
         '200':
-          description: Información del usuario obtenida exitosamente
+          description: User role successfully updated
           content:
             application/json:
               schema:
@@ -165,59 +402,38 @@ paths:
                 properties:
                   success:
                     type: boolean
-                    example: true
-                  data:
-                    type: array
-                    items:
-                        type: object
-                        properties:
-                          username:
-                            type: string
-                            example: "test.simpsons@trivia.com"
-                          role:
-                            type: string
-                            example: "user"
+                  message:
+                    type: string
+                  user:
+                    type: object
+                    properties:
+                      id:
+                        type: integer
+                      name:
+                        type: string
+                      email:
+                        type: string
+                      previousRole:
+                        type: string
+                      newRole:
+                        type: string
+        '400':
+          description: Invalid input
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/ForbiddenError'
         '404':
-          description: Usuers not found
-  
-  /scores:
-    get:
-      tags:
-        - Developers
-      summary: Get scores
-      operationId: getScores
-      description: Devuelve los puntajes de los usuarios.
-      responses:
-        '200':
-          description: Puntajes de los usuarios obtenida exitosamente
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  success:
-                    type: boolean
-                    example: true
-        '201':
-          description: Puntajes de los usuarios obtenida exitosamente sin datos
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  success:
-                    type: boolean
-                    example: true
-                  data:
-                    type: array
-                    items:
-                        type: object
-                        properties:
-                          score:
-                            type: string
-                            example: ""
-                          username:
-                            type: string
-                            example: ""
-        '404':
-          description: Scores not found
+          description: User not found
+
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+  responses:
+    UnauthorizedError:
+      description: Access token is missing or invalid
+    ForbiddenError:
+      description: The server understood the request but refuses to authorize it
