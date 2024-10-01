@@ -1,5 +1,10 @@
 # Changelog
 
+## Version 0.4.9: - 2024-09-30 -
+
+### Modificado
+   - Nombre del archivo changelog a CHANGELOG
+
 ## Version 0.4.8: - 2024-09-30 -
 
 ### Modificado
