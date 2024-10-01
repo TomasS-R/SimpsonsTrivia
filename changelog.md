@@ -1,5 +1,10 @@
 # Changelog
 
+## Version 0.4.9a: - 2024-09-30 -
+
+### Modificado
+   - Commit de correccion del archivo [release](.github/workflows/release.yml)
+
 ## Version 0.4.9c: - 2024-09-30 -
 
 ### Modificado
