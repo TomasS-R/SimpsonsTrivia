@@ -33,7 +33,8 @@ jobs:
         with:
           tag_name: ${{ github.ref }}  # El nombre del tag (por ejemplo, v1.0.1)
           release_name: Release ${{ github.ref }}  # Nombre del release
-          body: $(cat RELEASE_NOTES.md)  # Contenido extraído del changelog
+          body: |
+            $(cat RELEASE_NOTES.md)  # Contenido extraído del changelog
           draft: true
           prerelease: false
           

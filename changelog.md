@@ -1,5 +1,11 @@
 # Changelog
 
+## Version 0.4.6: - 2024-09-30 -
+
+### Modificado
+   - Commit de correccion del archivo [release](.github/workflows/release.yml)
+   - Ruta host del servidor
+
 ## Version 0.4.5: - 2024-09-30 -
 
 ### Modificado
