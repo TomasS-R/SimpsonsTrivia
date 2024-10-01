@@ -25,7 +25,7 @@ jobs:
           echo "Content of changelog.md:"
           cat changelog.md
           echo "Attempting to extract changelog section..."
-          CHANGELOG_CONTENT=$(sed -n "/## $VERSION/,/## /p" changelog.md | sed '$d')
+          CHANGELOG_CONTENT=$(awk "/^## $VERSION/,/^## /" changelog.md | sed '$d')
           echo "Extracted content:"
           echo "$CHANGELOG_CONTENT"
           echo "CHANGELOG_CONTENT<<EOF" >> $GITHUB_OUTPUT
