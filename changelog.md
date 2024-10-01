@@ -1,6 +1,11 @@
 # Changelog
 
-## Version 0.5.0: - 2024-09-30 -
+## Version 0.5.1: - 2024-10-01 -
+
+### Modificado
+   - Comando npm start modificado para correcto deploy. Archivo [package](package.json).
+
+## Version 0.5.0: - 2024-10-01 -
 
 ### Modificado
    - Se corrigio el error que se producia al iniciar la aplicacion al ejecutar node src/app.js y hacia que se cayera a los minutos de haber realizado el deploy. Archivo [package](package.json).
