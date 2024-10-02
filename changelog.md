@@ -1,5 +1,10 @@
 # Changelog
 
+## Version 0.5.4: - 2024-10-01 -
+
+### Modificado:
+   - Modificado el puerto del [dockerfile](./Dockerfile) en produccion para que lo detecte de las variables de entorno.
+
 ## Version 0.5.3: - 2024-10-01 -
 
 ### Modificado

@@ -34,7 +34,7 @@ ENV DATABASEUSER=$DATABASEUSER \
     CONNECTPOSTGRES=$CONNECTPOSTGRES \
     # Establecer NODE_ENV en production
     NODE_ENV=production \
-    PORT=3000
+    PORT=$PORT
 
 WORKDIR /app
 
