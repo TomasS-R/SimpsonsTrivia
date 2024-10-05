@@ -1,6 +1,6 @@
 {
   "name": "proyecto-devops",
-  "version": "0.5.4",
+  "version": "0.5.5",
   "description": "Proyecto universitario para devops",
   "main": "../src/routes/routes.js",
   "scripts": {
@@ -12,6 +12,8 @@
   "author": "Tomás Saint Romain",
   "license": "MIT",
   "dependencies": {
+    "@sentry/node": "^8.33.1",
+    "@sentry/profiling-node": "^8.33.0",
     "axios": "^1.7.7",
     "bcryptjs": "^2.4.3",
     "cors": "^2.8.5",

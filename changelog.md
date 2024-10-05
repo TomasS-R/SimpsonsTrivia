@@ -1,5 +1,27 @@
 # Changelog
 
+## Version 0.5.5: - 2024-10-05 -
+
+### Agregado:
+   - Ignorar todo git mediante **/.git en el archivo [dockerignore](.dockerignore)
+   - Configuracion de Sentry para su uso y reportes en el archivo [sentryConfig](./src/monitoring/sentryConfig.js)
+   - Dependencias de Sentry: @sentry/node y @sentry/profiling-node al archivo [package](package.json)
+   - 3 variables de entorno en [.env](.env.template) CORS_ORIGIN, URLHOST y SENTRY_DSN
+   - Esquema de funcionamiento y del flujo de la api hacho con excalidraw en [readme](./readme.md) y en [svg](./media/esqSimpsonsApi.svg)
+   - Archivo [fly.toml](./fly.toml) el cual contiene la configuracion para hacer el deploy en fly.io
+
+### Modificado:
+   - Optimizado el [dockerfile](./Dockerfile)
+   - Agregada la estructura del proyecto en el [readme](readme.md)
+   - El archivo [node](.github/workflows/node.js.yml) en el cual se realizo la configuracion para desplegar en fly.io y se comento/quito la configuracion de despliegue en render
+   - Se cambio en el [dockerfile](./Dockerfile) el comando CMD a ENTRYPOINT para una mejor optimizacion
+   - Realizadas varias modificaciones en el archivo [app](./src/app.js):
+      - Se mejoro el manejo de CORS
+      - Inicializacion de Sentry
+      - Modificada la funcion de las rutas de setupRoutes > setupRoutesV1
+   - Se insertaron las rutas del archivo [routes](./src/routes/routes.js) dentro de una funcion para su correcto funcionamiento al iniciarse la api.
+   - Mejorada la logica y el manejo de CORS en [app](./src/app.js) a partir de ahora maneja una o varias rutas
+
 ## Version 0.5.4: - 2024-10-01 -
 
 ### Modificado:

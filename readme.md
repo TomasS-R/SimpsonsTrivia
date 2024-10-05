@@ -14,6 +14,7 @@
 [![Render](https://img.shields.io/static/v1?style=for-the-badge&message=Render&color=555&logo=Render&logoColor=3333&label=)](https://render.com/)
 [![Docker](https://img.shields.io/static/v1?style=for-the-badge&message=Docker&color=555&logo=Docker&logoColor=3333&label=)](https://docker.com/)
 [![Sentry](https://img.shields.io/static/v1?style=for-the-badge&message=Sentry&color=555&logo=Sentry&logoColor=3333&label=)](https://sentry.com/)
+[![Grafana](https://img.shields.io/static/v1?style=for-the-badge&message=Grafana&color=555&logo=Grafana&logoColor=3333&label=)](https://grafana.com/)
 
 ![OpenSource](https://img.shields.io/badge/-open%20source-informational?style=for-the-badge)
 ![Free](https://img.shields.io/badge/-free-success?style=for-the-badge)
@@ -37,7 +38,7 @@
 
 # 🔑 Acceso a la api - ![API Status](https://img.shields.io/endpoint?url=https://check-api-status-simpsons.tomas-saintromain.workers.dev/)
 
-### Podes acceder a la api a traves del siguiente [link](https://simpsons-trivia.onrender.com/)
+### Podes acceder a la api a traves del siguiente [link](https://simpsons-trivia.fly.dev/)
 
 #### En la documentacion podras encontrar mas informacion sobre que rutas estan disponibles para consultar y/o realizar solicitudes.
 
@@ -179,6 +180,20 @@ Variables de entorno para la conexion con postgress
 
 `URLHOST=`
 
+<summary><h3>CORS_ORIGIN</h3></h3> <h5>(las urls que permitira CORS)</h5></summary>
+
+> [!NOTE]
+> Si no se ingresa ninguna url por default permitira todas las url´s, puedes colocar una o varias rutas de esta forma =https://www.url1.com,http://www.url2.com,http...
+
+`CORS_ORIGIN=`
+
+<summary><h3>SENTRY_DNS</h3></h3> <h5>(monitoreo mediante Sentry)</h5></summary>
+
+> [!NOTE]
+> Ingresa tu DSN de sentry si tienes y si quieres realizar un monitoreo de la api mas preciso, si no puedes dejarlo vacio!
+
+`SENTRY_DSN=`
+
 ### Testing
 
 Para realizar testing del proyecto ejecutar el siguiente comando:
@@ -220,6 +235,72 @@ npm run lint
 #### El mismo mostrara los errores varios (si es que hay).
 
 # 📚 Mucha mas Documentacion
+
+```bash
+📂 PROYECTO-DEVOPS
+├── 📂.github
+│   └── 📂 workflows                    # Contiene los archivos de CI/CD para GitHub Actions
+│       ├── node.js.yml                 # Pipeline de CI y CD para la construccion, subida a docker hub y el deploy en render
+│       └── release.yml                 # Archvio que se encarga de hacer un release automatico en github
+│
+├── 📂 media                            # Contiene imagenes para el readme
+├── 📂 src                              # Contiene el código fuente de la aplicación
+│   ├── app.py                          # Archivo de arranque del proyecto
+│   ├── 📂 account                      # Contiene el manejo de cuentas de los usuarios
+│   │   ├── 📂 roles                    # Contiene los archivos que manejan los roles
+│   │   │   ├── roleMiddleware.js       # Intermediario en controlar y verificar los roles y accesos
+│   │   │   └── rolesManager.js         # Clase donde se manejan la jerarquia y cada tipo de rol
+│   │   │
+│   │   ├── login.js                    # Archvio para iniciar sesion y administrar tokens
+│   │   ├── passportConfig.js           # Validacion de credenciales del login
+│   │   └── register.js                 # Archivo que registra a los usuarios y valida los campos
+│   │   
+│   ├── 📂 controllers                  # Contiene archivos de controladores
+│   │   └── triviaControllers.js        # Archvio que es intermediario entre routes y queries
+│   │   
+│   ├── 📂 dbFiles                      # Contiene archvios de la base de datos
+│   │   ├── 📂 creatingTables           # Contiene archivos de la creacion de las tablas automaticas
+│   │   │   └── userTables.js           # Nombres de tablas y campos de cada una
+│   │   │
+│   │   ├── 📂 monitoring               # Contiene los archvios correspondientes al monitoreo de la api
+│   │   │   └── sentryConfig.js         # Configuracion para la conexion con Sentry
+│   │   │
+│   │   ├── databaseManager.js          # Archivo que se encarga de realizar la conexion a pg al iniciar
+│   │   └── queries.js                  # Archvio que realiza las consultas a la BD
+│   │   
+│   ├── 📂 routes                       # Contiene los archvos que manejan las rutas
+│   │   ├── apiRoutesDoc.yaml           # Explica como comunicarse con cada ruta
+│   │   ├── routes.js                   # Todas las rutas del proyecto
+│   │   ├── securityRoutes.js           # Maneja la seguridad de las rutas
+│   │   └── swaggerDocs.js              # Se encarga de la interfaz de apiRoutesDoc.yaml
+│   │   
+│   └── 📂 scrapQuotes                  # Contiene los archivos de las frases
+│       ├── characters_simpsons.csv     # Tiene los personajes de la serie animada
+│       └── quotes_simspons.csv         # Se encuentran las frases de la serie y su numero de personaje
+│
+├── 📂 tests                            # Contiene todos los tests
+│   └── queries.test.js                 # Archivo que tiene y realiza los tests del proyecto
+│
+├── .env.template                       # Plantilla para las variables de entorno
+├── .gitignore                          # Archvios que no se suben a github
+├── changelog.md                        # Cambios que se realizan en cada version
+├── docker-compose.yml                  # Configuración de Docker Compose
+├── Dockerfile                          # Archivo Docker para construir la imagen de la api
+├── eslint.config.mjs                   # Configuracion de la dependencia EsLint
+├── fly.toml                            # Configuracion para deploy en Fly.io
+├── license.txt                         # Archivo de licencia del proyecto
+│
+├── 📂 package.json                     # Contiene las dependencias del proyecto y + configuraciones
+│   └── package-lock.json               # Maneja las dependencias
+│
+└── readme.md                           # Instrucciones principales de la api y usos
+```
+
+<div align= "center" >
+
+<div align="center"><img src="./media/esqSimpsonsApi.svg" width="1000" height="600"></div>
+
+</div>
 
 #### En este archivo podras encontrar todo el instructivo relaccionado al proyecto en si.
 

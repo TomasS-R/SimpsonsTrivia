@@ -7,10 +7,10 @@ const rolesManager = require('../account/roles/rolesManager');
 
 const routeapi = "/triviasimpsons/api/v1";
 
-function setupRoutes(app, hostname) {
+function setupRoutesV1(app, hostname) {
     app.get([routeapi+'/', '/'], (req, res) => {
         const hostnameapp = hostname || req.get('host');
-        const LinkDocs = `<a href="${hostnameapp}${routeapi}/docs">${hostnameapp}${routeapi}/docs</a>`
+        const LinkDocs = `<a href="https://${hostnameapp}${routeapi}/docs">${hostnameapp}${routeapi}/docs</a>`
         res.send(`English:<br>Welcome to the Simpsons Trivia API, you can test the api if you want, go to ${LinkDocs} to see all the routes
             <br><br>Spanish:<br>Bienvenido a la API Trivia de los Simpsons, puedes probar la api si quieres, ve a ${LinkDocs} para ver todas las rutas disponibles`);
     });
@@ -71,5 +71,5 @@ function setupRoutes(app, hostname) {
 // app.post(routeapi+'/questions/:id/answer', triviaControll.answerQuestion);
 
 module.exports = {
-    setupRoutes,
+    setupRoutesV1,
 }

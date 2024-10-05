@@ -4,13 +4,30 @@ const userTables = require('./dbFiles/creatingTables/userTables');
 const express = require('express');
 const cors = require('cors');
 const passport = require('passport');
-const { setupRoutes } = require('../src/routes/routes');
-const securityRoutes = require('../src/routes/securityRoutes')
+const { setupRoutesV1 } = require('../src/routes/routes');
+const securityRoutes = require('../src/routes/securityRoutes');
+const sentryConfig = require('./monitoring/sentryConfig');
 
 const app = express();
-app.use(cors());
-app.use(express.json());
+app.set('trust proxy', 1);
 
+// Inicializa Sentry
+sentryConfig.initSentry();
+
+const allowedOrigins = process.env.CORS_ORIGIN ? process.env.CORS_ORIGIN.split(',') : ['*'];
+
+app.use(cors({
+    origin: (origin, callback) => {
+        if (allowedOrigins.indexOf(origin) !== -1 || allowedOrigins[0] === '*' || !origin) {
+            callback(null, true);
+        } else {
+            callback(new Error('Not allowed by CORS'));
+        }
+    },
+    methods: ['GET', 'POST', 'PUT', 'DELETE'],
+    allowedHeaders: ['Origin', 'X-Requested-With', 'Content-Type', 'Accept']
+}));
+app.use(express.json());
 app.use(passport.initialize());
 app.use(securityRoutes.apiLimiter);
 
@@ -23,7 +40,7 @@ const HOST = isProduction ? '0.0.0.0' : 'localhost';
 const hostname = isProduction ? process.env.URLHOST : `http://localhost:${PORT}`;
 
 // Importa y configura las rutas
-setupRoutes(app, hostname);
+setupRoutesV1(app, hostname);
 
 // Colores para mensajes en la terminal
 const RESET = '\x1b[0m';
@@ -64,7 +81,7 @@ async function configureApp() {
         // Mostrar mensajes en la terminal según el entorno
         if (isProduction) {
             console.log(`${RED}${BOLD}⚠️  Advertencia: ¡Estás en modo producción!${RESET}`);
-            app.listen(PORT, () => console.log(`${GREEN}${BOLD}🚀 Servidor en producción corriendo!`));
+            app.listen(PORT, () => console.log(`${GREEN}${BOLD}🚀 Servidor en producción corriendo en el puerto: ${PORT}!`));
         } else {
             console.log(`${GREEN}${BOLD}🔧 Estás en modo desarrollo.${RESET}`);
             app.listen(PORT, () => console.log(`${GREEN}${BOLD}🚀 Servidor de desarrollo corriendo en: http://${HOST}:${PORT}${RESET}`));

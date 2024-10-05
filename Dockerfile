@@ -47,4 +47,4 @@ COPY --from=build /app/src ./src
 EXPOSE ${PORT}
 
 # Comando para ejecutar la aplicación
-CMD ["npm", "start"]
+ENTRYPOINT ["npm", "start"]
