@@ -4,11 +4,12 @@ const userTables = require('./dbFiles/creatingTables/userTables');
 const express = require('express');
 const cors = require('cors');
 const passport = require('passport');
-const { setupRoutesV1 } = require('../src/routes/routes');
+const { setupRoutesV1, routeapi } = require('../src/routes/routes');
 const securityRoutes = require('../src/routes/securityRoutes');
 const sentryConfig = require('./monitoring/sentryConfig');
 
 const app = express();
+// Configura la aplicación para que confíe en el encabezado X-Forwarded-For establecido por el proxy.
 app.set('trust proxy', 1);
 
 // Inicializa Sentry
@@ -24,7 +25,7 @@ app.use(cors({
             callback(new Error('Not allowed by CORS'));
         }
     },
-    methods: ['GET', 'POST', 'PUT', 'DELETE'],
+    methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH'],
     allowedHeaders: ['Origin', 'X-Requested-With', 'Content-Type', 'Accept']
 }));
 app.use(express.json());
@@ -47,6 +48,7 @@ const RESET = '\x1b[0m';
 const RED = '\x1b[31m';
 const GREEN = '\x1b[32m';
 const YELLOW = '\x1b[33m';
+const BLUE = '\x1b[96m';
 const BOLD = '\x1b[1m';
 
 // Verifica si la conexión a postgres está habilitada
@@ -82,6 +84,11 @@ async function configureApp() {
         if (isProduction) {
             console.log(`${RED}${BOLD}⚠️  Advertencia: ¡Estás en modo producción!${RESET}`);
             app.listen(PORT, () => console.log(`${GREEN}${BOLD}🚀 Servidor en producción corriendo en el puerto: ${PORT}!`));
+            if (hostname == undefined){
+                console.log(`${YELLOW}${BOLD} ❗ Configura la variable de entorno *URLHOST* en tu host para poder ver la ruta de desplegue.${RESET}`);
+            } else {
+                console.log(`${BLUE}${BOLD} 🌐 Puedes acceder a traves de https://${hostname}${routeapi} ${RESET}`);
+            }
         } else {
             console.log(`${GREEN}${BOLD}🔧 Estás en modo desarrollo.${RESET}`);
             app.listen(PORT, () => console.log(`${GREEN}${BOLD}🚀 Servidor de desarrollo corriendo en: http://${HOST}:${PORT}${RESET}`));
@@ -101,4 +108,5 @@ process.on('SIGINT', () => {
 
 module.exports = {
     app,
+    isProduction
 };

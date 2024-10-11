@@ -154,13 +154,36 @@ async function getRandomQuestion() {
     try {
         const result = await databaseManager.query(`
             SELECT q.id, q.quote, c.name as correct_character,
-                   (SELECT array_agg(c2.name) FROM ${userTables.tableNameCharacter} c2 WHERE c2.id != q.character_id ORDER BY RANDOM() LIMIT 3) as incorrect_options
+                   (SELECT array_agg(c2.name)
+                    FROM ${userTables.tableNameCharacter} c2
+                    WHERE c2.id != q.character_id
+                    ORDER BY RANDOM()
+                    LIMIT 10) as incorrect_options
             FROM ${userTables.tableNameQuotes} q
             JOIN ${userTables.tableNameCharacter} c ON q.character_id = c.id
             ORDER BY RANDOM()
             LIMIT 1
         `);
-        return result.rows[0];
+
+        // Verificar si se obtuvo un resultado
+        if (result.rows.length === 0) {
+            console.error("No questions found in the database.");
+            return undefined;
+        }
+
+        const incorrectOptions = result.rows[0].incorrect_options;
+
+        // Asegurarse de que incorrectOptions tenga al menos 3 elementos
+        if (!incorrectOptions || incorrectOptions.length < 3) {
+            console.error("Not enough incorrect options available.");
+            return undefined;
+        }
+
+        const shuffledOptions = incorrectOptions.sort(() => Math.random() - 0.5).slice(0, 3);
+        return {
+            ...result.rows[0],
+            incorrect_options: shuffledOptions
+        };
     } catch (e) {
         console.log(e);
         throw e;

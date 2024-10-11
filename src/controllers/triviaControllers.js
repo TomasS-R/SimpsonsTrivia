@@ -12,25 +12,25 @@ function validateEmail(email) {
 // Funcion para registrar un usuario
 async function registerUserReq (req, res) {
   try {
-      const { email, username, password } = req.body;
-      const defaultRole = rolesManager.getDefaultRole();
+    const { email, username, password } = req.body;
+    const defaultRole = rolesManager.getDefaultRole();
 
-      if (!email) {
-        return res.status(400).json({ success: false, error: "The request needs the 'email' field!" });
-      }
-      else if (!validateEmail(email)) {
-        return res.status(400).json({ success: false, error: "The email is not valid!" });
-      }
-      else if (!username) {
-        return res.status(400).json({ success: false, error: "The request needs the 'username' field!" });
-      }
-      else if (!password) {
-        return res.status(400).json({ success: false, error: "The request needs the 'password' field!" });
-      }
-      accountRegister.registerUser(username, email, password, defaultRole, res);
+    if (!email) {
+      return res.status(400).json({ success: false, error: "The request needs the 'email' field!" });
+    }
+    else if (!validateEmail(email)) {
+      return res.status(400).json({ success: false, error: "The email is not valid!" });
+    }
+    else if (!username) {
+      return res.status(400).json({ success: false, error: "The request needs the 'username' field!" });
+    }
+    else if (!password) {
+      return res.status(400).json({ success: false, error: "The request needs the 'password' field!" });
+    }
+    accountRegister.registerUser(username, email, password, defaultRole, res);
   }
   catch (e) {
-      console.log(e);
+    console.log(e);
   }
 };
 
@@ -91,38 +91,38 @@ async function changeUserRole(req, res) {
 // Funcion para loguear un usuario
 async function loginUserReq (req, res, next) {
   try {
-      const { email, password } = req.body;
-      const fields = Object.keys(req.body);
+    const { email, password } = req.body;
+    const fields = Object.keys(req.body);
 
-      // Comprueba que solo se envien 2 campos, usuario y password
-      if (fields.length > 2) {
-        return res.status(400).json({ success: false, error: "The request has more than 2 fields!" });
-      }
-      else if (!email) {
-          return res.status(409).json({ success: false, error: "The request needs the 'email' field!" });
-      }
-      else if (!validateEmail(email)) {
-          return res.status(409).json({ success: false, error: "The email is not valid!" });
-      }
-      else if (!password) {
-          return res.status(409).json({ success: false, error: "The request needs the 'password' field!" });
-      }
-      await accountLogin.loginUser(req, res, next);
+    // Comprueba que solo se envien 2 campos, usuario y password
+    if (fields.length > 2) {
+      return res.status(400).json({ success: false, error: "The request has more than 2 fields!" });
+    }
+    else if (!email) {
+        return res.status(409).json({ success: false, error: "The request needs the 'email' field!" });
+    }
+    else if (!validateEmail(email)) {
+        return res.status(409).json({ success: false, error: "The email is not valid!" });
+    }
+    else if (!password) {
+        return res.status(409).json({ success: false, error: "The request needs the 'password' field!" });
+    }
+    await accountLogin.loginUser(req, res, next);
   }
   catch (e) {
-      console.log(e);
-      next(e);
+    console.log(e);
+    next(e);
   }
 };
 
 // Funcion para obtener la lista de usuarios
 async function getUsersList (req, res) {
     try {
-        const response = await queries.getUsers(); 
-        res.status(200).json({
-            success: true,
-            data: response,
-        });
+      const response = await queries.getUsers(); 
+      res.status(200).json({
+          success: true,
+          data: response,
+      });
     } catch (error) {
       res.status(500).json({
         success: false,
@@ -134,11 +134,11 @@ async function getUsersList (req, res) {
 // Funcion para obtener los puntajes de los usuarios
 async function getUsersScores (req, res) {
     try {
-        const response = await queries.getScores(); 
-        res.status(200).json({
-            success: true,
-            data: response,
-        });
+      const response = await queries.getScores(); 
+      res.status(200).json({
+          success: true,
+          data: response,
+      });
     } catch (error) {
       res.status(500).json({
         success: false,
@@ -149,11 +149,11 @@ async function getUsersScores (req, res) {
 
 async function getQuestionsTrivia (req, res) {
     try {
-        const response = await queries.getQuestions(); 
-        res.status(200).json({
-            success: true,
-            data: response,
-        });
+      const response = await queries.getQuestions(); 
+      res.status(200).json({
+          success: true,
+          data: response,
+      });
     } catch (error) {
       res.status(500).json({
         success: false,
@@ -164,99 +164,99 @@ async function getQuestionsTrivia (req, res) {
 
 async function getQuote(req, res) {
     try {
-        const question = await queries.getRandomQuestion();
-        
-        if (!question) {
-            return res.status(404).json({ success: false, error: "No questions available" });
-        }
+      const question = await queries.getRandomQuestion();
+      
+      if (!question) {
+        return res.status(404).json({ success: false, error: "No questions available" });
+      }
 
-        // Mezclar las opciones
-        const allOptions = [question.correct_character, ...question.incorrect_options];
-        // Selecciona 4 opciones de la BD 3 erroneas y 1 correcta
-        if (allOptions.length > 4) {
-            allOptions.splice(4);
-        } else if (allOptions.length < 4) {
-            console.error("Not enough options for question ID:", question.id);
-            return res.status(500).json({ success: false, error: "Not enough options available" });
-        }
+      // Mezclar las opciones
+      const allOptions = [question.correct_character, ...question.incorrect_options];
+      // Selecciona 4 opciones de la BD 3 erroneas y 1 correcta
+      if (allOptions.length > 4) {
+        allOptions.splice(4);
+      } else if (allOptions.length < 4) {
+        console.error("Not enough options for question ID:", question.id);
+        return res.status(500).json({ success: false, error: "Not enough options available" });
+      }
 
-        const shuffledOptions = allOptions.sort(() => Math.random() - 0.5);
+      const shuffledOptions = allOptions.sort(() => Math.random() - 0.5);
 
-        res.status(200).json({
-            success: true,
-            data: {
-                id: question.id,
-                quote: question.quote,
-                options: shuffledOptions
-            }
-        });
+      res.status(200).json({
+          success: true,
+          data: {
+            id: question.id,
+            quote: question.quote,
+            options: shuffledOptions
+          }
+      });
 
     } catch (error) {
         res.status(500).json({
-            success: false,
-            error: error.message,
+          success: false,
+          error: error.message,
         });
     }
 }
 
 async function healthCheck(req, res) {
     res.status(200).json({
-        success: true,
-        message: 'La API está funcionando correctamente',
-        timestamp: new Date().toISOString()
+      success: true,
+      message: 'La API está funcionando correctamente',
+      timestamp: new Date().toISOString()
     });
 }
 
 async function getQuotesByCharacter(req, res) {
     try {
-        const characterId = parseInt(req.params.characterId);
-        
-        if (isNaN(characterId)) {
-            return res.status(400).json({
-                success: false,
-                message: 'Character ID must be a number'
-            });
-        }
+      const characterId = parseInt(req.params.characterId);
+      
+      if (isNaN(characterId)) {
+        return res.status(400).json({
+          success: false,
+          message: 'Character ID must be a number'
+        });
+      }
 
-        const result = await queries.getQuotesByCharacter(characterId);
-        
-        if (!result) {
-          return res.status(404).json({
-              success: false,
-              message: `Character with ID ${characterId} does not exist`
-          });
-        }
+      const result = await queries.getQuotesByCharacter(characterId);
+      
+      if (!result) {
+        return res.status(404).json({
+          success: false,
+          message: `Character with ID ${characterId} does not exist`
+        });
+      }
 
-        if (result.quotes.length === 0) {
-          return res.status(404).json({
-            success: false,
-            message: `No quotes found for character ${result.character.name}`
-          });
-        }
+      if (result.quotes.length === 0) {
+        return res.status(404).json({
+          success: false,
+          message: `No quotes found for character ${result.character.name}`
+        });
+      }
 
         // Convertir el array de quotes en un objeto con el indice como clave
         const quotesObject = result.quotes.reduce((acc, quote, index) => {
           acc[index + 1] = {
-              id: quote.id,
-              quote: quote.quote
+            id: quote.id,
+            quote: quote.quote
           };
           return acc;
       }, {});
 
-        res.json({
-          success: true,
-          data: {
-            character: result.character.name,
-            totalQuotes: result.totalQuotes,
-            quotes: quotesObject
-          }
-        });
+      res.json({
+        success: true,
+        data: {
+          character: result.character.name,
+          totalQuotes: result.totalQuotes,
+          quotes: quotesObject
+        }
+      });
     } catch (error) {
-        console.error('Error getting quotes by character:', error);
-        res.status(500).json({
-          success: false,
-          message: 'Error getting quotes by character'
-        });
+      console.error('Error getting quotes by character:', error);
+      res.status(500).json({
+        success: false,
+        message: 'Error getting quotes by character'
+      });
     }
 };
 
@@ -266,8 +266,8 @@ const getCharacters = async (req, res) => {
       
       if (characters.length === 0) {
         return res.status(404).json({
-            success: false,
-            message: "No characters found"
+          success: false,
+          message: "No characters found"
         });
       }
 

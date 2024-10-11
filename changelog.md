@@ -1,5 +1,24 @@
 # Changelog
 
+## Version 0.5.6: - 2024-10-11 -
+
+### Agregado:
+   - Dependencia swagger-themes para personalizar la documentacion de swagger (modo oscuro y mas temas) en [swaggerDocs](./src/routes/swaggerDocs.js)
+
+### Modificado:
+   - Agregados mas detalles al momento de hacer deploy y ver en la consola/terminal en [app](./src/app.js)
+   - Exportada y acortada la routeapi del archivo [routes](./src/routes/routes.js)
+   - Se mejoro la ruta "home" para que muestre correctamente la url segun el entorno de desarrollo en [routes](./src/routes/routes.js)
+   - [docker-compose](./docker-compose.yml) mejorado
+   - Se arreglo un bug que al consultar la frase y personajes devolvia siempre los mismos 3 personajes erroneos, ahora obtiene 10 personajes y de esos 10 obtiene 3 como incorrectos en el archvio [queries](./src/dbFiles/queries.js)
+   - Corregida la identacion del archivo [triviaControllers](./src/controllers/triviaControllers.js)
+   - Arreglados los nombres de algunos personajes en [characters_simpsons](./src/scrapQuotes/characters_simpson.csv)
+   - Al ejecutar el comando npm run dev se modifico para que antes de ejecutar la api se realicen los tests correspondientes en [package](./package.json)
+   - Todos los usuarios al registrarse/logearse recibiran un token, esta modificacion fue realizada en [login](./src/account/login.js) y [register](./src/account/register.js)
+
+### Obsoleto:
+   - Se retiro la implementacion del deploy en render y se transfirio definitivamente a flyio en [workflows](.github/workflows/node.js.yml)
+
 ## Version 0.5.5: - 2024-10-05 -
 
 ### Agregado:

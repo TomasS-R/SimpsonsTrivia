@@ -45,14 +45,23 @@ test('getRandomQuestion returns a question with correct structure', async () => 
     incorrect_options: ['Bart Simpson', 'Lisa Simpson', 'Marge Simpson']
   };
 
+  // Simular la respuesta de la base de datos
   databaseManager.query.mockResolvedValue({ rows: [mockQuestion] });
 
   const result = await getRandomQuestion();
 
-  expect(result).toEqual(mockQuestion);
-  expect(result.quote).toBeDefined();
-  expect(result.correct_character).toBeDefined();
+  // Verificar que el resultado tenga la estructura correcta
+  expect(result).toHaveProperty('id');
+  expect(result).toHaveProperty('quote');
+  expect(result).toHaveProperty('correct_character');
+  expect(result).toHaveProperty('incorrect_options');
+
+  // Verificar que las opciones incorrectas sean 3
   expect(result.incorrect_options).toHaveLength(3);
+
+  // Verificar que la respuesta correcta esté presente en las opciones
+  expect(result.incorrect_options).toEqual(expect.arrayContaining(mockQuestion.incorrect_options));
+  expect(result.correct_character).toBe(mockQuestion.correct_character);
 });
 
 // Test para comprobar que la función getRandomQuestion maneja correctamente un resultado vacío

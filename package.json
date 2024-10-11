@@ -1,11 +1,11 @@
 {
   "name": "proyecto-devops",
-  "version": "0.5.5",
+  "version": "0.5.6",
   "description": "Proyecto universitario para devops",
   "main": "../src/routes/routes.js",
   "scripts": {
     "test": "jest",
-    "dev": "nodemon --env-file=.env src/app.js",
+    "dev": "npm run test && nodemon --env-file=.env src/app.js",
     "lint": "eslint . --max-warnings 0",
     "start": "node src/app.js"
   },
@@ -25,6 +25,7 @@
     "passport-jwt": "^4.0.1",
     "passport-local": "^1.0.0",
     "pg": "^8.12.0",
+    "swagger-themes": "^1.4.3",
     "swagger-ui-express": "^5.0.1",
     "yamljs": "^0.3.0"
   },

@@ -1,16 +1,16 @@
 require('../account/passportConfig');
 const triviaControll = require('../controllers/triviaControllers');
-const { swaggerDocument, swaggerUi } = require('./swaggerDocs');
+const { swaggerDocument, swaggerUi, options } = require('./swaggerDocs');
 const securityRoutes = require('./securityRoutes');
 const { checkRole } = require('../account/roles/roleMiddleware');
 const rolesManager = require('../account/roles/rolesManager');
 
-const routeapi = "/triviasimpsons/api/v1";
+const routeapi = "/api/v1";
 
 function setupRoutesV1(app, hostname) {
     app.get([routeapi+'/', '/'], (req, res) => {
         const hostnameapp = hostname || req.get('host');
-        const LinkDocs = `<a href="https://${hostnameapp}${routeapi}/docs">${hostnameapp}${routeapi}/docs</a>`
+        let LinkDocs = `<a href="${process.env.NODE_ENV === 'production' ? 'https://' : ''}${hostnameapp}${routeapi}/docs">${hostnameapp}${routeapi}/docs</a>`;
         res.send(`English:<br>Welcome to the Simpsons Trivia API, you can test the api if you want, go to ${LinkDocs} to see all the routes
             <br><br>Spanish:<br>Bienvenido a la API Trivia de los Simpsons, puedes probar la api si quieres, ve a ${LinkDocs} para ver todas las rutas disponibles`);
     });
@@ -49,7 +49,7 @@ function setupRoutesV1(app, hostname) {
     app.get(routeapi+'/characters', triviaControll.getCharacters);
 
     // Rutas de la API documentada con Swagger usando el archivo apiRoutesDoc.yaml
-    app.use(routeapi + '/docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument));
+    app.use(routeapi + '/docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument, options));
 
     // Middleware para manejar rutas no encontradas (404)
     app.use((req, res) => {
@@ -72,4 +72,5 @@ function setupRoutesV1(app, hostname) {
 
 module.exports = {
     setupRoutesV1,
+    routeapi,
 }

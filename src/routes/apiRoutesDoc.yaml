@@ -1,11 +1,9 @@
 openapi: 3.0.0
 servers:
   - description: API Simpsons Trivia Flyio server
-    url: https://simpsons-trivia.fly.dev/triviasimpsons/api/v1
-  - description: API Simpsons Trivia Render server
-    url: https://simpsons-trivia.onrender.com/triviasimpsons/api/v1
+    url: https://simpsons-trivia.fly.dev/api/v1
   - description: API Simpsons Trivia localhost
-    url: http://localhost:3001/triviasimpsons/api/v1
+    url: http://localhost:3001/api/v1
 
 info:
   description: This is a simple API of Simpsons Trivia

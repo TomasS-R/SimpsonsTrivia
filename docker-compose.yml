@@ -10,17 +10,23 @@ services:
     env_file:
       - .env
     restart: unless-stopped
+    # networks: Los contenedores que pertenecen a esa red pueden comunicarse entre sí, mientras que los contenedores que no están en la misma red no pueden hacerlo.
+    # Esto proporciona un nivel de aislamiento y seguridad.
+    networks:
+      - app-network
 
-  # dev:
-  #   build:
-  #     context: .
-  #     target: dev
-  #   ports:
-  #     - "3000:3000"
-  #   environment:
-  #     - NODE_ENV=development
-  #   env_file:
-  #     - .env
-  #   volumes:
-  #     - ./src:/app/src
-  #   command: npm run dev
+  dev:
+    build:
+      context: .
+      target: dev
+    ports:
+      - "3000:3000"
+    environment:
+      - NODE_ENV=development
+    env_file:
+      - .env
+    volumes:
+      - ./src:/app/src
+    command: npm run dev
+    networks:
+      - app-network

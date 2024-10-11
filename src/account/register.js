@@ -1,5 +1,5 @@
 const bcryptjs = require('bcryptjs');
-//const jwt = require('jsonwebtoken');
+const jwt = require('jsonwebtoken');
 const queries = require('../dbFiles/queries');
 
 // Funcion para registrar un usuario
@@ -21,8 +21,15 @@ async function registerUser (username, email, password, role = 'user', res) {
         const result = await queries.createUser(username, email, hashedPassword, role, created_at);
         const user = result.rows[0];
 
+        const token = jwt.sign(
+            { id: result.id, email: result.email, role: result.role },
+            process.env.JWT_SECRET,
+            { expiresIn: '1h' }
+        );
+
         res.status(201).json({
             success: true,
+            token: token,
             data: {
                 id: user.id,
                 username: user.username,

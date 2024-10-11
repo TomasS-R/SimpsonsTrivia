@@ -12,6 +12,7 @@
 [![Actions](https://img.shields.io/static/v1?style=for-the-badge&message=Actions&color=555&logo=githubactions&logoColor=3333&label=)](https://docs.github.com/en/actions)
 [![Supabase](https://img.shields.io/static/v1?style=for-the-badge&message=Supabase&color=555&logo=supabase&logoColor=3333&label=)](https://supabase.com/)
 [![Render](https://img.shields.io/static/v1?style=for-the-badge&message=Render&color=555&logo=Render&logoColor=3333&label=)](https://render.com/)
+[![Flyio](https://img.shields.io/static/v1?style=for-the-badge&message=Fly.io&color=555&logo=Fly.io&logoColor=3333&label=)](https://Fly.io/)
 [![Docker](https://img.shields.io/static/v1?style=for-the-badge&message=Docker&color=555&logo=Docker&logoColor=3333&label=)](https://docker.com/)
 [![Sentry](https://img.shields.io/static/v1?style=for-the-badge&message=Sentry&color=555&logo=Sentry&logoColor=3333&label=)](https://sentry.com/)
 [![Grafana](https://img.shields.io/static/v1?style=for-the-badge&message=Grafana&color=555&logo=Grafana&logoColor=3333&label=)](https://grafana.com/)
@@ -64,7 +65,7 @@
 
 - **Testing:** Jest
 
-- **Host:** Render
+- **Host:** Flyio
 
 - **Documentacion:** Swagger
 
@@ -148,7 +149,7 @@ Variables de entorno para la conexion con postgress
 <summary><h3>Host</h3> <h5>(donde se aloja la aplicacion)</h5></summary>
 
 > [!NOTE]
-> Por defecto tiene 'localhost:' debes cambiarlo al subirlo a la nube
+> Por defecto tiene 'localhost:' debes cambiarlo al subirlo a la nube o puedes dejarlo vacio como en mi caso
 
 `HOST`
 
@@ -176,7 +177,7 @@ Variables de entorno para la conexion con postgress
 <summary><h3>URLHOST</h3></h3> <h5>(la url donde esta tu proyecto alojado)</h5></summary>
 
 > [!NOTE]
-> En mi caso lo coloque en render por lo que estara apuntando a https://simpsons-trivia.onrender.com pero debes colocar el tuyo segun la url que te entregue el proveedor.
+> En mi caso lo coloque en flyio por lo que estara apuntando a simpsons-trivia.fly.dev pero debes colocar el tuyo segun la url que te entregue el proveedor.
 
 `URLHOST=`
 
@@ -240,7 +241,7 @@ npm run lint
 📂 PROYECTO-DEVOPS
 ├── 📂.github
 │   └── 📂 workflows                    # Contiene los archivos de CI/CD para GitHub Actions
-│       ├── node.js.yml                 # Pipeline de CI y CD para la construccion, subida a docker hub y el deploy en render
+│       ├── node.js.yml                 # Pipeline de CI y CD para la construccion, subida a docker hub y el deploy en flyio o render
 │       └── release.yml                 # Archvio que se encarga de hacer un release automatico en github
 │
 ├── 📂 media                            # Contiene imagenes para el readme
@@ -298,7 +299,7 @@ npm run lint
 
 <div align= "center" >
 
-<div align="center"><img src="./media/esqSimpsonsApi.svg" width="1000" height="600"></div>
+<div align="center"><img src="./media/esqSimpsonsApi.svg" width="1000" height="400"></div>
 
 </div>
 

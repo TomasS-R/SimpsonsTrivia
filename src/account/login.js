@@ -35,17 +35,14 @@ async function loginUser(req, res, next) {
 
             const responseData = {
                 success: true,
+                token: token,
                 user: {
                     id: user.id,
                     email: user.email,
                     username: user.username,
                     role: user.role
-                }
+                },
             };
-
-            if (user.role === 'admin') {
-                responseData.token = token;
-            }
 
             return res.status(200).json(responseData)
         });
