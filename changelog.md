@@ -1,5 +1,39 @@
 # Changelog
 
+## Version 0.5.7: - 2024-10-23 -
+
+### Agregado:
+   - Supabase Authentication: Se movio la logica y la autenticacion a supabase ya que ofrece una base solida en cuanto a seguridad para login y registro asi como tambien ofrece oAuth con otras apps.
+   - Se agrego supabaseAuth en [triviaControllers](./src/controllers/triviaControllers.js) para poder obtener determinados datos de la autenticacion y asi aprobar o no a los usuarios.
+   - 2 variables de entorno para la conexion con supabase SUPABASE_URL y SUPABASE_ANON_KEY
+   - Se agrego informacion en el [readme](readme.md) sobre como implementar las nuevas variables de entorno.
+   - Mas informacion al momento de logearse/autenticarse en [login](./src/account/login.js).
+   - Dependencia Cookie Parser para manejo de tokens en login y registro.
+   - Dependencia Zod para mejorar la seguridad y y las validaciones en el registro.
+   - Dependencia ejs para la implementacion y manejo del login y registro.
+   - [Index](./src/account/index.ejs) para poder manejar correctamente la implementacion con el front end en cuanto a login y registro.
+   - Ruta logout para cerrar sesion de la cuenta y ruta protected la cual permite acceder a recursos que solo usuarios registrados/logeados (rol: user) pueden ver en [routes](./src/routes/routes.js).
+   - Archivo [protected](./src/views/protected.ejs) en el se podra ver informacion solo para usuarios logeados con el rol requerido (user).
+   - Se genero el archivo [authSupabase](./src/account/authSupabase.js) el cual maneja la conexion con la api de supabase.
+   - La tabla user_anonimus para una futura implementacion de usuarios no logeados que quieran jugar sin tener que perder el progreso en esa sesion, tabla agregada en [userTables](./src/dbFiles/creatingTables/userTables.js).
+
+### Modificado:
+   - Se modificaron las rutas protegidas para que funcionen correctamente con supabase en [routes](./src/routes/routes.js).
+   - Modificado el archivo [roleMiddleware](./src/account/roles/roleMiddleware.js) para manejar adecuadamente los roles.
+   - [register](./src/account/register.js) para el uso correcto con supabase auth.
+   - Memoria de la virtual machine de flyio reducida de 1024mb a 512mb para evitar costos mayores en la facturacion, cambio realizado en el archivo [fly.toml](fly.toml).
+   - Mejorado la ruta home, ahora se visualiza el login y el registro en esta ruta, asi tambien se mejoro el mensaje con respecto a la redireccion de la documentacion.
+   - La tabla usuarios del archivo [userTables](./src/dbFiles/creatingTables/userTables.js) se cambio el campo password_hash a supabase_user_id y de tipo UUID para conectar los usuarios creados mediante Supabase Auth a los usuarios de la tabla users_trivia.
+   - Se reestructuro el archivo [userTables](./src/dbFiles/creatingTables/userTables.js) para que se puedan crear nuevas tablas sin tener que modificar parametros en otros archivos como lo era en el archivo [app](./src/app.js).
+   - Se reestructuro la funcion createDatabaseTables del archivo [app](./src/app.js) para que automaticamente detecte las tablas del archivo [userTables](./src/dbFiles/creatingTables/userTables.js) de esta forma allí se pueden crear muchas tablas y el sistema automaticamente las creara en la base de datos.
+   - Mejorado y arreglado un bug en [queries](./src/dbFiles/queries.js) que no reconocia las tablas al modificar el archivo userTables.
+
+### Obsoleto:
+   - Se elimino el archivo PassportConfig
+   - Se quito la configuracion de JWT de las rutas protegidas
+   - Se quitaron las dependencias bcryptjs, passport-jwt, passport-local, passport y se remplazaron por el sistema de Supabase.
+   - Test de verificacion de email (esto lo verificara ahora de ahora en adelante supabase).
+
 ## Version 0.5.6: - 2024-10-11 -
 
 ### Agregado:

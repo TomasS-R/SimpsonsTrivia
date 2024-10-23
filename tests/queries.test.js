@@ -1,5 +1,4 @@
 const { createUser, userExists, getRandomQuestion } = require('../src/dbFiles/queries');
-const { validateEmail } = require('../src/controllers/triviaControllers')
 const databaseManager = require('../src/dbFiles/databaseManager');
 
 // Simula la base de datos
@@ -71,17 +70,4 @@ test('getRandomQuestion handles empty result', async () => {
   const result = await getRandomQuestion();
 
   expect(result).toBeUndefined();
-});
-
-// Conjunto de tests para verificar la función validateEmail
-describe('validateEmail', () => {
-  // Test para comprobar que validateEmail acepta un email correcto
-  test('validates correct email', () => {
-    expect(validateEmail('test@example.com')).toBe(true);
-  });
-
-  // Test para comprobar que validateEmail rechaza un email incorrecto
-  test('invalidates incorrect email', () => {
-    expect(validateEmail('notanemail')).toBe(false);
-  });
 });

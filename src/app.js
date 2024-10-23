@@ -3,14 +3,19 @@ const { createTables } = require('./dbFiles/queries');
 const userTables = require('./dbFiles/creatingTables/userTables');
 const express = require('express');
 const cors = require('cors');
-const passport = require('passport');
+const cookieParser = require('cookie-parser')
 const { setupRoutesV1, routeapi } = require('../src/routes/routes');
 const securityRoutes = require('../src/routes/securityRoutes');
 const sentryConfig = require('./monitoring/sentryConfig');
+const { supabaseConection } = require('../src/account/authSupabase')
 
 const app = express();
 // Configura la aplicación para que confíe en el encabezado X-Forwarded-For establecido por el proxy.
 app.set('trust proxy', 1);
+// Configurar EJS para la configuracion del login y el registro como motor de plantillas
+app.set('view engine', 'ejs')
+// Establecer el directorio de vistas
+app.set('views', './src/views');
 
 // Inicializa Sentry
 sentryConfig.initSentry();
@@ -29,7 +34,7 @@ app.use(cors({
     allowedHeaders: ['Origin', 'X-Requested-With', 'Content-Type', 'Accept']
 }));
 app.use(express.json());
-app.use(passport.initialize());
+app.use(cookieParser());
 app.use(securityRoutes.apiLimiter);
 
 // Determinar el entorno
@@ -55,13 +60,13 @@ const BOLD = '\x1b[1m';
 const connectionps = process.env.CONNECTPOSTGRES === 'True' ? true : (process.env.CONNECTPOSTGRES === undefined ? false : false);
 
 async function createDatabaseTables() {
-    const tables = [
-        { name: userTables.tableNameUsers, columns: userTables.columnsUsers },
-        { name: userTables.tableNameCharacter, columns: userTables.columnsCharacter },
-        { name: userTables.tableNameScores, columns: userTables.columnsScores },
-        { name: userTables.tableNameQuotes, columns: userTables.columnsQuotes },
-        { name: userTables.tableNameQuotesUsers, columns: userTables.columnsQuotesUsers }
-    ];
+    // Obtener todas las tablas y sus columnas desde userTables
+    const tables = Object.keys(userTables).map(key => {
+        return {
+            name: userTables[key].tableName,
+            columns: userTables[key].columns
+        };
+    });
 
     for (const table of tables) {
         await createTables(table.name, table.columns);
@@ -78,6 +83,13 @@ async function configureApp() {
             console.log(`${GREEN}${BOLD}✅ Tablas de la base de datos creadas con éxito.${RESET}`);
         } else {
             console.log(`${YELLOW}${BOLD}⚠️  La conexión a PostgreSQL está deshabilitada.${RESET}`);
+        }
+
+        // Comprobar si se conecto o no con la api de supabase
+        if (supabaseConection) {
+            console.log(`${GREEN}${BOLD}✅ Conexion con el cliente Supabase establecida exitosamente${RESET}`);
+        } else {
+            console.log(`${RED}${BOLD}❌ Falló la conexion con el cliente Supabase.${RESET}`);
         }
 
         // Mostrar mensajes en la terminal según el entorno

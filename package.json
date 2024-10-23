@@ -1,6 +1,6 @@
 {
   "name": "proyecto-devops",
-  "version": "0.5.6",
+  "version": "0.5.7",
   "description": "Proyecto universitario para devops",
   "main": "../src/routes/routes.js",
   "scripts": {
@@ -14,20 +14,21 @@
   "dependencies": {
     "@sentry/node": "^8.33.1",
     "@sentry/profiling-node": "^8.33.0",
+    "@supabase/supabase-js": "^2.45.4",
     "axios": "^1.7.7",
     "bcryptjs": "^2.4.3",
+    "cookie-parser": "^1.4.7",
     "cors": "^2.8.5",
+    "ejs": "^3.1.10",
     "express": "^4.20.0",
     "express-brute": "^1.0.1",
     "express-rate-limit": "^7.4.0",
     "jsonwebtoken": "^9.0.2",
-    "passport": "^0.7.0",
-    "passport-jwt": "^4.0.1",
-    "passport-local": "^1.0.0",
     "pg": "^8.12.0",
     "swagger-themes": "^1.4.3",
     "swagger-ui-express": "^5.0.1",
-    "yamljs": "^0.3.0"
+    "yamljs": "^0.3.0",
+    "zod": "^3.23.8"
   },
   "devDependencies": {
     "@eslint/js": "^9.11.1",

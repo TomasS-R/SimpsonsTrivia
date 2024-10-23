@@ -90,7 +90,9 @@ async function createTables(tableName, columns) {
 // Verificar la existencia de la tabla
 async function verifyTable(tableName) {
     try {
-        const result = await databaseManager.query('select exists (select * from information_schema.tables where table_name = $1)', [tableName]);
+        const result = await databaseManager.query(`
+            SELECT exists (select * from information_schema.tables where table_name = $1)
+        `, [tableName]);
         return result.rows;
     } catch (e) {
         console.log(e);
@@ -100,7 +102,10 @@ async function verifyTable(tableName) {
 // Funcion que consulta la bd y obtiene los usuarios de la tabla
 async function getUsers() {
     try {
-        const result = await databaseManager.query(`SELECT id, username, role FROM ${userTables.tableNameUsers}`);
+        const result = await databaseManager.query(`
+            SELECT id, username, role
+            FROM ${userTables.users.tableName}
+        `);
         return result.rows;
     } catch (e) {
         console.log(e);
@@ -110,7 +115,10 @@ async function getUsers() {
 // Funcion que consulta la bd y obtiene los puntajes de la tabla
 async function getScores() {
     try {
-        const result = await databaseManager.query(`SELECT * FROM ${userTables.tableNameScores}`);
+        const result = await databaseManager.query(`
+            SELECT *
+            FROM ${userTables.scores.tableName}
+        `);
         return result.rows;
     } catch (e) {
         console.log(e);
@@ -120,7 +128,10 @@ async function getScores() {
 // Funcion que consulta la bd y obtiene las preguntas de la tabla
 async function getQuestions() {
     try {
-        const result = await databaseManager.query(`SELECT * FROM ${userTables.tableNameQuotes}`);
+        const result = await databaseManager.query(`
+            SELECT *
+            FROM ${userTables.quotes.tableName}
+        `);
         return result.rows;
     } catch (e) {
         console.log(e);
@@ -128,9 +139,13 @@ async function getQuestions() {
 }
 
 // Funcion que crea un usuario en la bd
-async function createUser(username, email, hashedPassword, role, created_at) {
+async function createUser(username, email, supabase_user_id, role, created_at) {
     try {
-        const result = await databaseManager.query('INSERT INTO users_trivia (username, email, password_hash, role, created_at) VALUES ($1, $2, $3, $4, $5) RETURNING *', [username, email,hashedPassword, role, created_at]);
+        const result = await databaseManager.query(`
+            INSERT INTO ${userTables.users.tableName} (username, email, supabase_user_id, role, created_at)
+            VALUES ($1, $2, $3, $4, $5)
+            RETURNING *
+        `, [username, email,supabase_user_id, role, created_at]);
         return result;
     } catch (e) {
         console.log(e);
@@ -141,7 +156,11 @@ async function createUser(username, email, hashedPassword, role, created_at) {
 // Valida si existe el usuario en la bd
 async function userExists(email) {
     try {
-        const result = await databaseManager.query('SELECT * FROM users_trivia WHERE email = $1', [email]);
+        const result = await databaseManager.query(`
+            SELECT *
+            FROM ${userTables.users.tableName}
+            WHERE email = $1
+            `, [email]);
         return result;
     } catch (e) {
         console.log(e);
@@ -155,12 +174,12 @@ async function getRandomQuestion() {
         const result = await databaseManager.query(`
             SELECT q.id, q.quote, c.name as correct_character,
                    (SELECT array_agg(c2.name)
-                    FROM ${userTables.tableNameCharacter} c2
+                    FROM ${userTables.character.tableName} c2
                     WHERE c2.id != q.character_id
                     ORDER BY RANDOM()
                     LIMIT 10) as incorrect_options
-            FROM ${userTables.tableNameQuotes} q
-            JOIN ${userTables.tableNameCharacter} c ON q.character_id = c.id
+            FROM ${userTables.quotes.tableName} q
+            JOIN ${userTables.character.tableName} c ON q.character_id = c.id
             ORDER BY RANDOM()
             LIMIT 1
         `);
@@ -195,7 +214,7 @@ async function getQuotesByCharacter(characterId) {
     try {
         const characterResult = await databaseManager.query(`
             SELECT id, name
-            FROM ${userTables.tableNameCharacter}
+            FROM ${userTables.character.tableName}
             WHERE id = $1
         `, [characterId]);
 
@@ -210,7 +229,7 @@ async function getQuotesByCharacter(characterId) {
         // Se obtiene las frases del personaje
         const quotesResult = await databaseManager.query(`
             SELECT id, quote
-            FROM ${userTables.tableNameQuotes}
+            FROM ${userTables.quotes_users.tableName}
             WHERE character_id = $1
         `, [characterId]);
 
@@ -231,25 +250,13 @@ async function getQuotesByCharacter(characterId) {
 // Funcion que obtiene los personajes de la bd
 async function getCharacters() {
     try {
-        const result = await databaseManager.query(`SELECT id, name FROM ${userTables.tableNameCharacter}`);
+        const result = await databaseManager.query(`
+            SELECT id, name 
+            FROM ${userTables.character.tableName}
+            `);
         return result.rows;
     } catch (e) {
         console.log(e);
-    }
-}
-
-// Función para obtener un usuario por email
-async function getUserByEmail(email) {
-    try {
-        const result = await databaseManager.query(`
-            SELECT id, username, email, password_hash as password, role 
-            FROM ${userTables.tableNameUsers} 
-            WHERE email = $1
-        `, [email]);
-        return result.rows[0] || null;
-    } catch (e) {
-        console.error("Error getting user by email:", e);
-        throw e;
     }
 }
 
@@ -258,7 +265,7 @@ async function getUserById(id) {
     try {
         const result = await databaseManager.query(`
             SELECT id, username, email, role 
-            FROM ${userTables.tableNameUsers} 
+            FROM ${userTables.users.tableName} 
             WHERE id = $1
         `, [id]);
         return result.rows[0] || null;
@@ -271,7 +278,7 @@ async function getUserById(id) {
 async function changeUserRole(userId, newRole) {
     try {
       const result = await databaseManager.query(
-        `UPDATE ${userTables.tableNameUsers} SET role = $1 WHERE id = $2 RETURNING *`,
+        `UPDATE ${userTables.users.tableName} SET role = $1 WHERE id = $2 RETURNING *`,
         [newRole, userId]);
       if (result.rows.length === 0) {
         throw new Error('User not found');
@@ -287,8 +294,25 @@ async function getUserRole(userId) {
     try {
       const result = await databaseManager.query(`
         SELECT role 
-        FROM ${userTables.tableNameUsers} 
+        FROM ${userTables.users.tableName} 
         WHERE id = $1`, [userId]);
+      if (result.rows.length === 0) {
+        throw new Error('Role not found');
+      }
+      return result.rows[0];
+    } catch (error) {
+      console.error('Error obtain user role:', error);
+      throw error;
+    }
+}
+
+// Función para obtener TODOS los datos de un usuario por ID de Supabase
+async function getUserDataSupabaseAuth(userId) {
+    try {
+      const result = await databaseManager.query(`
+        SELECT * 
+        FROM ${userTables.users.tableName} 
+        WHERE supabase_user_id = $1`, [userId]);
       if (result.rows.length === 0) {
         throw new Error('Role not found');
       }
@@ -310,8 +334,8 @@ module.exports = {
     getRandomQuestion,
     getQuotesByCharacter,
     getCharacters,
-    getUserByEmail,
     getUserById,
     changeUserRole,
-    getUserRole
+    getUserRole,
+    getUserDataSupabaseAuth,
 }

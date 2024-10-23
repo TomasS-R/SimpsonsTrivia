@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Panel de Administración</title>
+    <link rel="stylesheet" href="styles.css">
+    <script>
+        async function realizarSolicitudPost(url, datos) {
+            try {
+                const respuesta = await fetch(url, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(datos)
+                });
+                if (respuesta.ok) {
+                    window.location.href = '/';
+                } else {
+                    console.error('Error al cerrar sesión');
+                }
+            } catch (error) {
+                console.error('Error en la solicitud:', error);
+            }
+        }
+
+        function cerrarSesion() {
+            realizarSolicitudPost('/api/v1/logout', {});
+        }
+    </script>
+    <style>
+        body {
+            font-family: "Helvetica Neue", Arial, sans-serif;
+        }
+
+        .protected-container {
+            text-align: center;
+            padding: 20px;
+            border: 1px solid #ccc;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            border-radius: 5px;
+            width: 300px;
+            margin: 20px auto;
+        }
+
+        button.logout {
+            width: 100%;
+            padding: 10px;
+            background-color: red;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+    <div class="protected-container">
+        <h2>Hola <span id="username"><%= username %></span>!</h2>
+        <p>Estás en el panel de administración</p>
+        <button class="logout" onclick="cerrarSesion()">Cerrar sesión</button>
+    </div>
+</body>
+</html>

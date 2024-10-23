@@ -2,12 +2,7 @@ const queries = require('../dbFiles/queries');
 const accountRegister = require('../account/register');
 const accountLogin = require('../account/login');
 const rolesManager = require('../account/roles/rolesManager')
-
-// Funcion para validar el email
-function validateEmail(email) {
-    const re = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    return re.test(email);
-}
+const { supabaseConection } = require('../account/authSupabase')
 
 // Funcion para registrar un usuario
 async function registerUserReq (req, res) {
@@ -18,16 +13,34 @@ async function registerUserReq (req, res) {
     if (!email) {
       return res.status(400).json({ success: false, error: "The request needs the 'email' field!" });
     }
-    else if (!validateEmail(email)) {
-      return res.status(400).json({ success: false, error: "The email is not valid!" });
-    }
     else if (!username) {
       return res.status(400).json({ success: false, error: "The request needs the 'username' field!" });
     }
     else if (!password) {
       return res.status(400).json({ success: false, error: "The request needs the 'password' field!" });
     }
-    accountRegister.registerUser(username, email, password, defaultRole, res);
+    const data = await accountRegister.registerUser(username, email, password, defaultRole, res);
+
+    // Establecer cookies después de un inicio de sesión exitoso
+    res.cookie('accessToken', data.session.access_token, {
+      httpOnly: true, // Solo se puede acceder desde el servidor
+      secure: process.env.NODE_ENV === 'production', // secure true en produccion
+      sameSite: 'strict', // Evitar que se envien a través de peticiones CSRF
+      maxAge: 1000 * 60 * 60 // 1 hora de duracion de la cookie
+    });
+
+    res.status(201).json({
+        success: true,
+        message: "User registered successfully",
+        token: data.session.access_token,
+        data: {
+          id: data.user.id,
+          username: data.user.username,
+          email: data.user.email,
+          role: data.user.role,
+          created_at: data.user.created_at,
+        },
+    });
   }
   catch (e) {
     console.log(e);
@@ -39,7 +52,7 @@ async function changeUserRole(req, res) {
   try {
     const { userId } = req.params;
     const { newRole } = req.body
-    const changerRole = req.user.role; // El rol del usuario que intenta hacer el cambio
+    const changerRole = req.user.roleUser.role; // El rol del usuario que intenta hacer el cambio
 
     if (!userId) {
       return res.status(400).json({ success: false, error: "User ID is required" });
@@ -99,19 +112,44 @@ async function loginUserReq (req, res, next) {
       return res.status(400).json({ success: false, error: "The request has more than 2 fields!" });
     }
     else if (!email) {
-        return res.status(409).json({ success: false, error: "The request needs the 'email' field!" });
-    }
-    else if (!validateEmail(email)) {
-        return res.status(409).json({ success: false, error: "The email is not valid!" });
+      return res.status(409).json({ success: false, error: "The request needs the 'email' field!" });
     }
     else if (!password) {
-        return res.status(409).json({ success: false, error: "The request needs the 'password' field!" });
+      return res.status(409).json({ success: false, error: "The request needs the 'password' field!" });
     }
-    await accountLogin.loginUser(req, res, next);
-  }
-  catch (e) {
+    const { data } = await accountLogin.loginUser(email, password);
+
+    // Establecer cookies después de un inicio de sesión exitoso
+    res.cookie('accessToken', data.session.access_token, {
+      httpOnly: true, // Solo se puede acceder desde el servidor
+      secure: process.env.NODE_ENV === 'production', // secure true en produccion
+      sameSite: 'strict', // Evitar que se envien a través de peticiones CSRF
+      maxAge: 1000 * 60 * 60 // 1 hora de duracion de la cookie
+    });
+    //res.cookie('refreshToken', data.session.refresh_token, { httpOnly: true, secure: true }); // Asegúrate de que 'secure' sea true en producción
+
+    res.status(200).json({
+      success: true,
+      user: {
+        id: data.user.id,
+        email: data.user.email,
+        role: data.user.role,
+        createdAt: data.user.created_at,
+        lastSignInAt: data.user.last_sign_in_at,
+      },
+      session: {
+        accessToken: data.session.access_token,
+        refreshToken: data.session.refresh_token,
+        expiresIn: data.session.expires_in,
+      },
+    });
+  } catch (e) {
     console.log(e);
-    next(e);
+    if (e.message === "Invalid login credentials") {
+      return res.status(401).json({ success: false, error: "Invalid credentials. Please check your email and password." });
+    } else {
+      next(e);
+    }
   }
 };
 
@@ -290,8 +328,37 @@ const getCharacters = async (req, res) => {
     }
 };
 
+const supabaseAuth = async (req, res, next) => {
+  // Obtener el token de las cookies
+  const token = req.cookies.accessToken;
+  try {
+    if (!token) {
+      return res.status(401).json({ success: false, error: 'No token provided' });
+    }
+
+    const { data, error } = await supabaseConection.auth.getUser(token);
+
+    if (error || !data) {
+      return res.status(401).json({ success: false, error: 'Unauthorized' });
+    }
+
+    // Obtiene la data del usuario
+    const userData = data.user;
+    // Obtiene el id dentro de la data
+    const userID = userData.id;
+    // Busca mediante el id el rol del usuario
+    const userDataDB = await queries.getUserDataSupabaseAuth(userID);
+
+    // Devuelve la data del usuario (por si se quiere usar) y los datos del usuario de la DB
+    req.user = { user: userData, dataUser: userDataDB };
+    next();
+  } catch (error) {
+    console.error('Error in supabaseAuth:', error);
+    return res.status(500).json({ success: false, error: 'Internal server error' });
+  }
+};
+
 module.exports = {
-    validateEmail,
     registerUserReq,
     loginUserReq,
     changeUserRole,
@@ -301,5 +368,6 @@ module.exports = {
     getQuote,
     healthCheck,
     getQuotesByCharacter,
-    getCharacters
+    getCharacters,
+    supabaseAuth
 };

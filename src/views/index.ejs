@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Registro y Login</title>
+    <link rel="stylesheet" href="styles.css">
+    <script>
+        async function realizarSolicitudPost(url, datos) {
+            try {
+                const respuesta = await fetch(url, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(datos)
+                });
+                const resultado = await respuesta.json();
+
+                if (respuesta.ok) {
+                    document.getElementById('mensaje').style.color = 'green';
+                    document.getElementById('mensaje').innerText = resultado.message;
+                    if (resultado.success) {
+                        if (url === '/api/v1/login') {
+                            document.getElementById('mensaje').innerText = 'Sesion iniciada, ingresando...';
+                            setTimeout(() => {
+                                window.location.href = '/api/v1/protected';
+                            }, 5000);
+                        } else {
+                            window.location.href = '/api/v1/protected';
+                        }
+                    }
+                } else {
+                    document.getElementById('mensaje').style.color = 'red';
+                    document.getElementById('mensaje').innerText = resultado.error;
+                }
+            } catch (error) {
+                document.getElementById('mensaje').style.color = 'red';
+                document.getElementById('mensaje').innerText = 'Error en la solicitud.';
+            }
+        }
+
+        function validarRegistro() {
+            const username = document.getElementById("reg-username").value;
+            const email = document.getElementById("reg-email").value;
+            const password = document.getElementById("reg-password").value;
+            const confirmPassword = document.getElementById("confirm-password").value;
+            let mensajesError = [];
+
+            if (username.length < 3) {
+                mensajesError.push("El nombre de usuario debe tener al menos 3 caracteres.");
+            }
+            if (!email.match(/^[^@]+@[^@]+\.[a-zA-Z]{2,}$/)) {
+                mensajesError.push("Ingrese un email válido.");
+            }
+            if (password.length < 6) {
+                mensajesError.push("La contraseña debe tener al menos 6 caracteres.");
+            }
+            if (password !== confirmPassword) {
+                mensajesError.push("Las contraseñas no coinciden.");
+            }
+
+            if (mensajesError.length > 0) {
+                alert(mensajesError.join("\n"));
+                return false;
+            }
+            realizarSolicitudPost('/api/v1/register', { username, email, password });
+            return false;
+        }
+
+        function validarLogin() {
+            const email = document.getElementById("login-email").value;
+            const password = document.getElementById("login-password").value;
+            let mensajesError = [];
+
+            if (!email.match(/^[^@]+@[^@]+\.[a-zA-Z]{2,}$/)) {
+                mensajesError.push("Ingrese un email válido.");
+            }
+            if (password.length < 6) {
+                mensajesError.push("La contraseña debe tener al menos 6 caracteres.");
+            }
+
+            if (mensajesError.length > 0) {
+                alert(mensajesError.join("\n"));
+                return false;
+            }
+            realizarSolicitudPost('/api/v1/login', { email, password });
+            return false;
+        }
+    </script>
+    <style>
+        body {
+            font-family: "Helvetica Neue", Arial, sans-serif;
+        }
+
+        .form-container {
+            width: 300px;
+            margin: 20px;
+            padding: 20px 20px 10px 20px;
+            border: 1px solid #ccc;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            border-radius: 5px;
+        }
+
+        .form-container.login {
+            padding-bottom: 15px 20px;
+        }
+
+        .form-container h2 {
+            text-align: center;
+            font-weight: bold;
+        }
+
+        label {
+            display: block;
+            margin: 10px 0 5px;
+        }
+
+        input {
+            width: calc(100% - 20px);
+            padding: 8px;
+            margin-bottom: 10px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+        }
+
+        button {
+            width: 100%;
+            padding: 10px;
+            background-color: green;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        button.logout {
+            background-color: red;
+        }
+
+        #mensaje {
+            text-align: center;
+            margin: 15px 0;
+        }
+
+        .form-wrapper {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+        }
+
+        .docs-button {
+            padding: 10px;
+            background-color: rgb(64, 125, 223); /* Changed to a bluer color */
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: bold;
+            width: auto; /* Changed to auto to size based on text */
+        }
+    </style>
+</head>
+<body>
+    <h1>Bienvenido a la API Trivia de los Simpsons 🍩</h1>
+    <p>
+        <strong>English:</strong> Welcome to the Simpsons Trivia API, you can test the API if you want, click the button to see all the routes.
+        <button class="docs-button" onclick="window.open('<%= LinkDocs %>', '_blank')">Documentation</button>
+    </p>
+    <p>
+        <strong>Spanish:</strong> Bienvenido a la API Trivia de los Simpsons, puedes probar la API si quieres, haz clic en el botón para ver todas las rutas disponibles.
+        <button class="docs-button" onclick="window.open('<%= LinkDocs %>', '_blank')">Documentación</button>
+    </p>
+
+    <div class="form-wrapper">
+        <div class="form-container login">
+            <h2>Login</h2>
+            <form onsubmit="return validarLogin()">
+                <label for="login-email">Email:</label>
+                <input type="email" id="login-email" name="email" required>
+
+                <label for="login-password">Password:</label>
+                <input type="password" id="login-password" name="password" required>
+
+                <button type="submit">Login</button>
+            </form>
+        </div>
+
+        <div class="form-container">
+            <h2>Register</h2>
+            <form onsubmit="return validarRegistro()">
+                <label for="reg-username">Username:</label>
+                <input type="text" id="reg-username" name="username" required>
+
+                <label for="reg-email">Email:</label>
+                <input type="email" id="reg-email" name="email" required>
+
+                <label for="reg-password">Password:</label>
+                <input type="password" id="reg-password" name="password" required>
+
+                <label for="confirm-password">Confirm Password:</label>
+                <input type="password" id="confirm-password" name="confirmPassword" required>
+
+                <button type="submit">Register</button>
+            </form>
+        </div>
+    </div>
+
+    <div id="mensaje"></div>
+</body>
+</html>

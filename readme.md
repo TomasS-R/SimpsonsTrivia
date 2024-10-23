@@ -71,7 +71,7 @@
 
 </details>
 
-<details close><summary><h2>Funcionalidades</h2></summary>
+<details close><summary><h2>Funcionalidades 🚥</h2></summary>
 
 - [x] Consultar frases iconicas y famosas de la serie
 
@@ -195,6 +195,20 @@ Variables de entorno para la conexion con postgress
 
 `SENTRY_DSN=`
 
+<summary><h3>SUPABASE_URL</h3></h3> <h5>(la url que brinda supabase para realizar la conexion y poder trabajar con la api)</h5></summary>
+
+> [!NOTE]
+> Esto es opcional, pero si no lo configuras no podras manejar el login y el registro.
+
+`SUPABASE_URL=`
+
+<summary><h3>SUPABASE_ANON_KEY</h3></h3> <h5>(la clave anonima que brinda supabase para realizar la conexion y poder trabajar con la api)</h5></summary>
+
+> [!NOTE]
+> Esto es opcional, pero si no lo configuras no podras manejar el login y el registro. Esta clave la puedes encontrar en supabase.com/dashboard > Project API Keys > anon public
+
+`SUPABASE_ANON_KEY=`
+
 ### Testing
 
 Para realizar testing del proyecto ejecutar el siguiente comando:
@@ -252,8 +266,9 @@ npm run lint
 │   │   │   ├── roleMiddleware.js       # Intermediario en controlar y verificar los roles y accesos
 │   │   │   └── rolesManager.js         # Clase donde se manejan la jerarquia y cada tipo de rol
 │   │   │
+│   │   ├── authSupabase.js             # Archivo de inicializacion y configuracion con supabase
 │   │   ├── login.js                    # Archvio para iniciar sesion y administrar tokens
-│   │   ├── passportConfig.js           # Validacion de credenciales del login
+│   │   ├── index.ejs                   # Configuracion para front end de login y registro
 │   │   └── register.js                 # Archivo que registra a los usuarios y valida los campos
 │   │   
 │   ├── 📂 controllers                  # Contiene archivos de controladores

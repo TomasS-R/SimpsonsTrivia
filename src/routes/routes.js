@@ -1,4 +1,4 @@
-require('../account/passportConfig');
+//require('../account/passportConfig');
 const triviaControll = require('../controllers/triviaControllers');
 const { swaggerDocument, swaggerUi, options } = require('./swaggerDocs');
 const securityRoutes = require('./securityRoutes');
@@ -10,9 +10,9 @@ const routeapi = "/api/v1";
 function setupRoutesV1(app, hostname) {
     app.get([routeapi+'/', '/'], (req, res) => {
         const hostnameapp = hostname || req.get('host');
-        let LinkDocs = `<a href="${process.env.NODE_ENV === 'production' ? 'https://' : ''}${hostnameapp}${routeapi}/docs">${hostnameapp}${routeapi}/docs</a>`;
-        res.send(`English:<br>Welcome to the Simpsons Trivia API, you can test the api if you want, go to ${LinkDocs} to see all the routes
-            <br><br>Spanish:<br>Bienvenido a la API Trivia de los Simpsons, puedes probar la api si quieres, ve a ${LinkDocs} para ver todas las rutas disponibles`);
+        let LinkDocs = `${process.env.NODE_ENV === 'production' ? 'https://' : ''}${hostnameapp}${routeapi}/docs`;
+        
+        res.render('index', { LinkDocs });
     });
 
     // Ruta de health check
@@ -25,15 +25,30 @@ function setupRoutesV1(app, hostname) {
     // Registro
     app.post(routeapi+'/register', triviaControll.registerUserReq);
 
+    // Logout
+    app.post(routeapi+'/logout', (req, res) => {
+        res
+            .clearCookie('accessToken')
+            .status(200)
+            .json({ success: true, message: 'Logout successful' });
+    });
+
+    // Ruta protegida
+    app.get(routeapi+'/protected', triviaControll.supabaseAuth, checkRole(rolesManager.roles.USER), (req, res) => {
+        const data = req.user;
+        const username = data.dataUser.username;
+        res.render('protected', { username });
+    });
+
     // **** Rutas protegidas ****
     // Ver todos los usuarios
-    app.get(routeapi+'/users', securityRoutes.authenticateJWT, checkRole(rolesManager.roles.ADMIN), triviaControll.getUsersList);
+    app.get(routeapi+'/users', triviaControll.supabaseAuth, checkRole(rolesManager.roles.ADMIN), triviaControll.getUsersList);
 
     // Ver puntajes
-    app.get(routeapi+'/scores', securityRoutes.authenticateJWT, checkRole(rolesManager.roles.ADMIN), triviaControll.getUsersScores);
+    app.get(routeapi+'/scores', triviaControll.supabaseAuth, checkRole(rolesManager.roles.ADMIN), triviaControll.getUsersScores);
 
     // Ruta para cambiar el rol de un usuario
-    app.patch(routeapi+'/users/:userId/role', securityRoutes.authenticateJWT, checkRole(rolesManager.roles.ADMIN), triviaControll.changeUserRole)
+    app.patch(routeapi+'/users/:userId/role', triviaControll.supabaseAuth, checkRole(rolesManager.roles.ADMIN), triviaControll.changeUserRole)
     // * Fin Rutas protegidas *
 
     // Ver preguntas
