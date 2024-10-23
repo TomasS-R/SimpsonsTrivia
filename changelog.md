@@ -1,5 +1,10 @@
 # Changelog
 
+## Version 0.5.8: - 2024-10-23 -
+
+### Modificado:
+   - Actualizado [package-lock](./package-lock.json)
+
 ## Version 0.5.7: - 2024-10-23 -
 
 ### Agregado:
