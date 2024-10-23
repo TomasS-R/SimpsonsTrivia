@@ -1,5 +1,10 @@
 # Changelog
 
+## Version 0.5.9: - 2024-10-23 -
+
+### Modificado:
+   - Agregadas las variables de entorno supabase al [workflow](.github/workflows/node.js.yml)
+
 ## Version 0.5.8: - 2024-10-23 -
 
 ### Modificado:

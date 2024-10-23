@@ -67,6 +67,8 @@ jobs:
             DATABASENAME=${{ secrets.DATABASENAME }}
             JWT_SECRET=${{ secrets.JWT_SECRET }}
             CONNECTPOSTGRES=${{ secrets.CONNECTPOSTGRES }}
+            SUPABASE_URL=${{ secrets.SUPABASE_URL }}
+            SUPABASE_ANON_KEY=${{ secrets.SUPABASE_ANON_KEY }}
             
 #  deploy_render:
     # Render config
