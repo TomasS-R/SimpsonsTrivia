@@ -143,3 +143,6 @@ tasksProject.md
 
 # Obtain quotes
 frases.csv
+
+# No ignorar este archivo
+!config.js

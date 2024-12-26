@@ -1,6 +1,12 @@
 # Changelog
 
-## Version 0.6.0: - 2024-12- -
+## Version 0.6.1: - 2024-12-26 -
+
+### Modificado:
+   - Modificacion de mejora para detectar el archivo config para hacer el deploy en fly.io en gitignore y dockerignore
+   - Se copia el archivo config en el dockerfile para correr en fly.io
+
+## Version 0.6.0: - 2024-12-26 -
 
 ### Agregado:
    - Archivo [deleteUsersAuth](./src/account/deleteUsersAuth.js) que elimina usuarios del sistema de Auth de supabase, este archivo se ejecuta automaticamente y elimina los usuarios anonimos que no se registraron en las ultimas 3 horas, la llamada al cronjob se encuentra en [app](./src/app.js).

@@ -19,3 +19,6 @@ tmp
 # Ignorar archivos y carpetas innecesarios
 docker-compose.yml
 Dockerfile
+
+# No ignorar este archivo
+!config.js

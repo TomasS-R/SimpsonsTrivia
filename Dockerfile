@@ -41,6 +41,7 @@ WORKDIR /app
 # Copiar los archivos necesarios desde la etapa de build
 COPY --from=build /app/package*.json ./
 COPY --from=build /app/node_modules ./node_modules
+COPY config.js ./config.js
 COPY --from=build /app/src ./src
 
 # Exponer el puerto en el que la aplicación escucha
