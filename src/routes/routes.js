@@ -1,73 +1,63 @@
-//require('../account/passportConfig');
 const triviaControll = require('../controllers/triviaControllers');
-const { swaggerDocument, swaggerUi, options } = require('./swaggerDocs');
 const securityRoutes = require('./securityRoutes');
 const { checkRole } = require('../account/roles/roleMiddleware');
 const rolesManager = require('../account/roles/rolesManager');
+const sessionHandler = require('../account/sessionHandler');
+const YAML = require('yamljs');
+const path = require('path');
+const config = require('../../config');
 
 const routeapi = "/api/v1";
 
-function setupRoutesV1(app, hostname) {
-    app.get([routeapi+'/', '/'], (req, res) => {
-        const hostnameapp = hostname || req.get('host');
-        let LinkDocs = `${process.env.NODE_ENV === 'production' ? 'https://' : ''}${hostnameapp}${routeapi}/docs`;
-        
-        res.render('index', { LinkDocs });
+function setupRoutesV1(app) {
+    // ** Rutas públicas **
+    app.get([routeapi+'/', '/'], securityRoutes.publicApiLimiter, sessionHandler.verifyUserSession, (req, res) => {
+        const swaggerSpec = YAML.load(path.join(__dirname, 'apiRoutesDoc.yaml'));
+        const isAuthenticated = req.user && !req.user.isAnonymous;
+        res.render('index', { swaggerSpec, isAuthenticated, isDevelopment: config.nodeEnv !== 'production'});
     });
 
-    // Ruta de health check
-    app.get(routeapi + '/healthcheck', triviaControll.healthCheck);
+    app.get(routeapi + '/healthcheck', securityRoutes.publicApiLimiter, triviaControll.healthCheck);
+    app.get(routeapi+'/quote/questions', securityRoutes.publicApiLimiter, triviaControll.getQuestionsTrivia);
+    app.get(routeapi+'/quote/random', securityRoutes.publicApiLimiter, triviaControll.getQuote);
+    app.get(routeapi+'/quotes/bycharacter/:characterId', securityRoutes.publicApiLimiter, triviaControll.getQuotesByCharacter);
+    app.get(routeapi+'/characters', securityRoutes.publicApiLimiter, triviaControll.getCharacters);
 
-    // ** Ruta configurada contra fuerza bruta **
-    // Login
-    app.post(routeapi+'/login', securityRoutes.bruteforce.prevent, triviaControll.loginUserReq);
+    // ** Rutas de autenticación **
+    app.post(routeapi+'/login', securityRoutes.authLimiter, securityRoutes.bruteforce.prevent, triviaControll.loginUserReq);
+    app.post(routeapi+'/register', securityRoutes.authLimiter, sessionHandler.handleUserSession, triviaControll.registerUserReq);
+    app.post(routeapi+'/logout', securityRoutes.authLimiter, triviaControll.logoutUser);
 
-    // Registro
-    app.post(routeapi+'/register', triviaControll.registerUserReq);
+    // ** Rutas protegidas (requieren autenticación) **
+    // Rutas administrativas
+    app.get(routeapi+'/users', securityRoutes.authenticatedApiLimiter, triviaControll.supabaseAuth, checkRole(rolesManager.roles.ADMIN), triviaControll.getUsersList);
+    app.get(routeapi+'/scores', securityRoutes.authenticatedApiLimiter, triviaControll.supabaseAuth, checkRole(rolesManager.roles.ADMIN), triviaControll.getUsersScores);
+    app.patch(routeapi+'/users/:userId/role', securityRoutes.authenticatedApiLimiter, triviaControll.supabaseAuth, checkRole(rolesManager.roles.ADMIN), triviaControll.changeUserRole);
 
-    // Logout
-    app.post(routeapi+'/logout', (req, res) => {
-        res
-            .clearCookie('accessToken')
-            .status(200)
-            .json({ success: true, message: 'Logout successful' });
-    });
+    // ** Rutas de usuario autenticado **
+    app.get(routeapi+'/protected', securityRoutes.authenticatedApiLimiter, sessionHandler.verifyUserSession, triviaControll.supabaseAuth, checkRole(rolesManager.roles.USER), triviaControll.protectedRoute);
+    app.get(routeapi+'/account', securityRoutes.authenticatedApiLimiter, (req, res) => {res.render('account');});
+    app.post(routeapi+'/quotes/:id/answer', securityRoutes.authenticatedApiLimiter, sessionHandler.handleUserSession, triviaControll.answerQuestion);
+    app.post(routeapi+'/gameover', securityRoutes.authenticatedApiLimiter, sessionHandler.verifyUserSession, sessionHandler.handleUserSession, triviaControll.gameOverRefreshPage);
+    app.get(routeapi+'/user/stats', securityRoutes.authenticatedApiLimiter, sessionHandler.verifyUserSession, triviaControll.supabaseAuth, checkRole(rolesManager.roles.USER), triviaControll.getUserStats);
+    app.get(routeapi+'/user/data', securityRoutes.authenticatedApiLimiter, sessionHandler.verifyUserSession, triviaControll.supabaseAuth, checkRole(rolesManager.roles.USER), triviaControll.userDataProfile);
 
-    // Ruta protegida
-    app.get(routeapi+'/protected', triviaControll.supabaseAuth, checkRole(rolesManager.roles.USER), (req, res) => {
-        const data = req.user;
-        const username = data.dataUser.username;
-        res.render('protected', { username });
-    });
+    // ** Rutas internas/sistema **
+    app.get(routeapi+'/session-status', securityRoutes.internalApiLimiter, sessionHandler.verifyUserSession, sessionHandler.sessionStatusController);
 
-    // **** Rutas protegidas ****
-    // Ver todos los usuarios
-    app.get(routeapi+'/users', triviaControll.supabaseAuth, checkRole(rolesManager.roles.ADMIN), triviaControll.getUsersList);
-
-    // Ver puntajes
-    app.get(routeapi+'/scores', triviaControll.supabaseAuth, checkRole(rolesManager.roles.ADMIN), triviaControll.getUsersScores);
-
-    // Ruta para cambiar el rol de un usuario
-    app.patch(routeapi+'/users/:userId/role', triviaControll.supabaseAuth, checkRole(rolesManager.roles.ADMIN), triviaControll.changeUserRole)
-    // * Fin Rutas protegidas *
-
-    // Ver preguntas
-    app.get(routeapi+'/quote/questions', triviaControll.getQuestionsTrivia);
-
-    // Obtener una frase aleatoria con 4 respuestas
-    app.get(routeapi+'/quote/random', triviaControll.getQuote);
-
-    // Obtener frases por el id personaje
-    app.get(routeapi+'/quotes/bycharacter/:characterId', triviaControll.getQuotesByCharacter);
-
-    // Obtener personajes
-    app.get(routeapi+'/characters', triviaControll.getCharacters);
-
-    // Rutas de la API documentada con Swagger usando el archivo apiRoutesDoc.yaml
-    app.use(routeapi + '/docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument, options));
+    if (config.nodeEnv !== 'production') {
+        app.get(routeapi+'/play', securityRoutes.internalApiLimiter, sessionHandler.verifyUserSession, 
+            (req, res) => {
+                res.render('trivia', {
+                    user: req.user || null,
+                    isAnonymous: !req.user
+                });
+            }
+        );
+    }
 
     // Middleware para manejar rutas no encontradas (404)
-    app.use((req, res) => {
+    app.use(securityRoutes.publicApiLimiter, (req, res) => {
         res.status(404).json({
             success: false,
             error: 'Not Found',
@@ -81,9 +71,6 @@ function setupRoutesV1(app, hostname) {
 
 // Eliminar pregunta
 // app.delete(routeapi+'/questions/:id',);
-
-// Enviar respuesta a una pregunta específica
-// app.post(routeapi+'/questions/:id/answer', triviaControll.answerQuestion);
 
 module.exports = {
     setupRoutesV1,

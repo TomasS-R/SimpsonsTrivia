@@ -1,4 +1,4 @@
-const { createUser, userExists, getRandomQuestion } = require('../src/dbFiles/queries');
+const { createUser, emailExists, usernameExists, getRandomQuestion } = require('../src/dbFiles/queries');
 const databaseManager = require('../src/dbFiles/databaseManager');
 
 // Simula la base de datos
@@ -22,17 +22,30 @@ test('createUser inserts a new user into the database', async () => {
   expect(result.rows[0].role).toBe('user');
 });
 
-// Test para comprobar que la función userExists verifica correctamente la existencia de un user en la BD
-test('existUser into the database', async () => {
-  const mockUser = {
-    username: 'testuser'
-  };
+// Test para comprobar que las funciones verifican correctamente la existencia de usuarios en la BD
+test('user existence verification in database', async () => {
+    const mockUserByEmail = {
+        email: 'test@gmail.com',
+        username: 'testuser'
+    };
 
-  databaseManager.query.mockResolvedValue({ rows: [mockUser] });
+    const mockUserByUsername = {
+        email: 'test@gmail.com',
+        username: 'testuser'
+    };
 
-  const result = await userExists(mockUser.username);
+    // Mock para la consulta de email
+    databaseManager.query
+        .mockResolvedValueOnce({ rows: [mockUserByEmail] })  // Para userExists
+        .mockResolvedValueOnce({ rows: [mockUserByUsername] }); // Para usernameExists
 
-  expect(result.rows[0].username).toBe('testuser');
+    // Verificar existencia por email
+    const emailResult = await emailExists(mockUserByEmail.email);
+    expect(emailResult.rows[0].email).toBe('test@gmail.com');
+
+    // Verificar existencia por username
+    const usernameResult = await usernameExists(mockUserByUsername.username);
+    expect(usernameResult.rows[0].username).toBe('testuser');
 });
 
 // Test para verificar que la función getRandomQuestion devuelve una pregunta con la estructura correcta
@@ -40,8 +53,13 @@ test('getRandomQuestion returns a question with correct structure', async () => 
   const mockQuestion = {
     id: 1,
     quote: "D'oh!",
-    correct_character: 'Homer Simpson',
-    incorrect_options: ['Bart Simpson', 'Lisa Simpson', 'Marge Simpson']
+    correct_character_id: 1,
+    correct_character_name: 'Homer Simpson',
+    incorrect_options: [
+      { id: 2, name: 'Bart Simpson' },
+      { id: 3, name: 'Lisa Simpson' },
+      { id: 4, name: 'Marge Simpson' }
+    ]
   };
 
   // Simular la respuesta de la base de datos
@@ -55,12 +73,23 @@ test('getRandomQuestion returns a question with correct structure', async () => 
   expect(result).toHaveProperty('correct_character');
   expect(result).toHaveProperty('incorrect_options');
 
+  // Verificar la estructura del personaje correcto
+  expect(result.correct_character).toEqual({
+    id: mockQuestion.correct_character_id,
+    name: mockQuestion.correct_character_name
+  });
+
   // Verificar que las opciones incorrectas sean 3
   expect(result.incorrect_options).toHaveLength(3);
 
-  // Verificar que la respuesta correcta esté presente en las opciones
+  // Verificar que cada opción incorrecta tenga id y name
+  result.incorrect_options.forEach(option => {
+    expect(option).toHaveProperty('id');
+    expect(option).toHaveProperty('name');
+  });
+
+  // Verificar que las opciones incorrectas coincidan con el mock
   expect(result.incorrect_options).toEqual(expect.arrayContaining(mockQuestion.incorrect_options));
-  expect(result.correct_character).toBe(mockQuestion.correct_character);
 });
 
 // Test para comprobar que la función getRandomQuestion maneja correctamente un resultado vacío

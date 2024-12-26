@@ -139,13 +139,13 @@ async function getQuestions() {
 }
 
 // Funcion que crea un usuario en la bd
-async function createUser(username, email, supabase_user_id, role, created_at) {
+async function createUser(username, user_tag, email, supabase_user_id, role, created_at) {
     try {
         const result = await databaseManager.query(`
-            INSERT INTO ${userTables.users.tableName} (username, email, supabase_user_id, role, created_at)
-            VALUES ($1, $2, $3, $4, $5)
+            INSERT INTO ${userTables.users.tableName} (username, user_tag, email, supabase_user_id, role, created_at)
+            VALUES ($1, $2, $3, $4, $5, $6)
             RETURNING *
-        `, [username, email,supabase_user_id, role, created_at]);
+        `, [username, user_tag, email, supabase_user_id, role, created_at]);
         return result;
     } catch (e) {
         console.log(e);
@@ -153,8 +153,8 @@ async function createUser(username, email, supabase_user_id, role, created_at) {
     }
 }
 
-// Valida si existe el usuario en la bd
-async function userExists(email) {
+// Valida si existe el email en la bd
+async function emailExists(email) {
     try {
         const result = await databaseManager.query(`
             SELECT *
@@ -168,12 +168,28 @@ async function userExists(email) {
     }
 }
 
+async function usernameExists(username) {
+    try {
+        const result = await databaseManager.query(`
+            SELECT *
+            FROM ${userTables.users.tableName}
+            WHERE username = $1
+            `, [username]);
+        return result;
+    } catch (e) {
+        console.log(e);
+        throw e;
+    }
+}
+
 // Funcion que obtiene una pregunta aleatoria
 async function getRandomQuestion() {
     try {
         const result = await databaseManager.query(`
-            SELECT q.id, q.quote, c.name as correct_character,
-                   (SELECT array_agg(c2.name)
+            SELECT q.id, q.quote, 
+                   c.id as correct_character_id, 
+                   c.name as correct_character_name,
+                   (SELECT json_agg(json_build_object('id', c2.id, 'name', c2.name))
                     FROM ${userTables.character.tableName} c2
                     WHERE c2.id != q.character_id
                     ORDER BY RANDOM()
@@ -184,24 +200,19 @@ async function getRandomQuestion() {
             LIMIT 1
         `);
 
-        // Verificar si se obtuvo un resultado
         if (result.rows.length === 0) {
-            console.error("No questions found in the database.");
+            //console.log("No questions found in the database.");
             return undefined;
         }
 
-        const incorrectOptions = result.rows[0].incorrect_options;
-
-        // Asegurarse de que incorrectOptions tenga al menos 3 elementos
-        if (!incorrectOptions || incorrectOptions.length < 3) {
-            console.error("Not enough incorrect options available.");
-            return undefined;
-        }
-
-        const shuffledOptions = incorrectOptions.sort(() => Math.random() - 0.5).slice(0, 3);
         return {
-            ...result.rows[0],
-            incorrect_options: shuffledOptions
+            id: result.rows[0].id,
+            quote: result.rows[0].quote,
+            correct_character: {
+                id: result.rows[0].correct_character_id,
+                name: result.rows[0].correct_character_name
+            },
+            incorrect_options: result.rows[0].incorrect_options || []
         };
     } catch (e) {
         console.log(e);
@@ -229,9 +240,11 @@ async function getQuotesByCharacter(characterId) {
         // Se obtiene las frases del personaje
         const quotesResult = await databaseManager.query(`
             SELECT id, quote
-            FROM ${userTables.quotes_users.tableName}
+            FROM ${userTables.quotes.tableName}
             WHERE character_id = $1
         `, [characterId]);
+
+        console.log(quotesResult);
 
         // Se obtiene el total de frases
         const totalQuotes = quotesResult.rows.length;
@@ -323,6 +336,212 @@ async function getUserDataSupabaseAuth(userId) {
     }
 }
 
+// Funcion que verifica si la respuesta es correcta
+async function checkAnswer(quoteId, answer) {
+    try {
+        const result = await databaseManager.query(`
+            SELECT *
+            FROM ${userTables.quotes.tableName}
+            WHERE id = $1 AND character_id = $2
+        `, [quoteId, answer]);
+        return result.rows.length > 0;
+    } catch (e) {
+        console.log(e);
+        throw e;
+    }
+}
+
+async function updateTimeAvgAnswer(userId, time) {
+    try {
+        const result = await databaseManager.query(`
+            UPDATE ${userTables.scores.tableName}
+            SET avg_answer = avg_answer + $1
+            WHERE user_id = $2
+        `, [time, userId]);
+        return result;
+    } catch (e) {
+        console.log(e);
+        throw e;
+    }
+}
+
+async function scoresUser(userId) {
+    try {
+        const userScore = await databaseManager.query(`
+            SELECT COALESCE(score, 0) as score
+            FROM ${userTables.scores.tableName}
+            WHERE user_id = $1
+        `, [userId]);
+
+        return userScore;
+    } catch (e) {
+        console.log('Error getting user score:', e);
+        throw e;
+    }
+}
+
+async function lastScoreUser(userId) {
+    try {
+        // Traer el score mediante una consulta y luego actualizar el last_score
+        let score = await scoresUser(userId);
+
+        if (score.rows.length === 0) {
+            return false;
+        }
+        else if (score.rows[0].score) {
+            score = score.rows[0].score;
+            const userLastScore = await databaseManager.query(`
+                UPDATE ${userTables.scores.tableName}
+                SET last_score = $1
+                WHERE user_id = $2
+            `, [score, userId]);
+            return userLastScore;
+        }
+    } catch (e) {
+        console.log(e);
+        throw e;
+    }
+}
+
+async function updateUserScore(userId, score, time) {
+    try {
+        // Primero, verifica si existe un registro para el usuario
+        const checkUser = await databaseManager.query(`
+            SELECT 1 FROM ${userTables.scores.tableName}
+            WHERE user_id = $1
+        `, [userId]);
+
+        if (checkUser.rows.length === 0) {
+            // Si no existe, crea un nuevo registro con los valores iniciales
+            await databaseManager.query(`
+                INSERT INTO ${userTables.scores.tableName} 
+                (user_id, score, highest_score, last_score, correct_answers)
+                VALUES ($1, $2, $2, $2, 1)
+            `, [userId, score]);
+            
+            if (time) {
+                await updateTimeAvgAnswer(userId, time);
+            }
+            
+            return true;
+        }
+
+        // Si existe, actualiza el puntaje y el mayor puntaje
+        await databaseManager.query(`
+            UPDATE ${userTables.scores.tableName}
+            SET 
+                score = COALESCE(score, 0) + $1,
+                correct_answers = COALESCE(correct_answers, 0) + 1,
+                highest_score = CASE 
+                    WHEN COALESCE(score, 0) + $1 > COALESCE(highest_score, 0) 
+                    THEN COALESCE(score, 0) + $1 
+                    ELSE highest_score 
+                END
+            WHERE user_id = $2
+        `, [score, userId]);
+
+        if (time) {
+            await updateTimeAvgAnswer(userId, time);
+        }
+
+        // Para verificar los valores actualizados
+        const updatedScores = await databaseManager.query(`
+            SELECT score, highest_score 
+            FROM ${userTables.scores.tableName}
+            WHERE user_id = $1
+        `, [userId]);
+
+        if (updatedScores.rows[0]) {
+            console.log('Updated scores:', {
+                currentScore: updatedScores.rows[0].score,
+                highestScore: updatedScores.rows[0].highest_score
+            });
+        }
+
+        return true;
+    } catch (e) {
+        console.log('Error updating user score:', e);
+        throw e;
+    }
+}
+
+async function updateUserScoreFailed(userId) {
+    try {
+        // Primero obtenemos el score actual para guardarlo como last_score
+        const currentScore = await scoresUser(userId);
+        
+        if (currentScore.rows[0]) {
+            const scoreValue = currentScore.rows[0].score;
+            
+            // Actualizamos reseteando el score y guardando el último puntaje
+            const result = await databaseManager.query(`
+                UPDATE ${userTables.scores.tableName}
+                SET 
+                    last_score = $1,
+                    score = 0,
+                    highest_score = CASE 
+                        WHEN $1 > highest_score THEN $1 
+                        ELSE highest_score 
+                    END,
+                    incorrect_answers = COALESCE(incorrect_answers, 0) + 1,
+                    updated_at = CURRENT_TIMESTAMP
+                WHERE user_id = $2
+                RETURNING score, last_score, highest_score, incorrect_answers
+            `, [scoreValue, userId]);
+            return result;
+        }
+
+        return null;
+    } catch (e) {
+        console.log('Error resetting user score:', e);
+        throw e;
+    }
+}
+
+async function getUserStats(userId) {
+    try {
+        const stats = await databaseManager.query(`
+            SELECT 
+                COALESCE(score, 0) as current_score,
+                COALESCE(highest_score, 0) as highest_score,
+                COALESCE(last_score, 0) as last_score,
+                COALESCE(avg_answer, 0) as avg_answer,
+                COALESCE(correct_answers, 0) as correct_answers,
+                COALESCE(incorrect_answers, 0) as incorrect_answers,
+                (COALESCE(correct_answers, 0) + COALESCE(incorrect_answers, 0)) as total_questions
+            FROM ${userTables.scores.tableName}
+            WHERE user_id = $1
+        `, [userId]);
+
+        return stats.rows[0] || {
+            current_score: 0,
+            highest_score: 0,
+            last_score: 0,
+            avg_answer: 0,
+            correct_answers: 0,
+            incorrect_answers: 0,
+            total_questions: 0
+        };
+    } catch (e) {
+        console.log('Error getting user stats:', e);
+        throw e;
+    }
+}
+
+async function getUserData(userId) {
+    try {
+        const result = await databaseManager.query(`
+            SELECT * 
+            FROM ${userTables.users.tableName} 
+            WHERE supabase_user_id = $1
+        `, [userId]);
+        return result.rows[0] || null;
+    } catch (e) {
+        console.error("Error getting user by ID:", e);
+        throw e;
+    }
+}
+
 module.exports = {
     createTables,
     verifyTable,
@@ -330,7 +549,8 @@ module.exports = {
     getScores,
     getQuestions,
     createUser,
-    userExists,
+    emailExists,
+    usernameExists,
     getRandomQuestion,
     getQuotesByCharacter,
     getCharacters,
@@ -338,4 +558,10 @@ module.exports = {
     changeUserRole,
     getUserRole,
     getUserDataSupabaseAuth,
+    checkAnswer,
+    lastScoreUser,
+    updateUserScore,
+    updateUserScoreFailed,
+    getUserStats,
+    getUserData
 }

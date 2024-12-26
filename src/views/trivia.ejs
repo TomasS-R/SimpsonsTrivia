@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Simpsons Trivia</title>
+
+    <script>
+        let currentQuoteId = null;
+        let startTime = null;
+
+        async function getNewQuestion() {
+            try {
+                startTime = Date.now();
+                const response = await fetch('/api/v1/quote/random');
+                const data = await response.json();
+                console.log('Datos recibidos:', data);
+                
+                if (data.success) {
+                    currentQuoteId = data.data.id;
+                    document.getElementById('quote').textContent = data.data.quote;
+                    
+                    const optionsContainer = document.getElementById('options');
+                    optionsContainer.innerHTML = '';
+                    
+                    const options = data.data.options;
+                    console.log('Opciones:', options);
+                    
+                    // Mezclar las opciones
+                    const shuffledOptions = [...options].sort(() => Math.random() - 0.5);
+                    
+                    shuffledOptions.forEach(option => {
+                        const button = document.createElement('button');
+                        button.className = 'option-button';
+                        button.textContent = option.name;
+                        button.onclick = function() {
+                            submitAnswer(option.id);
+                            document.querySelectorAll('.option-button').forEach(btn => btn.disabled = true);
+                        };
+                        optionsContainer.appendChild(button);
+                    });
+                    
+                    document.getElementById('message').style.display = 'none';
+                    document.querySelectorAll('.option-button').forEach(btn => btn.disabled = false);
+                }
+            } catch (error) {
+                console.error('Error al cargar nueva pregunta:', error);
+            }
+        }
+
+        async function submitAnswer(characterId) {
+            try {
+                const endTime = Date.now();
+                const timeElapsed = endTime - startTime;
+
+                console.log('Sending answer:', {
+                    quoteId: currentQuoteId,
+                    answer: characterId,
+                    time: timeElapsed
+                });
+
+                const response = await fetch(`/api/v1/quotes/${currentQuoteId}/answer`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ 
+                        answer: characterId,
+                        time: timeElapsed
+                    })
+                });
+                
+                const data = await response.json();
+                console.log('Response received:', data);
+                
+                const messageDiv = document.getElementById('message');
+                messageDiv.style.display = 'block';
+                messageDiv.textContent = data.result.message;
+                messageDiv.className = `message ${data.result.correct ? 'correct' : 'incorrect'}`;
+                
+                if (data.result.correct) {
+                    const scoreSpan = document.getElementById('currentScore');
+                    const pointsEarned = data.result.score;
+                    const currentScore = parseInt(scoreSpan.textContent);
+                    scoreSpan.textContent = currentScore + pointsEarned;
+                    
+                    messageDiv.textContent += ` +${pointsEarned} points!`;
+                    
+                    setTimeout(() => {
+                        document.querySelectorAll('.option-button').forEach(btn => btn.disabled = false);
+                        getNewQuestion();
+                        loadUserStats();
+                    }, 1500);
+                } else {
+                    setTimeout(() => {
+                        document.querySelectorAll('.option-button').forEach(btn => btn.disabled = false);
+                        loadUserStats();
+                    }, 1000);
+                }
+            } catch (error) {
+                console.error('Error submitting answer:', error);
+                document.querySelectorAll('.option-button').forEach(btn => btn.disabled = false);
+            }
+        }
+
+        // Función para cargar las estadísticas del usuario
+        async function loadUserStats() {
+            try {
+                const response = await fetch('/api/v1/user/stats');
+                const data = await response.json();
+
+                console.log('User stats:', data);
+                
+                if (data.success) {
+                    document.getElementById('currentScore').textContent = data.data.currentScore || 0;
+                }
+            } catch (error) {
+                console.error('Error loading user stats:', error);
+            }
+        }
+
+        // Manejar el refresh de la página
+        window.addEventListener('load', async function() {
+            try {
+                await fetch('/api/v1/gameover', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    keepalive: true // Asegurar que la petición se complete
+                });
+            } catch (error) {
+                console.error('Error handling page load:', error);
+            }
+        });
+
+        // También puedes llamar a loadUserStats aquí si deseas cargar las estadísticas al inicio
+        document.addEventListener('DOMContentLoaded', loadUserStats);
+
+        // Cargar primera pregunta al iniciar
+        getNewQuestion();
+    </script>
+
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        .quote-container {
+            background: #f9f9f9;
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+        }
+        .options {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 10px;
+        }
+        .option-button {
+            padding: 10px;
+            border: none;
+            background: #ffd90f;
+            cursor: pointer;
+            border-radius: 4px;
+        }
+        .option-button:hover {
+            background: #ffc60f;
+        }
+        .score {
+            font-size: 1.2em;
+            margin-bottom: 20px;
+        }
+        .message {
+            margin-top: 10px;
+            padding: 10px;
+            border-radius: 4px;
+        }
+        .correct {
+            background: #d4edda;
+            color: #155724;
+        }
+        .incorrect {
+            background: #f8d7da;
+            color: #721c24;
+        }
+        .back-button {
+            padding: 10px;
+            background-color: rgb(64, 125, 223);
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: bold;
+            width: 87%;
+            margin-bottom: 10px;
+        }
+    </style>
+</head>
+<body>
+    <% if (process.env.NODE_ENV !== 'production') { %>
+        <h1>Simpsons Trivia</h1>
+        <div class="score">Score: <span id="currentScore">0</span></div>
+        
+        <div class="quote-container">
+            <h3>¿Quién dijo esta frase?</h3>
+            <p id="quote"></p>
+            <div class="options" id="options"></div>
+            <div id="message" class="message" style="display: none;"></div>
+        </div>
+
+        <div style="text-align: center; margin-top: 50px;">
+            <button class="back-button" onclick="window.location.href='/api/v1/'">Volver al inicio</button>
+        </div>
+    <% } %>
+</body>
+</html>

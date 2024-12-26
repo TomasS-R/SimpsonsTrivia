@@ -7,7 +7,11 @@ const cookieParser = require('cookie-parser')
 const { setupRoutesV1, routeapi } = require('../src/routes/routes');
 const securityRoutes = require('../src/routes/securityRoutes');
 const sentryConfig = require('./monitoring/sentryConfig');
-const { supabaseConection } = require('../src/account/authSupabase')
+const { supabaseConection } = require('../src/account/authSupabase');
+const deleteUsersAuth = require('../src/account/deleteUsersAuth');
+const refreshAccessToken = require('../src/account/tokenRefresh');
+const redisManager = require('./dbFiles/redisManager');
+const config = require('../config');
 
 const app = express();
 // Configura la aplicación para que confíe en el encabezado X-Forwarded-For establecido por el proxy.
@@ -20,7 +24,7 @@ app.set('views', './src/views');
 // Inicializa Sentry
 sentryConfig.initSentry();
 
-const allowedOrigins = process.env.CORS_ORIGIN ? process.env.CORS_ORIGIN.split(',') : ['*'];
+const allowedOrigins = config.corsOrigin ? config.corsOrigin.split(',') : ['*'];
 
 app.use(cors({
     origin: (origin, callback) => {
@@ -35,15 +39,30 @@ app.use(cors({
 }));
 app.use(express.json());
 app.use(cookieParser());
-app.use(securityRoutes.apiLimiter);
+app.use(refreshAccessToken);
+// Middleware para verificar si la solicitud proviene de JMeter
+const isJMeter = (req) => {
+    return req.headers['user-agent'] && req.headers['user-agent'].includes('Apache-HttpClient');
+};
+  
+// Aplicar el limitador de API solo si no es una solicitud de JMeter
+app.use((req, res, next) => {
+    if (!isJMeter(req)) {
+        securityRoutes.publicApiLimiter(req, res, next);
+    } else {
+        next(); // Si es JMeter, continúa sin aplicar el limitador
+    }
+});
+
+deleteUsersAuth.startScheduledTask();
 
 // Determinar el entorno
-const isProduction = process.env.NODE_ENV === 'production';
+const isProduction = config.nodeEnv === 'production';
 
 // Configuración del puerto y host
-const PORT = process.env.PORT || 3000;
+const PORT = config.port || 3000;
 const HOST = isProduction ? '0.0.0.0' : 'localhost';
-const hostname = isProduction ? process.env.URLHOST : `http://localhost:${PORT}`;
+const hostname = isProduction ? config.urlHost : `http://localhost:${PORT}`;
 
 // Importa y configura las rutas
 setupRoutesV1(app, hostname);
@@ -57,7 +76,10 @@ const BLUE = '\x1b[96m';
 const BOLD = '\x1b[1m';
 
 // Verifica si la conexión a postgres está habilitada
-const connectionps = process.env.CONNECTPOSTGRES === 'True' ? true : (process.env.CONNECTPOSTGRES === undefined ? false : false);
+const connectionps = config.connectPostgres === 'True' ? true : (config.connectPostgres === undefined ? false : false);
+
+// Verifica si la conexión a redis está habilitada
+const connectionredis = config.connectRedis === 'True' ? true : (config.connectRedis === undefined ? false : false);
 
 async function createDatabaseTables() {
     // Obtener todas las tablas y sus columnas desde userTables
@@ -77,6 +99,8 @@ async function configureApp() {
     try {
         // Conectar a postgres
         await databaseManager.connectToPostgres(connectionps);
+        // Conectar a redis
+        const redisConnection = await redisManager.connectToRedis(connectionredis);
 
         if (databaseManager.isPostgresConnected()) {
             await createDatabaseTables();
@@ -104,6 +128,10 @@ async function configureApp() {
         } else {
             console.log(`${GREEN}${BOLD}🔧 Estás en modo desarrollo.${RESET}`);
             app.listen(PORT, () => console.log(`${GREEN}${BOLD}🚀 Servidor de desarrollo corriendo en: http://${HOST}:${PORT}${RESET}`));
+        }
+
+        if (redisConnection) {
+            //await redisManager.getConnectionInfo();
         }
     } catch (error) {
         console.error(`${RED}${BOLD}❌ Error: ${error.message}${RESET}`);

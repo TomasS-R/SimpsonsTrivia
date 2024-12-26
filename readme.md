@@ -2,12 +2,14 @@
 
 # Trivia Simpsons ES latam 🍩
 
-[![NodeJS](https://img.shields.io/badge/node-V20.9.0-success?color=yellow&logo=node.js&style=for-the-badge)](https://nodejs.org/)
+[![NodeJS](https://img.shields.io/badge/node-V22.9.0-success?color=yellow&logo=node.js&style=for-the-badge)](https://nodejs.org/)
 [![Npm](https://img.shields.io/badge/npm-V10.1.0-success?color=red&label=npm&logo=npm&style=for-the-badge)](https://www.npmjs.com/)
 [![Nodemon](https://img.shields.io/badge/nodemon-V3.1.4-success?color=76d04b&label=nodemon&logo=nodemon&style=for-the-badge)](https://www.nodemon.io/)
 [![Jest](https://img.shields.io/badge/jest-V29.7.0-success?color=c21325&label=Jest&logo=Jest&style=for-the-badge)](https://www.npmjs.com/)
 [![Express](https://img.shields.io/badge/express-V4.20.0-success?color=0d1117&label=express&logo=express&style=for-the-badge)](https://expressjs.com/)
 [![ESLint](https://img.shields.io/badge/eslint-V9.11.1-success?color=4B32C3&label=ESLint&logo=eslint&style=for-the-badge)](https://eslint.org/)
+[![JMeter](https://img.shields.io/badge/jmeter-V5.6.3-success?color=c21375&logo=Apache&style=for-the-badge)](https://nodejs.org/)
+[![Upstash](https://img.shields.io/badge/Upstash-v4.22.0-success?color=009688&label=Upstash&logo=upstash&style=for-the-badge)](https://upstash.com/)
 
 [![Actions](https://img.shields.io/static/v1?style=for-the-badge&message=Actions&color=555&logo=githubactions&logoColor=3333&label=)](https://docs.github.com/en/actions)
 [![Supabase](https://img.shields.io/static/v1?style=for-the-badge&message=Supabase&color=555&logo=supabase&logoColor=3333&label=)](https://supabase.com/)
@@ -160,54 +162,76 @@ Variables de entorno para la conexion con postgress
 
 `JWT_SECRET=`
 
-<summary><h3>CONNECTPOSTGRES</h3></h3> <h5>(conexion a base de datos)</h5></summary>
+<summary><h3>CONNECTPOSTGRES</h3> <h5>(conexion a base de datos)</h5></summary>
 
 > [!NOTE]
 > Por defecto si no tiene valor asignado esta en `False`, en caso de haber cargado las variables colocarlo en `True`
 
 `CONNECTPOSTGRES=`
 
-<summary><h3>NODE_ENV</h3></h3> <h5>(estado de desarrollo)</h5></summary>
+<summary><h3>NODE_ENV</h3> <h5>(estado de desarrollo)</h5></summary>
 
 > [!NOTE]
 > Dependiendo si se desplega en dev va a seguir por defecto en desarrollo, si no va a estar en produccion.
 
 `NODE_ENV=`
 
-<summary><h3>URLHOST</h3></h3> <h5>(la url donde esta tu proyecto alojado)</h5></summary>
+<summary><h3>URLHOST</h3> <h5>(la url donde esta tu proyecto alojado)</h5></summary>
 
 > [!NOTE]
 > En mi caso lo coloque en flyio por lo que estara apuntando a simpsons-trivia.fly.dev pero debes colocar el tuyo segun la url que te entregue el proveedor.
 
 `URLHOST=`
 
-<summary><h3>CORS_ORIGIN</h3></h3> <h5>(las urls que permitira CORS)</h5></summary>
+<summary><h3>CORS_ORIGIN</h3> <h5>(las urls que permitira CORS)</h5></summary>
 
 > [!NOTE]
 > Si no se ingresa ninguna url por default permitira todas las url´s, puedes colocar una o varias rutas de esta forma =https://www.url1.com,http://www.url2.com,http...
 
 `CORS_ORIGIN=`
 
-<summary><h3>SENTRY_DNS</h3></h3> <h5>(monitoreo mediante Sentry)</h5></summary>
+<summary><h3>SENTRY_DNS</h3> <h5>(monitoreo mediante Sentry)</h5></summary>
 
 > [!NOTE]
 > Ingresa tu DSN de sentry si tienes y si quieres realizar un monitoreo de la api mas preciso, si no puedes dejarlo vacio!
 
 `SENTRY_DSN=`
 
-<summary><h3>SUPABASE_URL</h3></h3> <h5>(la url que brinda supabase para realizar la conexion y poder trabajar con la api)</h5></summary>
+<summary><h3>SUPABASE_URL</h3> <h5>(la url que brinda supabase para realizar la conexion y poder trabajar con la api)</h5></summary>
 
 > [!NOTE]
 > Esto es opcional, pero si no lo configuras no podras manejar el login y el registro.
 
 `SUPABASE_URL=`
 
-<summary><h3>SUPABASE_ANON_KEY</h3></h3> <h5>(la clave anonima que brinda supabase para realizar la conexion y poder trabajar con la api)</h5></summary>
+<summary><h3>SUPABASE_ANON_KEY</h3> <h5>(la clave anonima que brinda supabase para realizar la conexion y poder trabajar con la api)</h5></summary>
 
 > [!NOTE]
 > Esto es opcional, pero si no lo configuras no podras manejar el login y el registro. Esta clave la puedes encontrar en supabase.com/dashboard > Project API Keys > anon public
 
 `SUPABASE_ANON_KEY=`
+
+<summary><h3>SERVICE_ROLE_KEY</h3> <h5>(clave con altos privilegios en supabase para poder modificar o eliminar recursos/usuarios/etc...)</h5></summary>
+
+> [!NOTE]
+> Esta clave la puedes encontrar en supabase.com/dashboard > Project API Keys > service rol
+
+`SERVICE_ROLE_KEY=`
+
+<summary><h3>CONNECTREDIS</h3> <h5>(conexion a la instancia de redis)</h5></summary>
+
+> [!NOTE]
+> Por defecto si no tiene valor asignado esta en `False`, en caso de haber cargado las variables colocarlo en `True` para conectarlo correctamente
+
+`CONNECTREDIS=`
+
+<summary><h3>UPSTASH_REDIS_URL</h3> <h5>(url que proporciona upstash/flyio)</h5></summary>
+
+`UPSTASH_REDIS_URL=`
+
+<summary><h3>UPSTASH_REDIS_TOKEN</h3> <h5>(token o password que proporciona upstash/flyio)</h5></summary>
+
+`UPSTASH_REDIS_TOKEN=`
 
 ### Testing
 
@@ -312,11 +336,14 @@ npm run lint
 └── readme.md                           # Instrucciones principales de la api y usos
 ```
 
-<div align= "center" >
-
+Flujo de la api
 <div align="center"><img src="./media/esqSimpsonsApi.svg" width="1000" height="400"></div>
 
-</div>
+Flujo de sesiones de usuarios
+<div align="center"><img src="./media/esqSimpsonsApiUserGuest.svg" width="1000" height="150"></div>
+
+Flujo de juego de usuarios
+<div align="center"><img src="./media/esqSimpsonsApiUserDataGame.svg" width="1000" height="550"></div>
 
 #### En este archivo podras encontrar todo el instructivo relaccionado al proyecto en si.
 

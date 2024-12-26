@@ -28,6 +28,38 @@
         function cerrarSesion() {
             realizarSolicitudPost('/api/v1/logout', {});
         }
+
+        // Función para cargar las estadísticas del usuario
+        async function loadUserData() {
+            try {
+                const userResponse = await fetch('/api/v1/user/data'); // Adjust the endpoint as needed
+                const userData = await userResponse.json();
+
+                if (userData.success) {
+                    document.getElementById('username').textContent = userData.data.username;
+                    document.getElementById('user_tag').textContent = userData.data.user_tag;
+                }
+
+                const response = await fetch('/api/v1/user/stats');
+                const data = await response.json();
+
+                console.log('User stats:', data);
+                
+                if (data.success) {
+                    document.getElementById('highestScore').textContent = data.data.highestScore || 0;
+                    document.getElementById('lastScore').textContent = data.data.lastScore || 0;
+                    document.getElementById('correctAnswers').textContent = data.data.correctAnswers || 0;
+                    document.getElementById('incorrectAnswers').textContent = data.data.incorrectAnswers || 0;
+                    document.getElementById('totalQuestions').textContent = data.data.totalQuestions || 0;
+                    document.getElementById('accuracy').textContent = data.data.accuracy || '0%';
+                }
+            } catch (error) {
+                console.error('Error loading user stats:', error);
+            }
+        }
+        
+        // También puedes llamar a loadUserStats aquí si deseas cargar las estadísticas al inicio
+        document.addEventListener('DOMContentLoaded', loadUserData);
     </script>
     <style>
         body {
@@ -40,7 +72,7 @@
             border: 1px solid #ccc;
             box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
             border-radius: 5px;
-            width: 300px;
+            width: 50%;
             margin: 20px auto;
         }
 
@@ -54,13 +86,79 @@
             cursor: pointer;
             font-weight: bold;
         }
+        button.back {
+            width: 100%;
+            padding: 10px;
+            background-color: green;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        .stats-container {
+            background: #f0f0f0;
+            padding: 20px;
+            border-radius: 8px;
+            margin-top: 20px;
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 10px;
+        }
+        .stat-item {
+            background: white;
+            padding: 10px;
+            border-radius: 4px;
+            text-align: center;
+        }
+        .stat-label {
+            font-weight: bold;
+            color: #666;
+        }
+        .stat-value {
+            font-size: 1.2em;
+            color: #333;
+            margin-top: 5px;
+        }
     </style>
 </head>
 <body>
     <div class="protected-container">
-        <h2>Hola <span id="username"><%= username %></span>!</h2>
+        <h2>Hola <span id="username"></span>!</h2>
+        <p>Tu user tag es: <span id="user_tag"></span></p>
         <p>Estás en el panel de administración</p>
-        <button class="logout" onclick="cerrarSesion()">Cerrar sesión</button>
+        
+        <!-- Nueva sección de estadísticas -->
+        <div class="stats-container">
+            <div class="stat-item">
+                <div class="stat-label">Mejor Puntaje</div>
+                <div class="stat-value" id="highestScore">0</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-label">Último Puntaje</div>
+                <div class="stat-value" id="lastScore">0</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-label">Respuestas Correctas</div>
+                <div class="stat-value" id="correctAnswers">0</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-label">Respuestas Incorrectas</div>
+                <div class="stat-value" id="incorrectAnswers">0</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-label">Total Preguntas</div>
+                <div class="stat-value" id="totalQuestions">0</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-label">Precisión</div>
+                <div class="stat-value" id="accuracy">0%</div>
+            </div>
+        </div>
+
+        <div style="text-align: center; margin: 20px; display: flex; justify-content: center; gap: 10px;">
+            <button class="back" onclick="window.location.href='/'">← Volver al inicio</button>
+            <button class="logout" onclick="cerrarSesion()">Cerrar sesión</button>
+        </div>
     </div>
 </body>
 </html>

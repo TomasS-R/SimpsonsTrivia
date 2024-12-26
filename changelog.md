@@ -1,5 +1,40 @@
 # Changelog
 
+## Version 0.6.0: - 2024-12- -
+
+### Agregado:
+   - Archivo [deleteUsersAuth](./src/account/deleteUsersAuth.js) que elimina usuarios del sistema de Auth de supabase, este archivo se ejecuta automaticamente y elimina los usuarios anonimos que no se registraron en las ultimas 3 horas, la llamada al cronjob se encuentra en [app](./src/app.js).
+   - Ruta [account](./src/views/account.ejs) se separo el login y el registro del inicio de la api, para una interfaz mas limpia, asi mismo tambien se separo para que los tokens de los usuarios se creen al momento de ingresar a una pagina especial (como la trivia).
+   - Variable de entorno nueva SERVICE_ROLE_KEY en [.env](.env.template) va a servir para realizar determinadas modificaciones en nuestro proyecto que requieran una key con altos privilegios.
+   - Token refresh y su configuracion en el archivo [tokenRefresh](./src/account/tokenRefresh.js).
+   - Sesiones anonimas, se crean, modifican y cierran en el archivo [sessionHandler](./src/account/sessionHandler.js) que actua como middleware, este middelware se debe colocar en la ruta donde se va a usar (verifyUserSession) y tambien en el registro.
+   - Conexion con Redis y manejo de conexion en el archivo [redisManager](/src/dbFiles/redisManager.js) los usuarios no registrados pasaran por auth -> redis (almacena dicha informacion temporalmente hasta el registro) -> tabla usuarios supabase.
+   - Se agrego la ruta /quotes/:id/answer en el archivo [routes](./src/routes/routes.js) la cual recibe la respuesta de una pregunta/frase.
+   - Creado el archivo [trivia](./src/views/trivia.ejs) para poder realizar pruebas con los datos y el frontend del juego.
+   - Se agrego una nueva tabla en [userTables](./src/dbFiles/creatingTables/userTables.js) esta tabla va a guardar las imagenes de perfil de los usuarios (estas van a estar almacenadas en supabase storage).
+   - Los usuarios en esta actualizacion tendran un user tag para en el futuro implementar una busqueda de usuarios de ser necesario, esto se genera en [register](./src/account/register.js) tomando como referencia el nombre del usuario.
+   - Se agrego y se mejoro el uso de variables de entorno, a partir de ahora las variables de entorno se llaman 1 sola vez en el archivo [config](./config.js) para evitar llamadas repetitivas en diferentes partes del proyecto.
+   - Creado el flujo del juego (usuarios registrados) con los datos de puntaje: ultimo, maximo, reciente, respuestas: correctas, incorrectas, totales, tiempo promedio en el archivo [triviaControllers](./src/controllers/triviaControllers.js) funcion *answerQuestion*. (Mas info en el [diagrama](./media/esqSimpsonsApiUserDataGame.svg)).
+   - Agregadas las rutas /gameover, /user/stats (estadisticas de juego X usuario), /user/data (informacion del perfil del usuario con estadisticas de juego) en [routes](./src/routes/routes.js).
+   - Libreria ioredis para el uso de upstash en [package](./package.json) y congigurado en [redisManager](./src/dbFiles/redisManager.js).
+   - Archivo [queriesRedis](./src/dbFiles/queriesRedis.js) para manejar todas las consultas a travez de este archivo, actua de igual forma que el archivo de postgresSQL.
+
+### Modificado:
+   - El archivo app se modifico el applimiter para que pudiera procesar las solicitudes de JMeter sin ningun problema, a partir de ahora deberas configurar en JMeter que el encabezado sea de tipo (nombre) User-Agent y (valor) Apache-HttpClient/4.5.13 para que pueda realizar las pruebas correctamente, de otro modo saltara que haz realizado demasiadas solicitudes.
+   - Archivo [fly](./fly.toml) el cual a llegar a determinado punto la aplicacion realizara un esalado automatico activando la segunda maquina virtual (VM) y se disminuyo la memoria asignada de 512 > 256 mb.
+   - A partir de esta actualizacion el login y el registro no seran visibles en produccion solo estaran disponibles en local y en modo desarrollo.
+   - Ahora en el archivo [register](./src/account/register.js) si un usuario se registra, automaticamente va actualizar el supabaseUserId para que no haya que crear usuarios de supabase sin sentido.
+   - Se mejoro la ui del archivo [index](./src/views/index.ejs) ahora solo los usuarios en localhost van a poder realizar pruebas y cualquier usuario podra acceder a la documentacion de [swaggerDocs](./src/routes/swaggerDocs.js) desde la ruta principal.
+   - Se mejoro la documentacion de las rutas en el archivo [apiRoutesDoc](./src/routes/apiRoutesDoc.yaml) y se agregaron nuevas rutas.
+   - Se arreglo la consulta de getQuotesByCharacter en el archivo [queries](./src/dbFiles/queries.js) debido a que no devolvia las frases de los personajes correctamente.
+   - Se arreglo la funcion getRandomQuestion en [queries](./src/dbFiles/queries.js) para que ademas de que mostrara los pesonajes tambien envie los id de cada personaje, esto permitira poder manejar y armar el juego de trivia.
+   - Se establecio un nuevo sistema de seguridad para las rutas, robusteciendo el sistema ya previsto anteriormente en [securityRoutes](./src/routes/securityRoutes.js) y se redujo la cantidad de intentos de fuerza bruta de 5 a 3 intentos, asi tambien se establecio los nuevos api limiter para endpoints críticos, para el servidor, API con token y API pública.
+   - Se mejoro el archivo [userTables](./src/dbFiles/creatingTables/userTables.js) ahora los nombres de las tablas se asignan al comienzo del archivo para evitar romper la estructura de las tablas y asi poder modificarlo de manera mas comoda y rapida.
+   - Se mejoro el archivo [protected](./src/views/protected.ejs), para poder moverse entre los diferentes paneles, se agregaron ls estadisticas del usuario logeado asi como tambien la informacion del perfil del mismo.
+
+### Obsoleto:
+   - Se elimino la tabla users_anonimus de [userTables](./src/dbFiles/creatingTables/userTables.js)
+
 ## Version 0.5.9: - 2024-10-23 -
 
 ### Modificado:

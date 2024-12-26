@@ -1,4 +1,5 @@
 const { Pool } = require('pg');
+const config = require('../../config');
 
 // Clase para manejar la conexión a la base de datos
 class DatabaseManager {
@@ -9,19 +10,19 @@ class DatabaseManager {
     // Conectar a la base de datos mediante una conexion pool PostgreSQL
     async connectToPostgres(shouldConnect = true) {
         if (shouldConnect && !this.pgPool) {
-            const { DATABASEUSER, DATABASEPASS, DATABASEHOST, DATABASEPORT, DATABASENAME } = process.env;
+            const { databaseUser, databasePassword, databaseHost, databasePort, databaseName } = config;
             
-            if (!DATABASEUSER || !DATABASEPASS || !DATABASEHOST || !DATABASEPORT || !DATABASENAME) {
+            if (!databaseUser || !databasePassword || !databaseHost || !databasePort || !databaseName) {
                 console.log('Missing required environment variables for PostgreSQL connection');
                 return null;
             }
     
             this.pgPool = new Pool({
-                user: DATABASEUSER,
-                password: DATABASEPASS,
-                host: DATABASEHOST,
-                port: DATABASEPORT,
-                database: DATABASENAME,
+                user: databaseUser,
+                password: databasePassword,
+                host: databaseHost,
+                port: databasePort,
+                database: databaseName,
                 ssl: {
                     rejectUnauthorized: false,
                 }

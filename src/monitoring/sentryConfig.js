@@ -1,9 +1,10 @@
 const Sentry = require('@sentry/node');
 const { nodeProfilingIntegration } = require("@sentry/profiling-node");
+const config = require('../../config');
 
 function initSentry() {
     Sentry.init({
-        dsn: `${ process.env.SENTRY_DSN }`,
+        dsn: `${ config.sentryDsn }`,
         integrations: [
           nodeProfilingIntegration(),
         ],

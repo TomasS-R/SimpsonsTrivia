@@ -1,8 +1,11 @@
 const queries = require('../dbFiles/queries');
 const accountRegister = require('../account/register');
 const accountLogin = require('../account/login');
-const rolesManager = require('../account/roles/rolesManager')
-const { supabaseConection } = require('../account/authSupabase')
+const rolesManager = require('../account/roles/rolesManager');
+const { supabaseConection } = require('../account/authSupabase');
+const config = require('../../config');
+const queriesRedis = require('../dbFiles/queriesRedis');
+const redisManager = require('../dbFiles/redisManager');
 
 // Funcion para registrar un usuario
 async function registerUserReq (req, res) {
@@ -19,31 +22,57 @@ async function registerUserReq (req, res) {
     else if (!password) {
       return res.status(400).json({ success: false, error: "The request needs the 'password' field!" });
     }
-    const data = await accountRegister.registerUser(username, email, password, defaultRole, res);
 
-    // Establecer cookies después de un inicio de sesión exitoso
-    res.cookie('accessToken', data.session.access_token, {
-      httpOnly: true, // Solo se puede acceder desde el servidor
-      secure: process.env.NODE_ENV === 'production', // secure true en produccion
-      sameSite: 'strict', // Evitar que se envien a través de peticiones CSRF
-      maxAge: 1000 * 60 * 60 // 1 hora de duracion de la cookie
-    });
+    const anonymousId = req.user?.isAnonymous ? req.user.id : null;
+    const data = await accountRegister.registerUser(username, email, password, defaultRole, anonymousId, res);
+
+    // Si existe un usuario anónimo, transferir sus datos
+    if (req.user?.isAnonymous) {
+      //console.log('req.user', req.user);
+      //await queries.transferAnonymousData(req.user.id, data.user.id, score);
+    }
+
+    // Verificar que data y session existan antes de usar access_token
+    if (data?.session?.access_token) {
+      res.cookie('accessToken', data.session.access_token, {
+        httpOnly: true,
+        secure: config.nodeEnv === 'production',
+        sameSite: 'strict',
+        maxAge: 3 * 60 * 60 * 1000 // 3 horas
+      });
+
+      res.cookie('refreshToken', data.session.refresh_token, {
+        httpOnly: true,
+        secure: config.nodeEnv === 'production',
+        sameSite: 'strict',
+        maxAge: 7 * 24 * 60 * 60 * 1000 // 7 días
+      });
+    }
+
+    // Verificar que tengamos los datos necesarios para la respuesta
+    if (!data?.user) {
+      throw new Error('User data not available after registration');
+    }
 
     res.status(201).json({
-        success: true,
-        message: "User registered successfully",
-        token: data.session.access_token,
-        data: {
-          id: data.user.id,
-          username: data.user.username,
-          email: data.user.email,
-          role: data.user.role,
-          created_at: data.user.created_at,
-        },
+      success: true,
+      message: "User registered successfully",
+      token: data.session?.access_token,
+      data: {
+        id: data.user.id,
+        username: data.user.username,
+        user_tag: data.user.user_tag,
+        email: data.user.email,
+        role: data.user.role,
+        created_at: data.user.created_at,
+      },
     });
-  }
-  catch (e) {
-    console.log(e);
+  } catch (e) {
+    console.error('Registration error:', e);
+    res.status(500).json({
+      success: false,
+      error: "An error occurred during registration: " + e.message
+    });
   }
 };
 
@@ -122,11 +151,17 @@ async function loginUserReq (req, res, next) {
     // Establecer cookies después de un inicio de sesión exitoso
     res.cookie('accessToken', data.session.access_token, {
       httpOnly: true, // Solo se puede acceder desde el servidor
-      secure: process.env.NODE_ENV === 'production', // secure true en produccion
+      secure: config.nodeEnv === 'production', // secure true en produccion
       sameSite: 'strict', // Evitar que se envien a través de peticiones CSRF
-      maxAge: 1000 * 60 * 60 // 1 hora de duracion de la cookie
+      maxAge: 3 * 60 * 60 * 1000 // 3 horas de duracion de la cookie
     });
-    //res.cookie('refreshToken', data.session.refresh_token, { httpOnly: true, secure: true }); // Asegúrate de que 'secure' sea true en producción
+
+    res.cookie('refreshToken', data.session.refresh_token, {
+      httpOnly: true,
+      secure: config.nodeEnv === 'production',
+      sameSite: 'strict',
+      maxAge: 7 * 24 * 60 * 60 * 1000 // 7 días
+    });
 
     res.status(200).json({
       success: true,
@@ -144,7 +179,6 @@ async function loginUserReq (req, res, next) {
       },
     });
   } catch (e) {
-    console.log(e);
     if (e.message === "Invalid login credentials") {
       return res.status(401).json({ success: false, error: "Invalid credentials. Please check your email and password." });
     } else {
@@ -358,16 +392,175 @@ const supabaseAuth = async (req, res, next) => {
   }
 };
 
+const logoutUser = async (req, res) => {
+  try {
+    const { error } = await supabaseConection.auth.signOut();
+    if (error) {
+      return res.status(400).json({ success: false, error: error.message });
+    }
+    res.clearCookie('accessToken').clearCookie('refreshToken').status(200).json({ success: true, message: 'Logout successful' });
+  } catch (error) {
+    console.error('Error in logoutUser:', error);
+    res.status(500).json({ success: false, error: 'Internal server error' });
+  }
+};
+
+// Ruta protegida para pruebas en backend luego del login
+const protectedRoute = (req, res) => {
+  try {
+    const userId = req.user.user.id;
+    res.render('protected', { user: userId });
+  } catch (error) {
+    console.error('Error in protectedRoute:', error);
+    res.status(500).json({ success: false, error: 'Internal server error' });
+  }
+};
+
+function calculateScore(time) {
+  let score = 1;
+
+  if (time) {
+    if (time <= 2000) {
+      score = 6;
+    }
+    else if (time <= 5000) {
+      score = 4;
+    } else if (time <= 10000) {
+      score = 2;
+    } else {
+      score = 1;
+    }
+  }
+  return score;
+}
+
+// Enviar respuesta a una pregunta
+async function answerQuestion(req, res) {
+  try {
+    const quoteId = req.params.id;
+    const { answer, time = null } = req.body;
+    const user = req.user; // ID del usuario (anónimo o registrado)
+
+    const isCorrect = await queries.checkAnswer(quoteId, answer);
+    let scoreToAdd = 0;
+
+    if (isCorrect) {
+      scoreToAdd = calculateScore(time);
+      
+      if (user && !user.isAnonymous) {
+        const userID = user.id
+        await queries.updateUserScore(userID, scoreToAdd, time);
+        await queries.lastScoreUser(userID);
+      } else {
+        const sessionId = user?.id || req.sessionID;
+        await queriesRedis.updateUserScore(sessionId, scoreToAdd);
+        (async () => {
+          await redisManager.debugRedis('*');
+        })();
+      }
+    } else {
+      if (user && !user.isAnonymous) {
+        await queries.updateUserScoreFailed(user.id);
+      }
+    }
+
+    res.json({
+      success: true,
+      result: {
+        correct: isCorrect,
+        score: isCorrect ? scoreToAdd : 0,
+        time: time,
+        message: isCorrect ? '¡Correct!' : '¡Incorrect! Game over!'
+      }
+    });
+
+  } catch (error) {
+    console.error('Error in answerQuestion:', error);
+    res.status(500).json({
+      success: false,
+      error: error.message
+    });
+  }
+};
+
+async function getUserStats(req, res) {
+  try {
+    const userId = req.user.user.id;
+    const stats = await queries.getUserStats(userId);
+
+    const accuracy = stats.total_questions > 0
+      ? ((stats.correct_answers / stats.total_questions) * 100).toFixed(2)
+      : 0;
+
+    res.json({
+      success: true,
+      data: {
+        currentScore: stats.current_score,
+        highestScore: stats.highest_score,
+        lastScore: stats.last_score,
+        answerTime: stats.avg_answer,
+        correctAnswers: stats.correct_answers,
+        incorrectAnswers: stats.incorrect_answers,
+        totalQuestions: stats.total_questions,
+        accuracy: `${accuracy}%`
+      }
+    });
+  } catch (error) {
+    console.error('Error in getUserStats:', error);
+    res.status(500).json({
+      success: false,
+      error: 'Error retrieving user statistics'
+    });
+  }
+}
+
+async function gameOverRefreshPage(req, res) {
+  try {
+    const userId = req.user.id;
+    await queries.updateUserScoreFailed(userId);
+  } catch (error) {
+    console.error('Error in gameOverRefreshPage:', error);
+    res.status(500).json({
+      success: false,
+      error: 'Error updating user score refresh page'
+    });
+  }
+}
+
+async function userDataProfile(req, res) {
+  try {
+    const userId = req.user.user.id;
+    const userData = await queries.getUserData(userId);
+
+    res.json({
+      success: true,
+      data: userData
+    });
+  } catch (error) {
+    console.error('Error in userDataProfile:', error);
+    res.status(500).json({
+      success: false,
+      error: 'Error retrieving user data'
+    });
+  }
+}
+
 module.exports = {
-    registerUserReq,
-    loginUserReq,
-    changeUserRole,
-    getUsersList,
-    getUsersScores,
-    getQuestionsTrivia,
-    getQuote,
-    healthCheck,
-    getQuotesByCharacter,
-    getCharacters,
-    supabaseAuth
+  registerUserReq,
+  loginUserReq,
+  changeUserRole,
+  getUsersList,
+  getUsersScores,
+  getQuestionsTrivia,
+  getQuote,
+  healthCheck,
+  getQuotesByCharacter,
+  getCharacters,
+  supabaseAuth,
+  logoutUser,
+  protectedRoute,
+  answerQuestion,
+  getUserStats,
+  userDataProfile,
+  gameOverRefreshPage
 };
