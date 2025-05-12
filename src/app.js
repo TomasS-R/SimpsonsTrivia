@@ -1,5 +1,5 @@
 const databaseManager = require('./dbFiles/databaseManager');
-const { createTables } = require('./dbFiles/queries');
+const { createTables, createBucketStorage } = require('./dbFiles/queries');
 const userTables = require('./dbFiles/creatingTables/userTables');
 const express = require('express');
 const cors = require('cors');
@@ -111,6 +111,8 @@ async function configureApp() {
 
         // Comprobar si se conecto o no con la api de supabase
         if (supabaseConection) {
+            const profileImageBucket = 'profile_images';
+            await createBucketStorage(profileImageBucket);
             console.log(`${GREEN}${BOLD}✅ Conexion con el cliente Supabase establecida exitosamente${RESET}`);
         } else {
             console.log(`${RED}${BOLD}❌ Falló la conexion con el cliente Supabase.${RESET}`);

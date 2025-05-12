@@ -25,6 +25,8 @@ function setupRoutesV1(app) {
 
     // ** Rutas de autenticación **
     app.post(routeapi+'/login', securityRoutes.authLimiter, securityRoutes.bruteforce.prevent, triviaControll.loginUserReq);
+    app.get(routeapi+'/loginoauth/:provider', /*securityRoutes.authLimiter, securityRoutes.bruteforce.prevent,*/ triviaControll.loginUserOAuth);
+    app.post(routeapi+'/oauth/callback', /*securityRoutes.authLimiter, securityRoutes.bruteforce.prevent,*/ triviaControll.handleOAuthCallback);
     app.post(routeapi+'/register', securityRoutes.authLimiter, sessionHandler.handleUserSession, triviaControll.registerUserReq);
     app.post(routeapi+'/logout', securityRoutes.authLimiter, triviaControll.logoutUser);
 

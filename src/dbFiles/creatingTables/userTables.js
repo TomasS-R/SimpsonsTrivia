@@ -6,7 +6,19 @@ const QUOTES_USERS_TABLE = 'quotes_users'
 const PROFILE_IMAGES_TABLE = 'profile_images'
 
 // En este archivo nombramos las diferentes tablas a crear en la BD
+// Es importante colocar las tablas que dependen de otras primero asi no hay problemas al crearlas
 const userTables = {
+    profile_images: {
+        tableName: PROFILE_IMAGES_TABLE,
+        columns: [
+            { name: 'id', type: 'smallint', primaryKey: true },
+            { name: 'image_url', type: 'text', notNull: true },
+            { name: 'name', type: 'text', notNull: true },
+            { name: 'description', type: 'text' },
+            { name: 'objetive', type: 'text', notNull: true },
+            { name: 'category', type: 'text', notNull: true }
+        ]
+    },
     users: {
         tableName: USER_TABLE,
         columns: [
@@ -60,14 +72,6 @@ const userTables = {
             {name: 'quote', type: 'text', notNull: true},
             {name: 'approved', type: 'bool', default: false},
             {name: 'submitted_at', type: 'timestamptz'},
-        ]
-    },
-    profile_images: {
-        tableName: PROFILE_IMAGES_TABLE,
-        columns: [
-            { name: 'id', type: 'smallint', primaryKey: true },
-            { name: 'image_url', type: 'text', notNull: true },
-            { name: 'name', type: 'text', notNull: true },
         ]
     },
 

@@ -87,6 +87,36 @@
             realizarSolicitudPost('/api/v1/login', { email, password });
             return false;
         }
+
+        async function loginWithGitHub() {
+            /*const { data, error } = supabaseConection.auth.signInWithOAuth({
+                provider: 'github',
+                options: {
+                    redirectTo: `${window.location.origin}/api/v1/oauth/callback`,
+                },
+            });
+
+            console.log(data);*/
+            url = `${window.location.origin}/api/v1/loginoauth/github`
+
+            const respuesta = await fetch(url, {
+                method: 'GET',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+            });
+            const resultado = await respuesta.json();
+        }
+
+        function loginWithGoogle() {
+            supabaseConection.auth.signInWithOAuth({
+                provider: 'google',
+                options: {
+                    redirectTo: `${window.location.origin}/api/v1/oauth/callback`,
+                },
+            });
+        }
+
     </script>
     <style>
         body {
@@ -159,6 +189,22 @@
                 margin: 10px;
             }
         }
+
+        .oauth-button {
+            width: 100%;
+            padding: 10px;
+            background-color: #4285F4;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            margin-bottom: 10px;
+        }
+
+        .oauth-button.github {
+            background-color: #333;
+            margin-top: 20px;
+        }
     </style>
 </head>
 <body>
@@ -179,6 +225,8 @@
 
                     <button type="submit">Login</button>
                 </form>
+                <button class="oauth-button github" onclick="loginWithGitHub()">Login with GitHub</button>
+                <button class="oauth-button" onclick="loginWithGoogle()">Login with Google</button>
             </div>
 
             <div class="form-container">

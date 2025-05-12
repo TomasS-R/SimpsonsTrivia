@@ -87,6 +87,89 @@ async function createTables(tableName, columns) {
     }
 }
 
+// Verify if bucket exist
+async function verifyBucket(bucketName) {
+    try {
+
+        const result = await databaseManager.query(`select * from storage.buckets where name = $1`,[bucketName]);
+
+        return result.rowCount > 0;
+        
+    } catch (e) {
+        console.error('Error to verify bucket storage has created', e.message, e.stack)
+    }
+    return;
+}
+
+// Verify if policy exist
+async function verifyPolicy() {
+    try {
+
+        const result = await databaseManager.query(`select count(*) from pg_policy where polname = 'Allow bucket creation'`);
+
+        // const resultJSON = JSON.stringify(result, null, 2)
+        const rowCount = result.rows[0].count;
+
+        if (rowCount >= 1){
+            return true;
+        } else {
+            return false;
+        }
+        
+    } catch (e) {
+        console.error('Error to verify Policy of bucket storage', e.message, e.stack)
+    }
+}
+
+async function createBucketStorage(bucketName) {
+    try {
+        let resultBucket = await verifyBucket(bucketName);
+        const resultPolicy = await verifyPolicy();
+
+        while (!resultBucket) {
+
+            if (!resultPolicy) {
+                // Create a policy that allows the insertion of new rows and can save files into the bucket
+                const createPolicyQuery = 
+                `create policy "Allow bucket creation" on storage.buckets for insert with check ( true );
+                create policy "Allow object creation" on storage.objects for insert with check (true);`;
+                const queryResponse = await databaseManager.query(createPolicyQuery);
+
+                if (queryResponse) {
+                    console.log('✅ Policy created successfully');
+                } else {
+                    console.log('⛔ Error creating policy');
+                }
+            }
+            // Create bucket in the storage
+            const supabaseUrl = process.env.SUPABASE_URL+'/storage/v1';
+            const supabaseKey = process.env.SUPABASE_ANON_KEY;
+
+            const responseBucket = await fetch(`${supabaseUrl}/bucket`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${supabaseKey}`
+                },
+                body: JSON.stringify({
+                    "name": bucketName,
+                    "public": false
+                })
+            })
+            const data = await responseBucket.json();
+
+            if (responseBucket.ok) {
+                console.log('✅ Bucket created successfully:', data);
+            } else {
+                console.log('⛔ Error creating bucket:', data);
+            }
+            resultBucket = await verifyBucket(bucketName);
+        }
+    } catch (error) {
+        console.error('Error in verify bucket:', error);
+    }
+}
+
 // Verificar la existencia de la tabla
 async function verifyTable(tableName) {
     try {
@@ -544,6 +627,8 @@ async function getUserData(userId) {
 
 module.exports = {
     createTables,
+    verifyBucket,
+    createBucketStorage,
     verifyTable,
     getUsers,
     getScores,

@@ -187,6 +187,58 @@ async function loginUserReq (req, res, next) {
   }
 };
 
+async function loginUserOAuth(req, res, next) {
+  try {
+    const { provider } = req.params;
+
+    console.log('provider:', provider);
+    
+    if (!provider) {
+      return res.status(400).json({ success: false, error: "Provider is required" });
+    } else if (provider !== 'google' && provider !== 'github') {
+      return res.status(400).json({ success: false, error: "Invalid provider" });
+    }
+    await accountLogin.loginWithOAuth(req, res);
+    
+  } catch (e) {
+    console.error('Error during OAuth login:', e);
+    next(e);
+  }
+}
+
+async function handleOAuthCallback(req, res) {
+  console.log(req.body);
+  const { access_token, refresh_token, expires_in } = req.body;
+
+  // Verifica que el access_token esté presente
+  if (!access_token) {
+    return res.status(400).json({ success: false, error: 'No access token provided' });
+  }
+
+  try {
+    // Aquí puedes guardar el access_token y otros datos en la sesión o en cookies
+    res.cookie('accessToken', access_token, {
+      httpOnly: true,
+      secure: config.nodeEnv === 'production',
+      sameSite: 'strict',
+      maxAge: expires_in * 1000 // Convertir a milisegundos
+    });
+
+    res.cookie('refreshToken', refresh_token, {
+      httpOnly: true,
+      secure: config.nodeEnv === 'production',
+      sameSite: 'strict',
+      maxAge: 7 * 24 * 60 * 60 * 1000 // 7 días
+    });
+
+    // Redirige al usuario a la página protegida o a donde desees
+    return res.redirect('/api/v1/protected'); // Cambia esto a la ruta que desees
+  } catch (error) {
+    console.error('Error during OAuth callback:', error);
+    return res.status(500).json({ success: false, error: 'Internal server error' });
+  }
+}
+
 // Funcion para obtener la lista de usuarios
 async function getUsersList (req, res) {
     try {
@@ -548,6 +600,8 @@ async function userDataProfile(req, res) {
 module.exports = {
   registerUserReq,
   loginUserReq,
+  loginUserOAuth,
+  handleOAuthCallback,
   changeUserRole,
   getUsersList,
   getUsersScores,
