@@ -26,9 +26,10 @@ function setupRoutesV1(app) {
     // ** Rutas de autenticación **
     app.post(routeapi+'/login', securityRoutes.authLimiter, securityRoutes.bruteforce.prevent, triviaControll.loginUserReq);
     app.get(routeapi+'/loginoauth/:provider', /*securityRoutes.authLimiter, securityRoutes.bruteforce.prevent,*/ triviaControll.loginUserOAuth);
-    app.post(routeapi+'/oauth/callback', /*securityRoutes.authLimiter, securityRoutes.bruteforce.prevent,*/ triviaControll.handleOAuthCallback);
+    app.get(routeapi+'/oauth/callback', /*securityRoutes.authLimiter, securityRoutes.bruteforce.prevent,*/ triviaControll.handleOAuthCallback);
     app.post(routeapi+'/register', securityRoutes.authLimiter, sessionHandler.handleUserSession, triviaControll.registerUserReq);
     app.post(routeapi+'/logout', securityRoutes.authLimiter, triviaControll.logoutUser);
+    app.post(routeapi+'/oauth/process-token', securityRoutes.authLimiter, triviaControll.processOAuthToken);
 
     // ** Rutas protegidas (requieren autenticación) **
     // Rutas administrativas
@@ -37,7 +38,7 @@ function setupRoutesV1(app) {
     app.patch(routeapi+'/users/:userId/role', securityRoutes.authenticatedApiLimiter, triviaControll.supabaseAuth, checkRole(rolesManager.roles.ADMIN), triviaControll.changeUserRole);
 
     // ** Rutas de usuario autenticado **
-    app.get(routeapi+'/protected', securityRoutes.authenticatedApiLimiter, sessionHandler.verifyUserSession, triviaControll.supabaseAuth, checkRole(rolesManager.roles.USER), triviaControll.protectedRoute);
+    app.get(routeapi+'/profile', securityRoutes.authenticatedApiLimiter, sessionHandler.verifyUserSession, triviaControll.supabaseAuth, checkRole(rolesManager.roles.USER), triviaControll.protectedRoute);
     app.get(routeapi+'/account', securityRoutes.authenticatedApiLimiter, (req, res) => {res.render('account');});
     app.post(routeapi+'/quotes/:id/answer', securityRoutes.authenticatedApiLimiter, sessionHandler.handleUserSession, triviaControll.answerQuestion);
     app.post(routeapi+'/gameover', securityRoutes.authenticatedApiLimiter, sessionHandler.verifyUserSession, sessionHandler.handleUserSession, triviaControll.gameOverRefreshPage);

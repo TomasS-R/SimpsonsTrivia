@@ -79,6 +79,34 @@ paths:
                         type: string
                         format: date-time
 
+  /quote/questions:
+    get:
+      tags:
+        - Game
+      summary: Obtener preguntas de trivia
+      description: Retorna una lista de preguntas disponibles para el juego de trivia
+      responses:
+        '200':
+          description: Lista de preguntas
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  data:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        id:
+                          type: integer
+                        quote:
+                          type: string
+                        character:
+                          type: string
+
   /quote/random:
     get:
       tags:

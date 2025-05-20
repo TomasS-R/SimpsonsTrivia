@@ -1,5 +1,6 @@
 const databaseManager = require('./databaseManager');
 const userTables = require('./creatingTables/userTables');
+const { formatUserTag } = require('../account/userUtils');
 
 async function createTables(tableName, columns) {
 
@@ -405,17 +406,44 @@ async function getUserRole(userId) {
 // Función para obtener TODOS los datos de un usuario por ID de Supabase
 async function getUserDataSupabaseAuth(userId) {
     try {
-      const result = await databaseManager.query(`
-        SELECT * 
-        FROM ${userTables.users.tableName} 
-        WHERE supabase_user_id = $1`, [userId]);
-      if (result.rows.length === 0) {
-        throw new Error('Role not found');
-      }
-      return result.rows[0];
+        // Obtener datos del usuario
+        const query = `
+            SELECT id, role 
+            FROM ${userTables.users.tableName}
+            WHERE supabase_user_id = $1
+        `;
+        const result = await databaseManager.query(query, [userId]);
+        
+        // Si el usuario existe
+        if (result.rows.length > 0) {
+            return {
+                id: result.rows[0].id,
+                role: result.rows[0].role || 'user'
+            };
+        }
+        
+        // Si el usuario no existe, crear nuevo con rol por defecto
+        const insertUserQuery = `
+            INSERT INTO ${userTables.users.tableName} 
+            (supabase_user_id, role, created_at) 
+            VALUES ($1, 'user', NOW()) 
+            RETURNING id, role
+        `;
+        
+        const newUser = await databaseManager.query(insertUserQuery, [userId]);
+        
+        return {
+            id: newUser.rows[0].id,
+            role: 'user'
+        };
+
     } catch (error) {
-      console.error('Error obtain user role:', error);
-      throw error;
+        console.error('Error en getUserDataSupabaseAuth:', error);
+        // En lugar de lanzar error, devolver rol por defecto
+        return {
+            id: userId,
+            role: 'user'
+        };
     }
 }
 
@@ -625,6 +653,110 @@ async function getUserData(userId) {
     }
 }
 
+async function createUserOAuth(userData) {
+  try {
+    console.log("Creando/actualizando usuario OAuth:", userData.email);
+    
+    // Verificar si el usuario ya existe por ID
+    const checkUserIdQuery = `SELECT id FROM ${userTables.users.tableName} WHERE supabase_user_id = $1`;
+    const userIdResult = await databaseManager.query(checkUserIdQuery, [userData.id]);
+    
+    if (userIdResult.rows.length > 0) {
+      console.log(`Usuario con ID ${userData.id} ya existe, actualizando datos`);
+      
+      // Actualizar datos del usuario existente
+      const updateQuery = `
+        UPDATE ${userTables.users.tableName}
+        SET username = $1, 
+            email = $2, 
+            role = $3,
+            updated_at = CURRENT_TIMESTAMP 
+        WHERE supabase_user_id = $4
+        RETURNING id, username, email, role`;
+        
+      const result = await databaseManager.query(updateQuery, [
+        userData.username, 
+        userData.email,
+        'user',
+        userData.id
+      ]);
+      
+      return result.rows[0];
+    } 
+    
+    // Verificar si existe un usuario con el mismo email pero diferente ID
+    const checkEmailQuery = `SELECT id FROM ${userTables.users.tableName} WHERE email = $1 AND supabase_user_id != $2`;
+    const emailResult = await databaseManager.query(checkEmailQuery, [userData.email, userData.id]);
+    
+    if (emailResult.rows.length > 0) {
+      console.log(`Ya existe un usuario con el email ${userData.email} pero diferente ID`);
+    }
+    
+    // Crear usuario con tag único
+    let userTag = formatUserTag(userData.username);
+    
+    // Asegurar que el user_tag sea único
+    let isUnique = false;
+    let attempts = 0;
+    
+    while (!isUnique && attempts < 10) {
+      const tagQuery = `SELECT id FROM ${userTables.users.tableName} WHERE user_tag = $1`;
+      const tagResult = await databaseManager.query(tagQuery, [userTag]);
+      
+      if (tagResult.rows.length === 0) {
+        isUnique = true;
+      } else {
+        userTag = formatUserTag(userData.username) + Math.floor(Math.random() * 10000);
+        attempts++;
+      }
+    }
+    
+    // Insertar nuevo usuario
+    const insertQuery = `
+      INSERT INTO ${userTables.users.tableName} (
+        username, 
+        email, 
+        user_tag,
+        supabase_user_id,
+        role,
+        created_at
+      )
+      VALUES ($1, $2, $3, $4, $5, CURRENT_TIMESTAMP)
+      RETURNING id, username, email, user_tag, role`;
+      
+    const result = await databaseManager.query(insertQuery, [
+      userData.username,
+      userData.email,
+      userTag,
+      userData.id,
+      'user'
+    ]);
+    
+    console.log(`Usuario OAuth creado con éxito: ${result.rows[0].username} (${result.rows[0].email})`);
+    return result.rows[0];
+    
+  } catch (error) {
+    console.error('Error en createUserOAuth:', error);
+    throw error;
+  }
+}
+
+async function getUserByEmail(email) {
+  try {
+    const query = `
+      SELECT id, username, email, user_tag, role
+      FROM ${userTables.users.tableName}
+      WHERE email = $1
+    `;
+    const result = await databaseManager.query(query, [email]);
+    
+    return result.rows.length > 0 ? result.rows[0] : null;
+  } catch (error) {
+    console.error('Error en getUserByEmail:', error);
+    throw error;
+  }
+}
+
 module.exports = {
     createTables,
     verifyBucket,
@@ -648,5 +780,7 @@ module.exports = {
     updateUserScore,
     updateUserScoreFailed,
     getUserStats,
-    getUserData
+    getUserData,
+    createUserOAuth,
+    getUserByEmail
 }

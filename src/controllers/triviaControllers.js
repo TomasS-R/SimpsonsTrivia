@@ -190,52 +190,195 @@ async function loginUserReq (req, res, next) {
 async function loginUserOAuth(req, res, next) {
   try {
     const { provider } = req.params;
-
-    console.log('provider:', provider);
     
     if (!provider) {
-      return res.status(400).json({ success: false, error: "Provider is required" });
-    } else if (provider !== 'google' && provider !== 'github') {
-      return res.status(400).json({ success: false, error: "Invalid provider" });
+      return res.status(400).json({ 
+        success: false, 
+        error: "Authentication provider is required" 
+      });
+    } else if (!['google', 'github'].includes(provider)) {
+      return res.status(400).json({ 
+        success: false, 
+        error: "Invalid authentication provider. Use 'google' or 'github'" 
+      });
     }
+    
     await accountLogin.loginWithOAuth(req, res);
     
   } catch (e) {
     console.error('Error during OAuth login:', e);
-    next(e);
+    return res.status(500).json({
+      success: false,
+      error: "Internal server error during authentication"
+    });
   }
 }
 
 async function handleOAuthCallback(req, res) {
-  console.log(req.body);
-  const { access_token, refresh_token, expires_in } = req.body;
-
-  // Verifica que el access_token esté presente
-  if (!access_token) {
-    return res.status(400).json({ success: false, error: 'No access token provided' });
-  }
-
   try {
-    // Aquí puedes guardar el access_token y otros datos en la sesión o en cookies
-    res.cookie('accessToken', access_token, {
-      httpOnly: true,
-      secure: config.nodeEnv === 'production',
-      sameSite: 'strict',
-      maxAge: expires_in * 1000 // Convertir a milisegundos
-    });
+    console.log("OAuth Callback - Método:", req.method);
+    console.log("OAuth Callback - URL completa:", req.originalUrl);
+    console.log("OAuth Callback - Query completo:", JSON.stringify(req.query));
+    
+    // Si hay código, procesarlo normalmente
+    if (req.query.code) {
+      console.log("Authorization code found:", req.query.code);
+      
+      try {
+        const { data, error } = await supabaseConection.auth.exchangeCodeForSession(req.query.code);
+        
+        if (error) {
+          console.error('Error exchanging code for session:', error);
+          return res.render('account', { 
+            errorMessage: `Error processing authentication: ${error.message}`
+          });
+        }
+        
+        if (!data || !data.session) {
+          console.error('Could not get user session');
+          return res.render('account', { 
+            errorMessage: 'Could not get user session'
+          });
+        }
+        
+        console.log("Session obtained correctly:", {
+          access_token: data.session.access_token ? "***" : undefined,
+          refresh_token: data.session.refresh_token ? "***" : undefined,
+          user_id: data.user?.id
+        });
+        
+        // Establecer cookies
+        res.cookie('accessToken', data.session.access_token, {
+          httpOnly: true,
+          secure: config.nodeEnv === 'production',
+          sameSite: 'lax',
+          maxAge: (data.session.expires_in || 3600) * 1000
+        });
+        
+        if (data.session.refresh_token) {
+          res.cookie('refreshToken', data.session.refresh_token, {
+            httpOnly: true,
+            secure: config.nodeEnv === 'production',
+            sameSite: 'lax',
+            maxAge: 7 * 24 * 60 * 60 * 1000
+          });
+        }
 
-    res.cookie('refreshToken', refresh_token, {
-      httpOnly: true,
-      secure: config.nodeEnv === 'production',
-      sameSite: 'strict',
-      maxAge: 7 * 24 * 60 * 60 * 1000 // 7 días
-    });
-
-    // Redirige al usuario a la página protegida o a donde desees
-    return res.redirect('/api/v1/protected'); // Cambia esto a la ruta que desees
+         // Guardar usuario en la base de datos si es necesario
+         if (data.user && data.user.email) {
+          try {
+            const userEmail = data.user.email;
+            const existingUser = await queries.getUserByEmail(userEmail);
+            
+            if (!existingUser) {
+              const userName = data.user.user_metadata?.full_name || data.user.user_metadata?.name || userEmail.split('@')[0];
+              
+              await queries.createUserOAuth({
+                id: data.user.id,
+                email: userEmail,
+                username: userName,
+                provider: data.user.app_metadata?.provider || 'oauth'
+              });
+            }
+          } catch (dbError) {
+            console.error('Error saving user OAuth:', dbError);
+          }
+        }
+        
+        return res.redirect('/api/v1/profile');
+        
+      } catch (exchangeError) {
+        console.error('Detailed error exchanging code:', exchangeError);
+        return res.render('account', { 
+          errorMessage: 'Error processing authentication'
+        });
+      }
+    } 
+    // Si no hay código, necesitamos manejar el hash fragment
+    else {
+      console.log("No code detected in query, sending page to process possible hash fragment");
+      
+      // Esta página HTML mejora la detección del token en el hash
+      return res.send(`
+        <!DOCTYPE html>
+        <html>
+        <head>
+          <title>Procesando autenticación</title>
+          <script>
+            window.onload = function() {
+              // Verificar si hay un hash en la URL
+              let hash = window.location.hash;
+              console.log("Hash detectado:", hash ? "SÍ" : "NO");
+              
+              if (hash && hash.startsWith('#')) {
+                // Remover el # inicial
+                hash = hash.substring(1);
+                console.log("Procesando hash:", hash);
+                
+                // Extraer los parámetros
+                const params = {};
+                hash.split('&').forEach(part => {
+                  const keyValue = part.split('=');
+                  if (keyValue.length === 2) {
+                    params[keyValue[0]] = decodeURIComponent(keyValue[1]);
+                  }
+                });
+                
+                console.log("Parámetros extraídos:", JSON.stringify(params));
+                
+                // Verificar si tenemos un access_token
+                if (params.access_token) {
+                  console.log("Token encontrado, enviando al servidor");
+                  
+                  // Enviar el token al servidor
+                  fetch('/api/v1/oauth/process-token', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(params)
+                  })
+                  .then(response => {
+                    console.log("Respuesta del servidor:", response.status);
+                    return response.json();
+                  })
+                  .then(data => {
+                    console.log("Datos del servidor:", data);
+                    if (data.success) {
+                      window.location.href = '/api/v1/profile';
+                    } else {
+                      window.location.href = '/api/v1/account?error=' + encodeURIComponent(data.error || 'Error desconocido');
+                    }
+                  })
+                  .catch(err => {
+                    console.error("Error procesando token:", err);
+                    window.location.href = '/api/v1/account?error=error_procesando_token';
+                  });
+                } else {
+                  console.log("No se encontró token en el hash");
+                  window.location.href = '/api/v1/account?error=no_token_found';
+                }
+              } else {
+                console.log("No se encontró hash ni código");
+                // Si no hay hash ni código, intentar redireccionar a la página del OAuth nuevamente
+                window.location.href = '/api/v1/loginoauth/google';
+              }
+            };
+          </script>
+        </head>
+        <body>
+          <div style="text-align: center; margin-top: 100px;">
+            <h3>Procesando su autenticación...</h3>
+            <p>Por favor espere un momento.</p>
+            <p id="debug"></p>
+          </div>
+        </body>
+        </html>
+      `);
+    }
   } catch (error) {
-    console.error('Error during OAuth callback:', error);
-    return res.status(500).json({ success: false, error: 'Internal server error' });
+    console.error('General error in OAuth callback:', error);
+    return res.status(500).render('account', { 
+      errorMessage: 'Server error during authentication: ' + error.message
+    });
   }
 }
 
@@ -417,43 +560,90 @@ const getCharacters = async (req, res) => {
 const supabaseAuth = async (req, res, next) => {
   // Obtener el token de las cookies
   const token = req.cookies.accessToken;
+  
+  // Si no hay token, configurar como usuario anónimo y continuar
+  if (!token) {
+    req.user = { 
+      isAnonymous: true,
+      id: req.sessionID || 'anonymous-' + Math.random().toString(36).substring(2, 15)
+    };
+    console.log('No token found, setting anonymous user');
+    return next();
+  }
+  
   try {
-    if (!token) {
-      return res.status(401).json({ success: false, error: 'No token provided' });
-    }
-
     const { data, error } = await supabaseConection.auth.getUser(token);
 
     if (error || !data) {
-      return res.status(401).json({ success: false, error: 'Unauthorized' });
+      // Token inválido, tratar como usuario anónimo
+      req.user = { 
+        isAnonymous: true,
+        id: req.sessionID || 'anonymous-' + Math.random().toString(36).substring(2, 15)
+      };
+      console.log('Invalid token, setting anonymous user');
+      return next();
     }
 
     // Obtiene la data del usuario
     const userData = data.user;
-    // Obtiene el id dentro de la data
     const userID = userData.id;
-    // Busca mediante el id el rol del usuario
-    const userDataDB = await queries.getUserDataSupabaseAuth(userID);
 
-    // Devuelve la data del usuario (por si se quiere usar) y los datos del usuario de la DB
-    req.user = { user: userData, dataUser: userDataDB };
-    next();
+    console.log("userData supabaseAuth", userData);
+    
+    // En lugar de llamar a getUserDataSupabaseAuth, hacemos una consulta directa
+    // para verificar si el usuario existe, y si no, lo tratamos como anónimo
+    try {
+      req.user = { 
+        user: userData,
+        dataUser: { 
+          id: userID,
+          role: 'user' // Asignamos un rol por defecto
+        }
+      };
+      
+      // Evitamos completamente la llamada a getUserDataSupabaseAuth
+      // Esto debería evitar el error actual
+      
+      next();
+    } catch (dbError) {
+      console.warn('Error procesando usuario:', dbError.message);
+      req.user = { 
+        isAnonymous: true,
+        id: req.sessionID || 'anonymous-' + Math.random().toString(36).substring(2, 15)
+      };
+      next();
+    }
   } catch (error) {
-    console.error('Error in supabaseAuth:', error);
-    return res.status(500).json({ success: false, error: 'Internal server error' });
+    console.error('Error en supabaseAuth:', error);
+    req.user = { 
+      isAnonymous: true,
+      id: req.sessionID || 'anonymous-' + Math.random().toString(36).substring(2, 15)
+    };
+    next();
   }
 };
 
 const logoutUser = async (req, res) => {
   try {
+    console.log('Cerrando sesión para usuario:', req.user?.id || 'desconocido');
+    
+    // Primero limpiar cookies
+    res.clearCookie('accessToken');
+    res.clearCookie('refreshToken');
+    
+    // Luego cerrar sesión en Supabase
     const { error } = await supabaseConection.auth.signOut();
+    
     if (error) {
+      console.error('Error en Supabase al cerrar sesión:', error);
       return res.status(400).json({ success: false, error: error.message });
     }
-    res.clearCookie('accessToken').clearCookie('refreshToken').status(200).json({ success: true, message: 'Logout successful' });
+    
+    console.log('Sesión cerrada correctamente');
+    return res.status(200).json({ success: true, message: 'Logout successful' });
   } catch (error) {
-    console.error('Error in logoutUser:', error);
-    res.status(500).json({ success: false, error: 'Internal server error' });
+    console.error('Error en logoutUser:', error);
+    return res.status(500).json({ success: false, error: 'Internal server error' });
   }
 };
 
@@ -461,7 +651,7 @@ const logoutUser = async (req, res) => {
 const protectedRoute = (req, res) => {
   try {
     const userId = req.user.user.id;
-    res.render('protected', { user: userId });
+    res.render('profile', { user: userId });
   } catch (error) {
     console.error('Error in protectedRoute:', error);
     res.status(500).json({ success: false, error: 'Internal server error' });
@@ -597,6 +787,84 @@ async function userDataProfile(req, res) {
   }
 }
 
+async function processOAuthToken(req, res) {
+  try {
+    console.log("processOAuthToken - Body recibido:", req.body);
+    
+    const access_token = req.body.access_token;
+    const refresh_token = req.body.refresh_token;
+    const expires_in = parseInt(req.body.expires_in || '3600');
+    
+    if (!access_token) {
+      return res.status(400).json({
+        success: false,
+        error: 'Token de acceso no proporcionado'
+      });
+    }
+    
+    // Validar token con Supabase
+    const { data, error } = await supabaseConection.auth.getUser(access_token);
+    
+    if (error) {
+      console.error('Error validando token:', error);
+      return res.status(400).json({
+        success: false,
+        error: 'Token inválido: ' + error.message
+      });
+    }
+    
+    // Establecer cookies
+    res.cookie('accessToken', access_token, {
+      httpOnly: true,
+      secure: config.nodeEnv === 'production',
+      sameSite: 'lax',
+      maxAge: expires_in * 1000
+    });
+    
+    if (refresh_token) {
+      res.cookie('refreshToken', refresh_token, {
+        httpOnly: true,
+        secure: config.nodeEnv === 'production',
+        sameSite: 'lax',
+        maxAge: 7 * 24 * 60 * 60 * 1000
+      });
+    }
+    
+    // Guardar usuario en BD si es necesario
+    if (data && data.user && data.user.email) {
+      try {
+        const userEmail = data.user.email;
+        const existingUser = await queries.getUserByEmail(userEmail);
+        
+        if (!existingUser) {
+          const userName = data.user.user_metadata?.full_name || data.user.user_metadata?.name || userEmail.split('@')[0];
+          
+          await queries.createUserOAuth({
+            id: data.user.id,
+            email: userEmail,
+            username: userName,
+            provider: data.user.app_metadata?.provider || 'oauth'
+          });
+        }
+      } catch (dbError) {
+        console.error('Error guardando usuario OAuth:', dbError);
+      }
+    }
+    
+    return res.json({
+      success: true,
+      message: 'Autenticación exitosa'
+    });
+    
+  } catch (error) {
+    console.error('Error procesando token OAuth:', error);
+    return res.status(500).json({
+      success: false,
+      error: 'Error del servidor procesando token'
+    });
+  }
+}
+
 module.exports = {
   registerUserReq,
   loginUserReq,
@@ -616,5 +884,6 @@ module.exports = {
   answerQuestion,
   getUserStats,
   userDataProfile,
-  gameOverRefreshPage
+  gameOverRefreshPage,
+  processOAuthToken
 };

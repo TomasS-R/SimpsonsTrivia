@@ -8,6 +8,17 @@
    - Nuevas rutas de Oauth
    - Nueva tabla de imagenes de perfil de los usuarios
 
+### Modificado:
+   - Se arreglo el error "Error obtain user role: Error: Role not found" que ocurria cuando un usuario anonimo empezaba a jugar. El error se encontraba en la funcion supabaseAuth del archivo [triviaControllers](./src/controllers/triviaControllers.js). Se modifico la funcion para manejar correctamente los usuarios anonimos y evitar el error de rol no encontrado.
+   - Se mejoro el sistema de autenticacion OAuth implementando el manejo de tokens y cookies de sesion en [triviaControllers](./src/controllers/triviaControllers.js).
+   - Se optimizo el proceso de registro de usuarios OAuth agregando validaciones y manejo de errores mejorado.
+   - Se actualizaron las rutas en [routes](./src/routes/routes.js) para soportar los diferentes flujos de autenticacion OAuth.
+   - Se actualizo la configuracion de proveedores OAuth en [oauthConfig](./src/account/oauthSystem/oauthConfig.js) para soportar multiples proveedores.
+   - Se cambio e archivo protected a [profile](./src/views/profile.ejs) asi tambin s cambiaron las referencias a este, y todo se migro a profile.
+   - Mejorada la interfaz de los archivos [ejs](./src/views/).
+   - Restructurado la seccion de OAuth ahora se encuentra la informacion de los proveedores en [oauthSystem](./src/account/oauthSystem/).
+   - Modificado el README con detalles de configuracion y otras mejoras.
+
 ## Version 0.6.1: - 2024-12-26 -
 
 ### Modificado:

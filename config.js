@@ -20,10 +20,15 @@ const {
     URLHOST: urlHost = 'simpsons-trivia.fly.dev',
     // ** CORS **
     CORS_ORIGIN: corsOrigin = '*',
+    // ** OAUTH SETTINGS **
+    OAUTH_GOOGLE_CLIENT_ID: oauthGoogleClientId = '',
+    OAUTH_GOOGLE_CLIENT_SECRET: oauthGoogleClientSecret = '',
+    OAUTH_GITHUB_CLIENT_ID: oauthGithubClientId = '',
+    OAUTH_GITHUB_CLIENT_SECRET: oauthGithubClientSecret = '',
     // ** SENTRY **
     SENTRY_DSN: sentryDsn = '',
     // ** REDIS **
-    CONNECT_REDIS: connectRedis = 'True',
+    CONNECTREDIS: connectRedis = 'True',
     UPSTASH_REDIS_URL: upstashRedisUrl = '',
     UPSTASH_REDIS_TOKEN: upstashRedisToken = '',
     // ** Desarrollo **
@@ -49,6 +54,12 @@ module.exports = {
     nodeEnv,
     urlHost,
     corsOrigin,
+    // OAuth
+    oauthGoogleClientId,
+    oauthGoogleClientSecret,
+    oauthGithubClientId,
+    oauthGithubClientSecret,
+    // Sentry
     sentryDsn,
     connectRedis,
     upstashRedisUrl,

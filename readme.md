@@ -220,8 +220,8 @@ Variables de entorno para la conexion con postgress
 
 <summary><h3>CONNECTREDIS</h3> <h5>(conexion a la instancia de redis)</h5></summary>
 
-> [!NOTE]
-> Por defecto si no tiene valor asignado esta en `False`, en caso de haber cargado las variables colocarlo en `True` para conectarlo correctamente
+> [!WARNING]
+> Por defecto si no tiene valor asignado esta en `False`, en caso de haber cargado las variables colocarlo en `True` para conectarlo correctamente. Debes correr una instancia de redis (recomiendo una instancia docker) localmente para que funcione correctamente si no te saltara un error de que no se puede conectar y fallara.
 
 `CONNECTREDIS=`
 
@@ -232,6 +232,18 @@ Variables de entorno para la conexion con postgress
 <summary><h3>UPSTASH_REDIS_TOKEN</h3> <h5>(token o password que proporciona upstash/flyio)</h5></summary>
 
 `UPSTASH_REDIS_TOKEN=`
+
+<summary><h3>CAVES DE GOOGLE AUTH</h3> <h5>(Se obtienen en Google Cloud Console dentro de credenciales)</h5></summary>
+
+`OAUTH_GOOGLE_CLIENT_ID=`
+
+`OAUTH_GOOGLE_CLIENT_SECRET=`
+
+<summary><h3>CAVES DE GITHUB AUTH</h3> <h5>(Se obtienen en Github settings dentro de las configuraciones de developers)</h5></summary>
+
+`OAUTH_GITHUB_CLIENT_ID=`
+
+`OAUTH_GITHUB_CLIENT_SECRET=`
 
 ### Testing
 
@@ -284,8 +296,12 @@ npm run lint
 │
 ├── 📂 media                            # Contiene imagenes para el readme
 ├── 📂 src                              # Contiene el código fuente de la aplicación
-│   ├── app.py                          # Archivo de arranque del proyecto
+│   ├── app.js                          # Archivo de arranque del proyecto
 │   ├── 📂 account                      # Contiene el manejo de cuentas de los usuarios
+│   │   ├── 📂 oauthSystem              # Manejo de todo lo referido a OAuth de terceros
+│   │   │   ├── deleteUsersAuth.js      # Cron job de eliminadion de usuarios que se encuentran en redis
+│   │   │   └── oauthConfig             # Configuracion de las plataformas que estan disponibles para logearse mediante OAuth
+│   │   │
 │   │   ├── 📂 roles                    # Contiene los archivos que manejan los roles
 │   │   │   ├── roleMiddleware.js       # Intermediario en controlar y verificar los roles y accesos
 │   │   │   └── rolesManager.js         # Clase donde se manejan la jerarquia y cada tipo de rol
@@ -293,7 +309,10 @@ npm run lint
 │   │   ├── authSupabase.js             # Archivo de inicializacion y configuracion con supabase
 │   │   ├── login.js                    # Archvio para iniciar sesion y administrar tokens
 │   │   ├── index.ejs                   # Configuracion para front end de login y registro
-│   │   └── register.js                 # Archivo que registra a los usuarios y valida los campos
+│   │   ├── register.js                 # Archivo que registra a los usuarios y valida los campos
+│   │   ├── sessionHandler.js           # Manejo de sesiones de los usuarios
+│   │   ├── tokenRefresh.js             # Actualizacion del token para mantener sesiones activas por un periodo mas prolongado
+│   │   └── userUtils.js                # Funciones para el manejo en archivos interconectados (evitar dependencia circular)
 │   │   
 │   ├── 📂 controllers                  # Contiene archivos de controladores
 │   │   └── triviaControllers.js        # Archvio que es intermediario entre routes y queries
@@ -306,7 +325,12 @@ npm run lint
 │   │   │   └── sentryConfig.js         # Configuracion para la conexion con Sentry
 │   │   │
 │   │   ├── databaseManager.js          # Archivo que se encarga de realizar la conexion a pg al iniciar
-│   │   └── queries.js                  # Archvio que realiza las consultas a la BD
+│   │   ├── queries.js                  # Archvio que realiza las consultas a la BD postgres
+│   │   ├── queriesRedis.js             # Archvio que realiza las consultas a redis
+│   │   └── redisManager.js             # Manejo principal de redis, se encarga de la conexion y las transacciones con la misma
+│   │
+│   ├── 📂 monitoring
+│   │   └── sentryConfig.js             # Manejo y configuracion de la conexion con Sentry
 │   │   
 │   ├── 📂 routes                       # Contiene los archvos que manejan las rutas
 │   │   ├── apiRoutesDoc.yaml           # Explica como comunicarse con cada ruta
@@ -318,20 +342,28 @@ npm run lint
 │       ├── characters_simpsons.csv     # Tiene los personajes de la serie animada
 │       └── quotes_simspons.csv         # Se encuentran las frases de la serie y su numero de personaje
 │
+├── 📂 views                            # Visualizaciones de las diferentes etapas del front para pruebas del back
+│   ├── account.ejs                     # Funcionamiento de la pagina cuenta (registro/login/OAuth)
+│   ├── index.ejs                       # Pagina principal con la api y redireccion a login y juego
+│   ├── profile.ejs                     # Perfil del usuario con datos o info
+│   └── trivia.js                       # Pagina de juego
+│
 ├── 📂 tests                            # Contiene todos los tests
 │   └── queries.test.js                 # Archivo que tiene y realiza los tests del proyecto
 │
+├── .dockerignore                       # Archivos o carpetas que docker debe ignorar o no incluir
 ├── .env.template                       # Plantilla para las variables de entorno
 ├── .gitignore                          # Archvios que no se suben a github
 ├── changelog.md                        # Cambios que se realizan en cada version
+├── config.js                           # Manejo principal por el cual se van a transmitir las variables de entorno (es un puente entre el .env y los archivos) para un mejor desempeño de la solucion y evitar concurrencia.
 ├── docker-compose.yml                  # Configuración de Docker Compose
 ├── Dockerfile                          # Archivo Docker para construir la imagen de la api
 ├── eslint.config.mjs                   # Configuracion de la dependencia EsLint
 ├── fly.toml                            # Configuracion para deploy en Fly.io
 ├── license.txt                         # Archivo de licencia del proyecto
 │
-├── 📂 package.json                     # Contiene las dependencias del proyecto y + configuraciones
-│   └── package-lock.json               # Maneja las dependencias
+├── package.json                        # Contiene las dependencias del proyecto y + configuraciones
+├── package-lock.json                   # Maneja las dependencias
 │
 └── readme.md                           # Instrucciones principales de la api y usos
 ```
@@ -344,6 +376,20 @@ Flujo de sesiones de usuarios
 
 Flujo de juego de usuarios
 <div align="center"><img src="./media/esqSimpsonsApiUserDataGame.svg" width="1000" height="550"></div>
+
+### Interfaz de la carpeta views para pruebas del backend
+
+Juego:
+<div align="center"><img src="./media/TriviaGame_Back_test.png" width="1000" height="550"></div>
+
+Game Over:
+<div align="center"><img src="./media/TriviaGameOver_Back_test.png" width="1000" height="550"></div>
+
+Login:
+<div align="center"><img src="./media/TriviaLogin_Back_test.png" width="1000" height="550"></div>
+
+Profile:
+<div align="center"><img src="./media/TriviaProfile_Back_test.png" width="1000" height="550"></div>
 
 #### En este archivo podras encontrar todo el instructivo relaccionado al proyecto en si.
 

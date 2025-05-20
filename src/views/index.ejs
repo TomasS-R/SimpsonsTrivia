@@ -3,12 +3,11 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Api Simpsons Trivia</title>
+    <title>Simpsons Trivia API</title>
     <link rel="stylesheet" href="https://unpkg.com/swagger-ui-dist@5.9.0/swagger-ui.css" />
-        
     <script src="https://unpkg.com/swagger-ui-dist@5.9.0/swagger-ui-bundle.js"></script>
     <script src="https://unpkg.com/swagger-ui-dist@5.9.0/swagger-ui-standalone-preset.js"></script>
-    
+    <link href="https://fonts.googleapis.com/css2?family=Bangers&display=swap" rel="stylesheet">
     <script>
         window.onload = function() {
             const ui = SwaggerUIBundle({
@@ -32,34 +31,76 @@
         };
     </script>
     <style>
+        :root {
+            --simpson-yellow: #FED90F;
+            --simpson-blue: #3F90D7;
+            --simpson-red: #DB5349;
+            --simpson-green: #7BC043;
+        }
+        
         body {
             font-family: "Helvetica Neue", Arial, sans-serif;
+            background-color: #f8f9fa;
+            margin: 0;
+            padding: 0;
+            color: #333;
         }
-
-        .docs-button {
-            padding: 10px;
-            background-color: rgb(64, 125, 223);
-            color: white;
+        
+        .header {
+            background-color: var(--simpson-yellow);
+            padding: 20px;
+            text-align: center;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+        
+        h1 {
+            font-family: 'Bangers', cursive;
+            color: #333;
+            font-size: 3em;
+            margin: 0;
+            text-shadow: 2px 2px 0 #fff;
+        }
+        
+        .buttons-container {
+            display: flex;
+            justify-content: center;
+            flex-wrap: wrap;
+            gap: 15px;
+            margin: 30px auto;
+            max-width: 600px;
+        }
+        
+        .button {
+            padding: 15px 25px;
             border: none;
-            border-radius: 5px;
-            cursor: pointer;
-            font-size: 16px;
+            border-radius: 50px;
             font-weight: bold;
-            width: auto;
+            font-size: 1.1em;
+            cursor: pointer;
+            transition: transform 0.2s, box-shadow 0.2s;
+            text-transform: uppercase;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
         }
-
+        
+        .button:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 6px 10px rgba(0,0,0,0.15);
+        }
+        
+        .button:active {
+            transform: translateY(1px);
+        }
+        
+        .play-button {
+            background-color: var(--simpson-blue);
+            color: white;
+        }
+        
         .account-button {
-            padding: 10px;
-            background-color: rgb(223, 64, 207);
+            background-color: var(--simpson-red);
             color: white;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
-            font-size: 16px;
-            font-weight: bold;
-            width: 87%;
         }
-
+        
         .api-docs {
             margin: 20px auto;
             padding: 30px;
@@ -68,36 +109,45 @@
             box-shadow: 0 2px 10px rgba(0,0,0,0.1);
             max-width: 1200px;
         }
-
-        .game-button {
-            padding: 10px;
-            background-color: rgb(64, 125, 223);
-            color: white;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
-            font-size: 16px;
-            font-weight: bold;
-            width: 87%;
-            margin-bottom: 10px;
+        
+        .donut {
+            display: inline-block;
+            margin: 0 5px;
+            font-size: 1.2em;
         }
-
+        
+        @media (max-width: 768px) {
+            h1 {
+                font-size: 2.5em;
+            }
+            
+            .buttons-container {
+                flex-direction: column;
+                align-items: center;
+            }
+            
+            .button {
+                width: 80%;
+            }
+        }
     </style>
 </head>
 <body>
-    <h1 align="center">Bienvenido a la API Trivia de los Simpsons 🍩</h1>
-    <div>
-        <% if (isDevelopment) { %>
-        <div style="text-align: center; margin-top: 50px;">
-            <button class="game-button" onclick="window.location.href='/api/v1/play'">Jugar Trivia</button>
-            <% if (isAuthenticated) { %>
-                <button class="account-button" onclick="window.location.href='/api/v1/protected'">Panel de Usuario</button>
-            <% } else { %>
-                <button class="account-button" onclick="window.location.href='/api/v1/account'">Login / Register (Pruebas)</button>
-            <% } %>
-        </div>
+    <div class="header">
+        <h1>Simpsons Trivia <span class="donut">🍩</span></h1>
+    </div>
+    
+    <% if (isDevelopment) { %>
+    <div class="buttons-container">
+        <button class="button play-button" onclick="window.location.href='/api/v1/play'">¡Jugar Trivia!</button>
+        <% if (isAuthenticated) { %>
+            <button class="button account-button" onclick="window.location.href='/api/v1/profile'">Mi Perfil</button>
+        <% } else { %>
+            <button class="button account-button" onclick="window.location.href='/api/v1/account'">Iniciar Sesión</button>
         <% } %>
     </div>
+    <% } %>
+    
     <div class="api-docs">
         <div id="swagger-ui"></div>
     </div>

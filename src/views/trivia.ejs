@@ -1,45 +1,312 @@
 <!DOCTYPE html>
-<html>
+<html lang="es">
 <head>
-    <title>Simpsons Trivia</title>
-
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Simpsons Trivia - ¡Juega!</title>
+    <link href="https://fonts.googleapis.com/css2?family=Bangers&family=Roboto:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --simpson-yellow: #FED90F;
+            --simpson-blue: #3F90D7;
+            --simpson-red: #DB5349;
+            --simpson-green: #7BC043;
+            --simpson-orange: #F7941D;
+        }
+        
+        @keyframes bounce {
+            0%, 20%, 50%, 80%, 100% {transform: translateY(0);}
+            40% {transform: translateY(-20px);}
+            60% {transform: translateY(-10px);}
+        }
+        
+        @keyframes pulse {
+            0% {transform: scale(1);}
+            50% {transform: scale(1.05);}
+            100% {transform: scale(1);}
+        }
+        
+        @keyframes fadeIn {
+            from {opacity: 0;}
+            to {opacity: 1;}
+        }
+        
+        body {
+            font-family: 'Roboto', sans-serif;
+            background-color: #f8f9fa;
+            background-image: url('https://www.transparenttextures.com/patterns/cubes.png');
+            margin: 0;
+            padding: 0;
+            color: #333;
+        }
+        
+        .game-header {
+            background-color: var(--simpson-yellow);
+            padding: 15px;
+            text-align: center;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+            position: relative;
+        }
+        
+        h1, h2, h3 {
+            font-family: 'Bangers', cursive;
+            color: #333;
+            text-shadow: 1px 1px 0 white;
+        }
+        
+        .container {
+            max-width: 800px;
+            margin: 30px auto;
+            padding: 0 20px;
+        }
+        
+        .score-container {
+            background-color: white;
+            border-radius: 10px;
+            padding: 15px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+            margin-bottom: 25px;
+            text-align: center;
+        }
+        
+        .score-label {
+            font-weight: bold;
+            font-size: 1.2em;
+            margin-right: 10px;
+            color: #555;
+        }
+        
+        .score-value {
+            font-size: 1.8em;
+            font-weight: bold;
+            color: var(--simpson-blue);
+            display: inline-block;
+            padding: 0 10px;
+            transition: transform 0.3s;
+        }
+        
+        .score-value.updated {
+            animation: pulse 0.5s;
+            color: var(--simpson-green);
+        }
+        
+        .quote-container {
+            background-color: white;
+            border-radius: 15px;
+            padding: 30px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+            margin-bottom: 30px;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .quote-container::before {
+            content: '"';
+            position: absolute;
+            top: 10px;
+            left: 20px;
+            font-size: 6em;
+            color: #f0f0f0;
+            font-family: serif;
+            line-height: 1;
+            z-index: 0;
+        }
+        
+        .quote-container h3 {
+            font-size: 1.8em;
+            margin-top: 0;
+            text-align: center;
+            position: relative;
+            z-index: 1;
+        }
+        
+        #quote {
+            font-size: 1.3em;
+            line-height: 1.5;
+            padding: 10px 20px;
+            margin: 20px 0;
+            font-style: italic;
+            border-left: 5px solid var(--simpson-yellow);
+            background-color: #f9f9f9;
+            position: relative;
+            z-index: 1;
+            animation: fadeIn 0.5s;
+        }
+        
+        .options {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 15px;
+            position: relative;
+            z-index: 1;
+        }
+        
+        .option-button {
+            padding: 15px;
+            border: none;
+            background-color: var(--simpson-yellow);
+            color: #333;
+            cursor: pointer;
+            border-radius: 10px;
+            font-size: 1.1em;
+            font-weight: bold;
+            transition: transform 0.2s, box-shadow 0.2s;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+        
+        .option-button:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 6px 12px rgba(0,0,0,0.15);
+            background-color: #FFCC00;
+        }
+        
+        .option-button:disabled {
+            opacity: 0.7;
+            cursor: not-allowed;
+            transform: none;
+        }
+        
+        .message {
+            margin-top: 20px;
+            padding: 15px;
+            border-radius: 10px;
+            text-align: center;
+            font-weight: bold;
+            font-size: 1.2em;
+            animation: fadeIn 0.5s;
+        }
+        
+        .correct {
+            background-color: var(--simpson-green);
+            color: white;
+        }
+        
+        .incorrect {
+            background-color: var(--simpson-red);
+            color: white;
+        }
+        
+        .back-button {
+            background-color: var(--simpson-blue);
+            color: white;
+            border: none;
+            border-radius: 50px;
+            padding: 12px 25px;
+            font-size: 1.1em;
+            font-weight: bold;
+            cursor: pointer;
+            display: block;
+            margin: 30px auto;
+            transition: transform 0.2s, box-shadow 0.2s;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+        
+        .back-button:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 6px 12px rgba(0,0,0,0.15);
+        }
+        
+        @media (max-width: 768px) {
+            .options {
+                grid-template-columns: 1fr;
+            }
+            
+            .quote-container {
+                padding: 20px;
+            }
+            
+            #quote {
+                font-size: 1.1em;
+            }
+        }
+    </style>
+</head>
+<body>
+    <% if (process.env.NODE_ENV !== 'production') { %>
+    <div class="game-header">
+        <h1>Simpsons Trivia</h1>
+    </div>
+    
+    <div class="container">
+        <div class="score-container">
+            <span class="score-label">Puntaje:</span>
+            <span class="score-value" id="currentScore">0</span>
+        </div>
+        
+        <div class="quote-container">
+            <h3>¿Quién dijo esta frase?</h3>
+            <p id="quote">Cargando pregunta...</p>
+            <div class="options" id="options">
+                <!-- Las opciones se cargarán dinámicamente -->
+            </div>
+            <div id="message" class="message" style="display: none;"></div>
+        </div>
+        
+        <button class="back-button" onclick="window.location.href='/api/v1/'">Volver al inicio</button>
+    </div>
+    <% } %>
+    
     <script>
         let currentQuoteId = null;
         let startTime = null;
+        let lastScore = 0;
 
         async function getNewQuestion() {
             try {
                 startTime = Date.now();
+                
+                // Mostrar cargando
+                document.getElementById('quote').textContent = "Cargando...";
+                document.getElementById('options').innerHTML = '';
+                
                 const response = await fetch('/api/v1/quote/random');
                 const data = await response.json();
-                console.log('Datos recibidos:', data);
                 
                 if (data.success) {
                     currentQuoteId = data.data.id;
-                    document.getElementById('quote').textContent = data.data.quote;
+                    
+                    // Animar la carga de la nueva frase
+                    const quoteElement = document.getElementById('quote');
+                    quoteElement.style.opacity = '0';
+                    
+                    setTimeout(() => {
+                        quoteElement.textContent = data.data.quote;
+                        quoteElement.style.transition = 'opacity 0.5s ease';
+                        quoteElement.style.opacity = '1';
+                    }, 300);
                     
                     const optionsContainer = document.getElementById('options');
                     optionsContainer.innerHTML = '';
                     
                     const options = data.data.options;
-                    console.log('Opciones:', options);
                     
                     // Mezclar las opciones
                     const shuffledOptions = [...options].sort(() => Math.random() - 0.5);
                     
-                    shuffledOptions.forEach(option => {
+                    // Añadir opciones con delay para animación
+                    shuffledOptions.forEach((option, index) => {
                         const button = document.createElement('button');
                         button.className = 'option-button';
                         button.textContent = option.name;
+                        button.style.opacity = '0';
+                        button.style.transform = 'translateY(20px)';
+                        
                         button.onclick = function() {
                             submitAnswer(option.id);
                             document.querySelectorAll('.option-button').forEach(btn => btn.disabled = true);
                         };
+                        
                         optionsContainer.appendChild(button);
+                        
+                        // Animar entrada de botones secuencialmente
+                        setTimeout(() => {
+                            button.style.transition = 'opacity 0.3s ease, transform 0.3s ease';
+                            button.style.opacity = '1';
+                            button.style.transform = 'translateY(0)';
+                        }, 100 + index * 100);
                     });
                     
                     document.getElementById('message').style.display = 'none';
-                    document.querySelectorAll('.option-button').forEach(btn => btn.disabled = false);
                 }
             } catch (error) {
                 console.error('Error al cargar nueva pregunta:', error);
@@ -50,6 +317,14 @@
             try {
                 const endTime = Date.now();
                 const timeElapsed = endTime - startTime;
+
+                // Deshabilitar todos los botones inmediatamente
+                const buttons = document.querySelectorAll('.option-button');
+                buttons.forEach(btn => {
+                    btn.disabled = true;
+                    btn.style.cursor = 'not-allowed';
+                    btn.style.opacity = '0.7'; // Hacer los botones más opacos para indicar que están deshabilitados
+                });
 
                 console.log('Sending answer:', {
                     quoteId: currentQuoteId,
@@ -85,19 +360,35 @@
                     messageDiv.textContent += ` +${pointsEarned} points!`;
                     
                     setTimeout(() => {
-                        document.querySelectorAll('.option-button').forEach(btn => btn.disabled = false);
                         getNewQuestion();
                         loadUserStats();
                     }, 1500);
                 } else {
+                    // En caso de respuesta incorrecta
+                    messageDiv.textContent += ' ¡Juego terminado!';
+                    
+                    // Deshabilitar completamente la interacción con la pregunta actual
+                    const quoteContainer = document.querySelector('.quote-container');
+                    quoteContainer.style.pointerEvents = 'none'; // Deshabilitar todas las interacciones
+                    quoteContainer.style.opacity = '0.7'; // Hacer la pregunta más opaca
+                    
+                    // Mostrar un botón para reiniciar el juego
+                    const restartButton = document.createElement('button');
+                    restartButton.className = 'back-button';
+                    restartButton.textContent = 'Jugar de nuevo';
+                    restartButton.onclick = function() {
+                        window.location.reload();
+                    };
+                    
+                    // Insertar el botón después del contenedor de la pregunta
+                    quoteContainer.parentNode.insertBefore(restartButton, quoteContainer.nextSibling);
+                    
                     setTimeout(() => {
-                        document.querySelectorAll('.option-button').forEach(btn => btn.disabled = false);
                         loadUserStats();
                     }, 1000);
                 }
             } catch (error) {
                 console.error('Error submitting answer:', error);
-                document.querySelectorAll('.option-button').forEach(btn => btn.disabled = false);
             }
         }
 
@@ -138,81 +429,5 @@
         // Cargar primera pregunta al iniciar
         getNewQuestion();
     </script>
-
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            max-width: 800px;
-            margin: 0 auto;
-            padding: 20px;
-        }
-        .quote-container {
-            background: #f9f9f9;
-            padding: 20px;
-            border-radius: 8px;
-            margin-bottom: 20px;
-        }
-        .options {
-            display: grid;
-            grid-template-columns: repeat(2, 1fr);
-            gap: 10px;
-        }
-        .option-button {
-            padding: 10px;
-            border: none;
-            background: #ffd90f;
-            cursor: pointer;
-            border-radius: 4px;
-        }
-        .option-button:hover {
-            background: #ffc60f;
-        }
-        .score {
-            font-size: 1.2em;
-            margin-bottom: 20px;
-        }
-        .message {
-            margin-top: 10px;
-            padding: 10px;
-            border-radius: 4px;
-        }
-        .correct {
-            background: #d4edda;
-            color: #155724;
-        }
-        .incorrect {
-            background: #f8d7da;
-            color: #721c24;
-        }
-        .back-button {
-            padding: 10px;
-            background-color: rgb(64, 125, 223);
-            color: white;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
-            font-size: 16px;
-            font-weight: bold;
-            width: 87%;
-            margin-bottom: 10px;
-        }
-    </style>
-</head>
-<body>
-    <% if (process.env.NODE_ENV !== 'production') { %>
-        <h1>Simpsons Trivia</h1>
-        <div class="score">Score: <span id="currentScore">0</span></div>
-        
-        <div class="quote-container">
-            <h3>¿Quién dijo esta frase?</h3>
-            <p id="quote"></p>
-            <div class="options" id="options"></div>
-            <div id="message" class="message" style="display: none;"></div>
-        </div>
-
-        <div style="text-align: center; margin-top: 50px;">
-            <button class="back-button" onclick="window.location.href='/api/v1/'">Volver al inicio</button>
-        </div>
-    <% } %>
 </body>
 </html>

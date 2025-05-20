@@ -1,5 +1,5 @@
 const cron = require('node-cron');
-const config = require('../../config');
+const config = require('../../../config');
 const { createClient } = require('@supabase/supabase-js');
 
 const supabaseAdmin = createClient(config.supabaseUrl, config.supabaseServiceRoleKey, {

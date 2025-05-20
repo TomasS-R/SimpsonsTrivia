@@ -2,6 +2,7 @@ const queries = require('../dbFiles/queries');
 const { supabaseConection } = require('../account/authSupabase');
 const redisManager = require('../dbFiles/redisManager');
 const { z } = require('zod');
+const userUtils = require('./userUtils');
 
 // Función que devuelve el esquema de validación para el registro de usuarios
 const validateDataUser = () => {
@@ -13,15 +14,6 @@ const validateDataUser = () => {
             .refine((data) => /[A-Z]/.test(data) && /[a-z]/.test(data) && /[0-9]/.test(data) && /[\W_]/.test(data), { message: "La contraseña debe contener al menos una letra mayúscula, una letra minúscula, un número y un carácter especial" }),
     });
 };
-
-function formatUserTag(username) {
-    return '@' + username
-        .toLowerCase()
-        .trim()
-        .replace(/\s+/g, '_')
-        .replace(/[^a-z0-9_]/g, '')
-        .replace(/_{2,}/g, '_');
-}
 
 // Función para registrar un usuario usando Supabase Auth
 async function registerUser(username, email, password, role, anonymousId, res) {
@@ -102,7 +94,7 @@ async function registerUser(username, email, password, role, anonymousId, res) {
         //const is_anon_user = false;
         const supabaseUserId = data.user.id;
 
-        const user_tag = formatUserTag(username);
+        const user_tag = userUtils.formatUserTag(username);
 
         let result;
         if (anonymousId) {

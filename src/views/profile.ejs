@@ -1,0 +1,294 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mi Perfil - Simpsons Trivia</title>
+    <link href="https://fonts.googleapis.com/css2?family=Bangers&family=Roboto:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --simpson-yellow: #FED90F;
+            --simpson-blue: #3F90D7;
+            --simpson-red: #DB5349;
+            --simpson-green: #7BC043;
+        }
+        
+        body {
+            font-family: 'Roboto', sans-serif;
+            background-color: #f0f2f5;
+            margin: 0;
+            padding: 0;
+            color: #333;
+        }
+        
+        .header {
+            background-color: var(--simpson-yellow);
+            padding: 25px 0;
+            text-align: center;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+        
+        h1, h2 {
+            font-family: 'Bangers', cursive;
+            color: #333;
+        }
+        
+        .container {
+            max-width: 900px;
+            margin: 30px auto;
+            padding: 0 20px;
+        }
+        
+        .profile-card {
+            background-color: white;
+            border-radius: 15px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+            overflow: hidden;
+            margin-bottom: 30px;
+        }
+        
+        .profile-header {
+            background-color: var(--simpson-blue);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+        
+        .profile-picture {
+            width: 120px;
+            height: 120px;
+            border-radius: 50%;
+            background-color: var(--simpson-yellow);
+            margin: 0 auto 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2.5em;
+            border: 5px solid white;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+        }
+        
+        .profile-name {
+            font-size: 2em;
+            margin: 0;
+        }
+        
+        .profile-tag {
+            font-size: 1.2em;
+            margin: 5px 0 0;
+            opacity: 0.8;
+        }
+        
+        .stats-container {
+            padding: 30px;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+        }
+        
+        .stat-card {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 10px;
+            text-align: center;
+            box-shadow: 0 3px 10px rgba(0,0,0,0.05);
+            transition: transform 0.3s;
+        }
+        
+        .stat-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+        
+        .stat-value {
+            font-size: 2.5em;
+            margin: 10px 0;
+            font-weight: bold;
+            color: var(--simpson-blue);
+        }
+        
+        .stat-label {
+            font-size: 1em;
+            color: #666;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        
+        .buttons-container {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            margin-top: 20px;
+        }
+        
+        .button {
+            padding: 12px 25px;
+            border: none;
+            border-radius: 50px;
+            font-weight: bold;
+            font-size: 1em;
+            cursor: pointer;
+            transition: transform 0.2s, box-shadow 0.2s;
+            text-transform: uppercase;
+        }
+        
+        .button:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 5px 10px rgba(0,0,0,0.15);
+        }
+        
+        .button:active {
+            transform: translateY(1px);
+        }
+        
+        .back-button {
+            background-color: var(--simpson-green);
+            color: white;
+        }
+        
+        .logout-button {
+            background-color: var(--simpson-red);
+            color: white;
+        }
+        
+        @media (max-width: 768px) {
+            .stats-container {
+                grid-template-columns: 1fr;
+            }
+            
+            .buttons-container {
+                flex-direction: column;
+                align-items: center;
+            }
+            
+            .button {
+                width: 80%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>Perfil de Simpsons Trivia</h1>
+    </div>
+    
+    <div class="container">
+        <div class="profile-card">
+            <div class="profile-header">
+                <div class="profile-picture">
+                    👤
+                </div>
+                <h2 class="profile-name" id="username">Cargando...</h2>
+                <p class="profile-tag" id="user_tag">@usuario</p>
+            </div>
+            
+            <div class="stats-container">
+                <div class="stat-card">
+                    <div class="stat-label">Mejor Puntaje</div>
+                    <div class="stat-value" id="highestScore">0</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-label">Último Puntaje</div>
+                    <div class="stat-value" id="lastScore">0</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-label">Respuestas Correctas</div>
+                    <div class="stat-value" id="correctAnswers">0</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-label">Respuestas Incorrectas</div>
+                    <div class="stat-value" id="incorrectAnswers">0</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-label">Total Preguntas</div>
+                    <div class="stat-value" id="totalQuestions">0</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-label">Precisión</div>
+                    <div class="stat-value" id="accuracy">0%</div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="buttons-container">
+            <button class="button back-button" onclick="window.location.href='/'">Volver al inicio</button>
+            <button class="button logout-button" onclick="cerrarSesion()">Cerrar sesión</button>
+        </div>
+    </div>
+    
+    <script>
+        async function cerrarSesion() {
+            try {
+                const respuesta = await fetch('/api/v1/logout', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    credentials: 'same-origin'
+                });
+                
+                const resultado = await respuesta.json();
+                
+                if (resultado.success) {
+                    window.location.href = '/api/v1/account';
+                } else {
+                    alert('Error al cerrar sesión: ' + (resultado.error || 'Error desconocido'));
+                }
+            } catch (error) {
+                alert('Error en la solicitud de cierre de sesión');
+            }
+        }
+
+        async function loadUserData() {
+            try {
+                // Cargar datos del usuario
+                const userResponse = await fetch('/api/v1/user/data');
+                const userData = await userResponse.json();
+
+                if (userData.success) {
+                    document.getElementById('username').textContent = userData.data.username;
+                    document.getElementById('user_tag').textContent = userData.data.user_tag;
+                    
+                    // Personalizar la inicial en el avatar
+                    if (userData.data.username) {
+                        const initialLetter = userData.data.username.charAt(0).toUpperCase();
+                        document.querySelector('.profile-picture').textContent = initialLetter;
+                    }
+                }
+
+                // Cargar estadísticas
+                const response = await fetch('/api/v1/user/stats');
+                const data = await response.json();
+                
+                if (data.success) {
+                    document.getElementById('highestScore').textContent = data.data.highestScore || 0;
+                    document.getElementById('lastScore').textContent = data.data.lastScore || 0;
+                    document.getElementById('correctAnswers').textContent = data.data.correctAnswers || 0;
+                    document.getElementById('incorrectAnswers').textContent = data.data.incorrectAnswers || 0;
+                    document.getElementById('totalQuestions').textContent = data.data.totalQuestions || 0;
+                    document.getElementById('accuracy').textContent = data.data.accuracy || '0%';
+                    
+                    // Añadir animación de conteo para los números
+                    animateNumbers();
+                }
+            } catch (error) {
+                console.error('Error loading user data:', error);
+            }
+        }
+        
+        function animateNumbers() {
+            const statValues = document.querySelectorAll('.stat-value');
+            statValues.forEach(value => {
+                value.style.opacity = 0;
+                setTimeout(() => {
+                    value.style.transition = 'opacity 0.5s ease-in-out';
+                    value.style.opacity = 1;
+                }, 300);
+            });
+        }
+        
+        document.addEventListener('DOMContentLoaded', loadUserData);
+    </script>
+</body>
+</html>
+</html>
