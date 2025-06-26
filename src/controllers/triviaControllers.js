@@ -3,6 +3,7 @@ const accountRegister = require('../account/register');
 const accountLogin = require('../account/login');
 const rolesManager = require('../account/roles/rolesManager');
 const { supabaseConection } = require('../account/authSupabase');
+const { createClient } = require('@supabase/supabase-js');
 const config = require('../../config');
 const queriesRedis = require('../dbFiles/queriesRedis');
 const redisManager = require('../dbFiles/redisManager');
@@ -187,7 +188,7 @@ async function loginUserReq (req, res, next) {
   }
 };
 
-async function loginUserOAuth(req, res, next) {
+async function loginUserOAuth(req, res) {
   try {
     const { provider } = req.params;
     
@@ -279,6 +280,11 @@ async function handleOAuthCallback(req, res) {
                 username: userName,
                 provider: data.user.app_metadata?.provider || 'oauth'
               });
+            } else {
+              // Usuario ya existe con este email pero diferente proveedor
+              console.log(`User already exists with email ${userEmail}, but authenticated with different provider`);
+              // Supabase ya maneja automáticamente múltiples identidades para el mismo email
+              // Solo necesitamos verificar que el usuario se creó correctamente en nuestra DB local
             }
           } catch (dbError) {
             console.error('Error saving user OAuth:', dbError);
@@ -865,6 +871,265 @@ async function processOAuthToken(req, res) {
   }
 }
 
+// Función para linkear un proveedor OAuth a la cuenta actual
+async function linkOAuthProvider(req, res) {
+  try {
+    const { provider } = req.params;
+    
+    console.log('LinkOAuth - Starting linking process for provider:', provider);
+    console.log('LinkOAuth - User authenticated:', !!req.user && !req.user.isAnonymous);
+    
+    if (!provider || !['google', 'github'].includes(provider)) {
+      return res.status(400).json({
+        success: false,
+        error: "Invalid provider. Use 'google' or 'github'"
+      });
+    }
+
+    // Verificar que el usuario esté autenticado
+    if (!req.user || req.user.isAnonymous || !req.user.dataUser || !req.user.dataUser.id) {
+      console.log('LinkOAuth - Authentication failed:', {
+        hasUser: !!req.user,
+        isAnonymous: req.user?.isAnonymous,
+        hasDataUser: !!req.user?.dataUser,
+        hasDataUserId: !!req.user?.dataUser?.id
+      }); // Debug
+      
+      return res.status(401).json({
+        success: false,
+        error: "User must be authenticated to link accounts"
+      });
+    }
+
+    // Obtener el token de acceso del usuario autenticado
+    const accessToken = req.cookies.accessToken;
+    if (!accessToken) {
+      return res.status(401).json({
+        success: false,
+        error: "Access token not found. Please login again."
+      });
+    }
+
+    // Primero establecer la sesión del usuario en el cliente
+    const userSupabase = createClient(config.supabaseUrl, config.supabaseAnonKey);
+    
+    // Establecer la sesión del usuario autenticado
+    const { data: session, error: sessionError } = await userSupabase.auth.setSession({
+      access_token: accessToken,
+      refresh_token: req.cookies.refreshToken || ''
+    });
+    
+    if (sessionError) {
+      console.error('Error setting session for linking:', sessionError);
+      return res.status(401).json({
+        success: false,
+        error: 'Invalid session for linking'
+      });
+    }
+
+    console.log('Session established for linking:', !!session.session); // Debug
+
+    // Generar URL de callback usando la misma lógica que el OAuth normal
+    const port = config.port || 3000;
+    const baseUrl = config.nodeEnv === 'production' 
+      ? `https://${config.urlHost}`
+      : `http://localhost:${port}`;
+    const callbackUrl = `${baseUrl}/api/v1/oauth/link-callback`;
+    
+    console.log('LinkOAuth - Using callback URL:', callbackUrl); // Debug
+
+    // Generar URL de linking con Supabase usando el cliente autenticado
+    const { data, error } = await userSupabase.auth.linkIdentity({
+      provider: provider,
+      options: {
+        redirectTo: callbackUrl
+      }
+    });
+
+    if (error) {
+      console.error('Error generating link URL:', error);
+      return res.status(500).json({
+        success: false,
+        error: 'Error generating authentication link: ' + error.message
+      });
+    }
+
+    console.log('LinkOAuth - Successfully generated linking URL for provider:', provider);
+    
+    return res.json({
+      success: true,
+      linkUrl: data.url,
+      message: `Redirect to this URL to link your ${provider} account`
+    });
+
+  } catch (error) {
+    console.error('Error in linkOAuthProvider:', error);
+    return res.status(500).json({
+      success: false,
+      error: 'Server error during account linking'
+    });
+  }
+}
+
+// Función para manejar el callback del linking
+async function handleOAuthLinkCallback(req, res) {
+  try {
+    console.log("OAuth Link Callback - Query:", JSON.stringify(req.query));
+    console.log("OAuth Link Callback - Hash:", req.url.includes('#') ? 'Hash present' : 'No hash');
+    console.log("OAuth Link Callback - Full URL:", req.originalUrl);
+    
+    // Verificar si hay un código de autorización
+    if (req.query.code) {
+      console.log('OAuth account linked successfully with code');
+      return res.redirect('/api/v1/profile?linked=success');
+    }
+
+    // Verificar si hay un error explícito
+    if (req.query.error) {
+      console.error('OAuth linking error:', req.query.error);
+      return res.redirect('/api/v1/profile?linked=error&message=' + encodeURIComponent(req.query.error_description || req.query.error));
+    }
+
+    // Si no hay query params, podría ser que el linking se completó pero sin parámetros
+    // En este caso, asumimos éxito y dejamos que el frontend verifique
+    console.log('OAuth link callback without query params - assuming success');
+    return res.redirect('/api/v1/profile?linked=success');
+
+  } catch (error) {
+    console.error('Error in OAuth link callback:', error);
+    return res.redirect('/api/v1/profile?linked=error&message=' + encodeURIComponent('Server error during account linking'));
+  }
+}
+
+// Función para obtener las identidades vinculadas del usuario
+async function getUserLinkedIdentities(req, res) {
+  try {
+    if (!req.user || req.user.isAnonymous || !req.user.dataUser || !req.user.dataUser.id) {
+      return res.status(401).json({
+        success: false,
+        error: "User must be authenticated"
+      });
+    }
+
+    // Obtener datos del usuario de Supabase
+    const { data: { user }, error } = await supabaseConection.auth.getUser(req.cookies.accessToken);
+    
+    if (error) {
+      return res.status(401).json({
+        success: false,
+        error: "Invalid authentication"
+      });
+    }
+
+    // Extraer información de las identidades
+    const identities = user.identities || [];
+    const linkedProviders = identities.map(identity => ({
+      provider: identity.provider,
+      email: identity.identity_data?.email,
+      created_at: identity.created_at,
+      updated_at: identity.updated_at
+    }));
+
+    return res.json({
+      success: true,
+      data: {
+        user_id: user.id,
+        email: user.email,
+        linked_providers: linkedProviders,
+        total_linked: linkedProviders.length
+      }
+    });
+
+  } catch (error) {
+    console.error('Error getting linked identities:', error);
+    return res.status(500).json({
+      success: false,
+      error: 'Server error retrieving linked accounts'
+    });
+  }
+}
+
+// Función para desenlazar un proveedor OAuth
+async function unlinkOAuthProvider(req, res) {
+  try {
+    const { provider } = req.params;
+    
+    if (!provider || !['google', 'github'].includes(provider)) {
+      return res.status(400).json({
+        success: false,
+        error: "Invalid provider. Use 'google' or 'github'"
+      });
+    }
+
+    if (!req.user || req.user.isAnonymous || !req.user.dataUser || !req.user.dataUser.id) {
+      return res.status(401).json({
+        success: false,
+        error: "User must be authenticated"
+      });
+    }
+
+    // Obtener identidades actuales
+    const { data: { user }, error: userError } = await supabaseConection.auth.getUser(req.cookies.accessToken);
+    
+    if (userError) {
+      return res.status(401).json({
+        success: false,
+        error: "Invalid authentication"
+      });
+    }
+
+    const identities = user.identities || [];
+    const providerIdentity = identities.find(id => id.provider === provider);
+    
+    if (!providerIdentity) {
+      return res.status(404).json({
+        success: false,
+        error: `No ${provider} account linked to this user`
+      });
+    }
+
+    // Verificar que no sea la única identidad
+    if (identities.length <= 1) {
+      return res.status(400).json({
+        success: false,
+        error: "Cannot unlink the only authentication method. Link another provider first."
+      });
+    }
+
+    // Crear cliente de Supabase con el token del usuario
+    const userSupabase = createClient(config.supabaseUrl, config.supabaseAnonKey, {
+      global: {
+        headers: {
+          Authorization: `Bearer ${req.cookies.accessToken}`
+        }
+      }
+    });
+
+    // Desenlazar la identidad
+    const { error: unlinkError } = await userSupabase.auth.unlinkIdentity(providerIdentity);
+    
+    if (unlinkError) {
+      console.error('Error unlinking identity:', unlinkError);
+      return res.status(500).json({
+        success: false,
+        error: 'Error unlinking account'
+      });
+    }
+
+    return res.json({
+      success: true,
+      message: `${provider} account unlinked successfully`
+    });
+
+  } catch (error) {
+    console.error('Error in unlinkOAuthProvider:', error);
+    return res.status(500).json({
+      success: false,
+      error: 'Server error during account unlinking'
+    });
+  }
+}
+
 module.exports = {
   registerUserReq,
   loginUserReq,
@@ -885,5 +1150,9 @@ module.exports = {
   getUserStats,
   userDataProfile,
   gameOverRefreshPage,
-  processOAuthToken
+  processOAuthToken,
+  linkOAuthProvider,
+  handleOAuthLinkCallback,
+  getUserLinkedIdentities,
+  unlinkOAuthProvider
 };

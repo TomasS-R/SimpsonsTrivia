@@ -31,6 +31,12 @@ function setupRoutesV1(app) {
     app.post(routeapi+'/logout', securityRoutes.authLimiter, triviaControll.logoutUser);
     app.post(routeapi+'/oauth/process-token', securityRoutes.authLimiter, triviaControll.processOAuthToken);
 
+    // ** Rutas de linking de cuentas OAuth **
+    app.post(routeapi+'/oauth/link/:provider', securityRoutes.authenticatedApiLimiter, triviaControll.supabaseAuth, checkRole(rolesManager.roles.USER), triviaControll.linkOAuthProvider);
+    app.get(routeapi+'/oauth/link-callback', securityRoutes.publicApiLimiter, triviaControll.handleOAuthLinkCallback);
+    app.get(routeapi+'/oauth/linked-accounts', securityRoutes.authenticatedApiLimiter, triviaControll.supabaseAuth, checkRole(rolesManager.roles.USER), triviaControll.getUserLinkedIdentities);
+    app.delete(routeapi+'/oauth/unlink/:provider', securityRoutes.authenticatedApiLimiter, triviaControll.supabaseAuth, checkRole(rolesManager.roles.USER), triviaControll.unlinkOAuthProvider);
+
     // ** Rutas protegidas (requieren autenticación) **
     // Rutas administrativas
     app.get(routeapi+'/users', securityRoutes.authenticatedApiLimiter, triviaControll.supabaseAuth, checkRole(rolesManager.roles.ADMIN), triviaControll.getUsersList);

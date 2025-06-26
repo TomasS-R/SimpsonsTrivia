@@ -1,12 +1,15 @@
 # Changelog
 
-## Version 0.6.1 (en proceso): - 2025-02- -
+## Version 0.6.2 (en proceso): - 2025- - -
 
 ### Agregado:
    - Se realizo la configuracion, adicion y creacion de un bucket storage para almacenar las imagenes de los usuarios en el archivo [queries](./src/dbFiles/queries.js) y se agrego la ejecucion en [app](./src/app.js).
    - Se implemento el sistema de autenticacion de terceros
    - Nuevas rutas de Oauth
    - Nueva tabla de imagenes de perfil de los usuarios
+   - Linking de las cuentas de usuarios de terceros OAuth google y github un usuario puede linkear sus cuentas
+   - Nuevas rutas de linking accounts en [routes](./src/routes/routes.js)
+   - Nuevo archivo para usar CLAUDE code en el proyecto.
 
 ### Modificado:
    - Se arreglo el error "Error obtain user role: Error: Role not found" que ocurria cuando un usuario anonimo empezaba a jugar. El error se encontraba en la funcion supabaseAuth del archivo [triviaControllers](./src/controllers/triviaControllers.js). Se modifico la funcion para manejar correctamente los usuarios anonimos y evitar el error de rol no encontrado.

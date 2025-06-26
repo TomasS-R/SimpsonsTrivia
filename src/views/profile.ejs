@@ -150,6 +150,160 @@
             background-color: var(--simpson-red);
             color: white;
         }
+
+        /* Estilos mejorados para la sección de cuentas vinculadas */
+        .oauth-providers {
+            margin-top: 30px;
+            padding: 25px;
+            background: linear-gradient(to bottom right, #ffffff, #f8f9fa);
+            border-radius: 12px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+        }
+
+        .provider-buttons {
+            display: flex;
+            gap: 20px;
+            flex-wrap: wrap;
+            margin-top: 20px;
+            justify-content: center;
+        }
+
+        .oauth-button {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 15px 25px;
+            border: none;
+            border-radius: 12px;
+            background-color: white;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 16px;
+            font-weight: 500;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+        }
+
+        .google-button {
+            background-color: #ffffff;
+            color: #4285f4;
+            border: 2px solid #4285f4;
+        }
+
+        .google-button:hover {
+            background-color: #4285f4;
+            color: white;
+            transform: translateY(-3px);
+        }
+
+        .github-button {
+            background-color: #ffffff;
+            color: #333;
+            border: 2px solid #333;
+        }
+
+        .github-button:hover {
+            background-color: #333;
+            color: white;
+            transform: translateY(-3px);
+        }
+
+        .linked-account {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 20px;
+            margin: 15px 0;
+            background-color: white;
+            border-radius: 12px;
+            border-left: 5px solid var(--simpson-yellow);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+            transition: all 0.3s ease;
+        }
+
+        .linked-account:hover {
+            transform: translateX(5px);
+            box-shadow: 0 6px 15px rgba(0,0,0,0.1);
+        }
+
+        .linked-account-info {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .linked-account-info img {
+            width: 32px;
+            height: 32px;
+            border-radius: 8px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+
+        .linked-account-info div {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+
+        .linked-account-info strong {
+            font-size: 16px;
+            color: #333;
+        }
+
+        .linked-account-info small {
+            color: #666;
+            font-size: 14px;
+        }
+
+        .unlink-button {
+            background-color: transparent;
+            color: var(--simpson-red);
+            border: 2px solid var(--simpson-red);
+            padding: 8px 16px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 500;
+            transition: all 0.3s ease;
+        }
+
+        .unlink-button:hover {
+            background-color: var(--simpson-red);
+            color: white;
+            transform: scale(1.05);
+        }
+
+        .success-message {
+            background-color: rgba(212, 237, 218, 0.9);
+            border-left: 5px solid #28a745;
+            color: #155724;
+            padding: 15px 20px;
+            border-radius: 8px;
+            margin: 15px 0;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+            animation: slideIn 0.3s ease-out;
+        }
+
+        .error-message {
+            background-color: rgba(248, 215, 218, 0.9);
+            border-left: 5px solid #dc3545;
+            color: #721c24;
+            padding: 15px 20px;
+            border-radius: 8px;
+            margin: 15px 0;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+            animation: slideIn 0.3s ease-out;
+        }
+
+        @keyframes slideIn {
+            from {
+                transform: translateX(-20px);
+                opacity: 0;
+            }
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
         
         @media (max-width: 768px) {
             .stats-container {
@@ -206,6 +360,33 @@
                 <div class="stat-card">
                     <div class="stat-label">Precisión</div>
                     <div class="stat-value" id="accuracy">0%</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Sección de linking de cuentas OAuth -->
+        <div class="profile-card">
+            <div class="profile-header">
+                <h2>Cuentas Vinculadas</h2>
+                <p>Vincula o desvincula tus cuentas de redes sociales para mayor comodidad al iniciar sesión</p>
+            </div>
+            <div class="profile-body">
+                <div id="linkedAccountsContainer">
+                    <div class="loading-message">Cargando cuentas vinculadas...</div>
+                </div>
+                
+                <div class="oauth-providers">
+                    <h3>Vincular Nueva Cuenta</h3>
+                    <div class="provider-buttons">
+                        <button class="oauth-button google-button" onclick="linkProvider('google')">
+                            <img src="https://www.google.com/favicon.ico" alt="Google" width="20" height="20">
+                            Vincular Google
+                        </button>
+                        <button class="oauth-button github-button" onclick="linkProvider('github')">
+                            <img src="https://github.com/favicon.ico" alt="GitHub" width="20" height="20">
+                            Vincular GitHub
+                        </button>
+                    </div>
                 </div>
             </div>
         </div>
@@ -271,9 +452,137 @@
                     // Añadir animación de conteo para los números
                     animateNumbers();
                 }
+
+                // Cargar cuentas vinculadas
+                await loadLinkedAccounts();
             } catch (error) {
                 console.error('Error loading user data:', error);
             }
+        }
+
+        async function loadLinkedAccounts() {
+            try {
+                const response = await fetch('/api/v1/oauth/linked-accounts');
+                const data = await response.json();
+                
+                const container = document.getElementById('linkedAccountsContainer');
+                
+                if (data.success && data.data.linked_providers.length > 0) {
+                    container.innerHTML = '';
+                    
+                    data.data.linked_providers.forEach(provider => {
+                        const accountDiv = document.createElement('div');
+                        accountDiv.className = 'linked-account';
+                        
+                        const providerIcon = provider.provider === 'google' 
+                            ? 'https://www.google.com/favicon.ico' 
+                            : 'https://github.com/favicon.ico';
+                        
+                        accountDiv.innerHTML = `
+                            <div class="linked-account-info">
+                                <img src="${providerIcon}" alt="${provider.provider}" width="24" height="24">
+                                <div>
+                                    <strong>${provider.provider.charAt(0).toUpperCase() + provider.provider.slice(1)}</strong>
+                                    <br>
+                                    <small>${provider.email}</small>
+                                </div>
+                            </div>
+                            ${data.data.total_linked > 1 ? 
+                                `<button class="unlink-button" onclick="unlinkProvider('${provider.provider}')">Desvincular</button>` 
+                                : '<small style="color: #666;">Método principal</small>'
+                            }
+                        `;
+                        
+                        container.appendChild(accountDiv);
+                    });
+                    
+                    // Ocultar botones de proveedores ya vinculados
+                    data.data.linked_providers.forEach(provider => {
+                        const button = document.querySelector(`.${provider.provider}-button`);
+                        if (button) {
+                            button.style.display = 'none';
+                        }
+                    });
+                } else {
+                    container.innerHTML = '<div class="loading-message">No hay cuentas adicionales vinculadas</div>';
+                }
+            } catch (error) {
+                console.error('Error loading linked accounts:', error);
+                document.getElementById('linkedAccountsContainer').innerHTML = 
+                    '<div class="error-message">Error al cargar las cuentas vinculadas</div>';
+            }
+        }
+
+        async function linkProvider(provider) {
+            try {
+                console.log(`Attempting to link provider: ${provider}`); // Debug
+                
+                const response = await fetch(`/api/v1/oauth/link/${provider}`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    credentials: 'same-origin'
+                });
+                
+                console.log('Link response status:', response.status); // Debug
+                const data = await response.json();
+                console.log('Link response data:', data); // Debug
+                
+                if (data.success) {
+                    // Redirigir al usuario a la URL de linking
+                    window.location.href = data.linkUrl;
+                } else {
+                    showMessage('Error al generar el enlace de vinculación: ' + data.error, 'error');
+                }
+            } catch (error) {
+                console.error('Error linking provider:', error);
+                showMessage('Error en la solicitud de vinculación', 'error');
+            }
+        }
+
+        async function unlinkProvider(provider) {
+            if (!confirm(`¿Estás seguro de que deseas desvincular tu cuenta de ${provider}?`)) {
+                return;
+            }
+            
+            try {
+                const response = await fetch(`/api/v1/oauth/unlink/${provider}`, {
+                    method: 'DELETE',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    credentials: 'same-origin'
+                });
+                
+                const data = await response.json();
+                
+                if (data.success) {
+                    showMessage(`Cuenta de ${provider} desvinculada exitosamente`, 'success');
+                    // Recargar las cuentas vinculadas
+                    setTimeout(() => {
+                        location.reload();
+                    }, 1500);
+                } else {
+                    showMessage('Error al desvincular la cuenta: ' + data.error, 'error');
+                }
+            } catch (error) {
+                console.error('Error unlinking provider:', error);
+                showMessage('Error en la solicitud de desvinculación', 'error');
+            }
+        }
+
+        function showMessage(message, type) {
+            const container = document.getElementById('linkedAccountsContainer');
+            const messageDiv = document.createElement('div');
+            messageDiv.className = type === 'success' ? 'success-message' : 'error-message';
+            messageDiv.textContent = message;
+            
+            container.parentNode.insertBefore(messageDiv, container);
+            
+            setTimeout(() => {
+                messageDiv.remove();
+            }, 5000);
         }
         
         function animateNumbers() {
@@ -287,8 +596,31 @@
             });
         }
         
-        document.addEventListener('DOMContentLoaded', loadUserData);
+        // Manejar parámetros de query para mensajes de linking
+        function handleLinkingResult() {
+            const urlParams = new URLSearchParams(window.location.search);
+            const linked = urlParams.get('linked');
+            const message = urlParams.get('message');
+            
+            if (linked === 'success') {
+                showMessage('¡Cuenta vinculada exitosamente! Ahora puedes usar ambos métodos de autenticación.', 'success');
+                // Limpiar la URL
+                window.history.replaceState({}, document.title, window.location.pathname);
+                // Recargar las cuentas vinculadas
+                setTimeout(() => {
+                    location.reload();
+                }, 2000);
+            } else if (linked === 'error') {
+                showMessage('Error al vincular la cuenta: ' + (message || 'Error desconocido'), 'error');
+                // Limpiar la URL
+                window.history.replaceState({}, document.title, window.location.pathname);
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            handleLinkingResult();
+            loadUserData();
+        });
     </script>
 </body>
-</html>
 </html>

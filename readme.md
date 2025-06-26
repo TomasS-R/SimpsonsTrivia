@@ -39,15 +39,27 @@
 
 ### Esto nos va a servir para poder controlar y verificar el funcionamiento del mismo asi como tambien analizar las metricas, los testeos, manejo de CI/CD, creacion y configuracion de archivos docker.
 
-# 🔑 Acceso a la api - ![API Status](https://img.shields.io/endpoint?url=https://check-api-status-simpsons.tomas-saintromain.workers.dev/)
+# 🚀 **Características Destacadas**
 
-### Podes acceder a la api a traves del siguiente [link](https://simpsons-trivia.fly.dev/)
+<div align="center">
 
-#### En la documentacion podras encontrar mas informacion sobre que rutas estan disponibles para consultar y/o realizar solicitudes.
+### 🎮 **Trivia Interactiva Completa** | 👤 **Sistema de Usuarios Avanzado** | 🔗 **OAuth Multi-Proveedor**
+
+**Juega la trivia más divertida de Los Simpsons con autenticación moderna y gestión completa de usuarios**
+
+</div>
+
+## 🔑 Acceso a la API - ![API Status](https://img.shields.io/endpoint?url=https://check-api-status-simpsons.tomas-saintromain.workers.dev/)
+
+### 🌐 **Demo en Vivo**
+Podes acceder a la aplicación completa a través del siguiente [**🔗 LINK**](https://simpsons-trivia.fly.dev/)
+
+### 📚 **Documentación API**
+Explora todos los endpoints disponibles en la [**📖 Documentación Swagger**](https://simpsons-trivia.fly.dev/api/v1/) integrada.
 
 # 🙋‍♂️ Preguntas y Respuestas
 
-<details close><summary><h2>De que trata el proyecto? 🤔</h2></summary>
+<details><summary><h2>De que trata el proyecto? 🤔</h2></summary>
 
 ### El proyecto contempla la creacion de una trivia usando frases de los simpsons, la idea es adivinar la mayor cantidad de personajes en base a las frases brindadas en cada ronda.
 
@@ -55,39 +67,91 @@
 
 </details>
 
-<details close><summary><h2>Que recursos se usaron? 🛠️</h2></summary>
+<details close><summary><h2>Stack Tecnológico 🛠️</h2></summary>
 
-### Se usaron diferentes herramientas las cuales son:
+### 🖥️ **Backend & Core**
+- **Runtime:** Node.js v22.9.0
+- **Framework:** Express.js v4.20.0
+- **Language:** JavaScript (CommonJS)
+- **Package Manager:** NPM v10.1.0
 
-- **Servidor:** Node, Express, NPM, Axios
+### 🗄️ **Base de Datos & Storage**
+- **Principal:** PostgreSQL (via Supabase)
+- **Cache:** Redis (Upstash/Local)
+- **Storage:** Supabase Storage (imágenes de perfil)
+- **ORM:** Queries SQL nativas
 
-- **Local:** Nodemon, EsLint
+### 🔐 **Autenticación & Seguridad**
+- **Auth Provider:** Supabase Auth
+- **OAuth:** Google, GitHub
+- **Tokens:** JWT con refresh automático
+- **Security:** bcryptjs, express-rate-limit, express-brute
+- **CORS:** Configuración personalizada
 
-- **Base de datos:** Supabase (Postgres)
+### 🧪 **Testing & Quality**
+- **Testing:** Jest v29.7.0
+- **Linting:** ESLint v9.11.1
+- **Load Testing:** JMeter v5.6.3
+- **Code Quality:** Pre-commit hooks
 
-- **Testing:** Jest
+### 🚀 **DevOps & Deployment**
+- **Containerización:** Docker (multi-stage)
+- **CI/CD:** GitHub Actions
+- **Hosting:** Fly.io (principal), Render (alternativo)
+- **Monitoring:** Sentry, Grafana
+- **Docs:** Swagger UI + YAML
 
-- **Host:** Flyio
+### 🖥️ **Frontend & UI**
+- **Engine:** EJS Templates
+- **Styling:** CSS3 con Variables Customizadas
+- **Icons:** Emoji + Provider Favicons
+- **Animations:** CSS Transitions & Keyframes
 
-- **Documentacion:** Swagger
+### 🔧 **Development Tools**
+- **Dev Server:** Nodemon v3.1.4
+- **Process Manager:** PM2 (producción)
+- **Environment:** Variables de entorno centralizadas
+- **Debugging:** Console logs + Sentry tracking
 
 </details>
 
 <details close><summary><h2>Funcionalidades 🚥</h2></summary>
 
+### 🎮 **Características Principales**
 - [x] Consultar frases iconicas y famosas de la serie
-
 - [x] Acceder a los diferentes endpoints
-
 - [x] Consultar todos los personajes
-
 - [x] Consultar que frase pertenece a que personaje
-
 - [x] Consultar el estado de la api en health check
+- [x] **Trivia completa funcional** - Juego interactivo con puntuación
+- [x] **Sistema de ranking** - Mejor puntaje, último puntaje y estadísticas
 
-- [ ] Posibilidad de jugar, sumar puntos (ranking)
+### 👤 **Sistema de Usuarios**
+- [x] **Registro y login tradicional** - Email/contraseña
+- [x] **Autenticación OAuth** - Google y GitHub
+- [x] **Vinculación de cuentas** - Conecta múltiples proveedores OAuth
+- [x] **Usuarios anónimos** - Juega sin registrarte
+- [x] **Gestión de sesiones** - Tokens JWT con refresh automático
+- [x] **Perfiles de usuario** - Estadísticas personalizadas y gestión de cuenta
 
+### 🔐 **Seguridad y Administración**
+- [x] **Roles de usuario** - Sistema de permisos (Admin/User/Guest)
+- [x] **Rate limiting** - Protección contra abuso de API
+- [x] **Brute force protection** - Seguridad en login
+- [x] **Eliminación automática** - Limpieza de usuarios temporales
+
+### 📊 **Características Técnicas**
+- [x] **Base de datos dual** - PostgreSQL + Redis para rendimiento
+- [x] **Monitoreo con Sentry** - Tracking de errores en tiempo real
+- [x] **CI/CD automatizado** - GitHub Actions para deploy
+- [x] **Documentación API** - Swagger integrado
+- [x] **Containerización** - Docker multi-stage para dev/prod
+
+### 🎯 **Pendientes**
 - [ ] Consultar a que capitulo/temporada pertenece la frase
+- [ ] Sistema de recompensas con imágenes de perfil
+- [ ] Cache Redis para preguntas frecuentes
+- [ ] Integración con IA para generar contenido
 
 </details>
 
@@ -99,29 +163,57 @@
 
 </details>
 
-# 📖 Documentacion
+# 📖 Documentación
 
 ###### Por mas que parezca tentador por favor no se coma la documentacion 🤤
 
-### Clonar el repositorio:
+## 🚀 **Inicio Rápido**
 
+### 1️⃣ **Clonar el repositorio**
 ``` bash
 git clone https://github.com/TomasS-R/SimpsonsTrivia
+cd SimpsonsTrivia
 ```
 
-### Instalar los requerimientos:
-
+### 2️⃣ **Instalar dependencias**
 ``` bash 
 npm install
 ```
 
-### Correr el proyecto en local:
+### 3️⃣ **Configurar variables de entorno**
 ``` bash
+# Copia el template y configura tus variables
+cp .env.template .env
+# Edita .env con tus configuraciones
+```
+
+### 4️⃣ **Ejecutar en desarrollo**
+``` bash
+# Opción 1: Con testing automático
+npm run dev
+
+# Opción 2: Solo servidor
+npm start
+
+# Opción 3: Modo manual
 nodemon --env-file=.env src/app.js
 ```
-### O tambien puedes usar:
+
+### 5️⃣ **Verificar funcionamiento**
+- 🌐 **App:** http://localhost:3000
+- 📚 **API Docs:** http://localhost:3000/api/v1
+- 🧪 **Health Check:** http://localhost:3000/api/v1/healthcheck
+
+### 🧪 **Testing & Quality**
 ``` bash
-npm run dev
+# Ejecutar tests
+npm test
+
+# Verificar código
+npm run lint
+
+# Ambos (usado en npm run dev)
+npm test && npm run lint
 ```
 
 ## Variables de entorno 💡
@@ -355,6 +447,7 @@ npm run lint
 ├── .env.template                       # Plantilla para las variables de entorno
 ├── .gitignore                          # Archvios que no se suben a github
 ├── changelog.md                        # Cambios que se realizan en cada version
+├── CLAUDE.md                           # Archivo de configuraciones basicas de claude code para entendimiento del proyecto
 ├── config.js                           # Manejo principal por el cual se van a transmitir las variables de entorno (es un puente entre el .env y los archivos) para un mejor desempeño de la solucion y evitar concurrencia.
 ├── docker-compose.yml                  # Configuración de Docker Compose
 ├── Dockerfile                          # Archivo Docker para construir la imagen de la api
