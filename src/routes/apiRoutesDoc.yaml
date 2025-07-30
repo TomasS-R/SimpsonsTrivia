@@ -6,8 +6,8 @@ servers:
     url: http://localhost:3001/api/v1
 
 info:
-  description: API para el juego de trivia de Los Simpson
-  version: "1.3"
+  description: API para el juego de trivia de Los Simpson con soporte para usuarios registrados y anónimos, incluyendo sistema de rachas y OAuth
+  version: "0.6.2"
   title: Simpsons Trivia API
   contact:
     email: tomas.saintromain@gmail.com
@@ -22,33 +22,32 @@ tags:
     description: Endpoints relacionados con el juego de trivia
   - name: Authentication
     description: Gestión de usuarios y sesiones
+  - name: OAuth
+    description: Autenticación con proveedores externos (Google, GitHub)
+  - name: User
+    description: Gestión de datos y estadísticas de usuario
   - name: Session
     description: Manejo de sesiones anónimas y autenticadas
   - name: Admin
     description: Endpoints protegidos solo para administradores
 
 paths:
+  # ===================
+  # ENDPOINTS PÚBLICOS
+  # ===================
   /healthcheck:
     get:
       tags:
         - Public
       summary: Verificar estado de la API
-      description: Verifica si la API está funcionando correctamente
+      description: Verifica si la API está funcionando correctamente y muestra información del sistema
       responses:
         '200':
           description: Estado de la API
           content:
             application/json:
               schema:
-                type: object
-                properties:
-                  success:
-                    type: boolean
-                  message:
-                    type: string
-                  timestamp:
-                    type: string
-                    format: date-time
+                $ref: '#/components/schemas/HealthCheckResponse'
 
   /session-status:
     get:
@@ -62,23 +61,11 @@ paths:
           content:
             application/json:
               schema:
-                type: object
-                properties:
-                  status:
-                    type: string
-                  data:
-                    type: object
-                    properties:
-                      isAnonymous:
-                        type: boolean
-                      timeRemaining:
-                        type: integer
-                      shouldWarn:
-                        type: boolean
-                      sessionExpires:
-                        type: string
-                        format: date-time
+                $ref: '#/components/schemas/SessionStatusResponse'
 
+  # ===================
+  # ENDPOINTS DE JUEGO
+  # ===================
   /quote/questions:
     get:
       tags:
@@ -91,76 +78,28 @@ paths:
           content:
             application/json:
               schema:
-                type: object
-                properties:
-                  success:
-                    type: boolean
-                  data:
-                    type: array
-                    items:
-                      type: object
-                      properties:
-                        id:
-                          type: integer
-                        quote:
-                          type: string
-                        character:
-                          type: string
+                $ref: '#/components/schemas/QuestionsResponse'
 
   /quote/random:
     get:
       tags:
         - Game
       summary: Obtener pregunta aleatoria
-      description: Retorna una frase aleatoria con 4 opciones de personajes (1 correcta y 3 incorrectas)
+      description: Retorna una frase aleatoria con opciones de personajes para responder
       responses:
         '200':
           description: Pregunta aleatoria con opciones
           content:
             application/json:
               schema:
-                type: object
-                properties:
-                  success:
-                    type: boolean
-                    example: true
-                  data:
-                    type: object
-                    properties:
-                      id:
-                        type: integer
-                        description: ID único de la frase
-                        example: 102
-                      quote:
-                        type: string
-                        description: Frase del personaje
-                        example: "A darle átomos!"
-                      options:
-                        type: array
-                        description: Lista de personajes posibles con sus IDs
-                        items:
-                          type: object
-                          properties:
-                            id:
-                              type: integer
-                              description: ID único del personaje
-                            name:
-                              type: string
-                              description: Nombre del personaje
-                        example:
-                          [
-                            { id: 3, name: "Helen Lovejoy" },
-                            { id: 1, name: "Bart Simpson" },
-                            { id: 35, name: "Hombre Radioactivo" },
-                            { id: 2, name: "Homero Simpson" }
-                          ]
+                $ref: '#/components/schemas/RandomQuoteResponse'
 
   /quotes/{id}/answer:
     post:
       tags:
         - Game
       summary: Enviar respuesta a una pregunta
-      description: Verifica si la respuesta es correcta y actualiza el puntaje
+      description: Verifica si la respuesta es correcta, actualiza puntaje y racha del usuario
       parameters:
         - in: path
           name: id
@@ -173,37 +112,14 @@ paths:
         content:
           application/json:
             schema:
-              type: object
-              properties:
-                answer:
-                  type: integer
-                  description: Nombre del personaje seleccionado
-                time:
-                  type: integer
-                  description: Tiempo de respuesta
-              required:
-                - answer
+              $ref: '#/components/schemas/AnswerRequest'
       responses:
         '200':
           description: Resultado de la respuesta
           content:
             application/json:
               schema:
-                type: object
-                properties:
-                  success:
-                    type: boolean
-                  result:
-                    type: object
-                    properties:
-                      correct:
-                        type: boolean
-                      score:
-                        type: integer
-                      time:
-                        type: integer
-                      message:
-                        type: string
+                $ref: '#/components/schemas/AnswerResponse'
 
   /quotes/bycharacter/{characterId}:
     get:
@@ -224,21 +140,7 @@ paths:
           content:
             application/json:
               schema:
-                type: object
-                properties:
-                  success:
-                    type: boolean
-                  data:
-                    type: array
-                    items:
-                      type: object
-                      properties:
-                        id:
-                          type: integer
-                        quote:
-                          type: string
-                        character:
-                          type: string
+                $ref: '#/components/schemas/CharacterQuotesResponse'
 
   /characters:
     get:
@@ -252,93 +154,76 @@ paths:
           content:
             application/json:
               schema:
-                type: object
-                properties:
-                  success:
-                    type: boolean
-                  data:
-                    type: array
-                    items:
-                      type: object
-                      properties:
-                        id:
-                          type: integer
-                        name:
-                          type: string
+                $ref: '#/components/schemas/CharactersResponse'
 
+  /gameover:
+    post:
+      tags:
+        - Game
+      summary: Finalizar juego y guardar último puntaje
+      description: Finaliza la sesión de juego, guarda el último puntaje y resetea el puntaje actual
+      responses:
+        '200':
+          description: Juego finalizado exitosamente
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GameOverResponse'
+
+  # ===================
+  # AUTENTICACIÓN
+  # ===================
   /login:
     post:
       tags:
         - Authentication
       summary: Iniciar sesión
-      description: Autenticación de usuario registrado
+      description: Autenticación de usuario registrado con email y contraseña
       requestBody:
         required: true
         content:
           application/json:
             schema:
-              type: object
-              properties:
-                email:
-                  type: string
-                  format: email
-                password:
-                  type: string
+              $ref: '#/components/schemas/LoginRequest'
       responses:
         '200':
           description: Login exitoso
           content:
             application/json:
               schema:
-                type: object
-                properties:
-                  success:
-                    type: boolean
-                  data:
-                    type: object
-                    properties:
-                      user:
-                        type: object
-                        properties:
-                          id:
-                            type: string
-                          email:
-                            type: string
-                          username:
-                            type: string
+                $ref: '#/components/schemas/LoginResponse'
+        '401':
+          description: Credenciales inválidas
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
 
   /register:
     post:
       tags:
         - Authentication
       summary: Registrar nuevo usuario
-      description: Crear una nueva cuenta de usuario
+      description: Crear una nueva cuenta de usuario con validaciones
       requestBody:
         required: true
         content:
           application/json:
             schema:
-              type: object
-              properties:
-                email:
-                  type: string
-                  format: email
-                username:
-                  type: string
-                password:
-                  type: string
+              $ref: '#/components/schemas/RegisterRequest'
       responses:
-        '200':
+        '201':
           description: Registro exitoso
           content:
             application/json:
               schema:
-                type: object
-                properties:
-                  success:
-                    type: boolean
-                  message:
-                    type: string
+                $ref: '#/components/schemas/RegisterResponse'
+        '400':
+          description: Datos inválidos o usuario ya existe
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
 
   /logout:
     post:
@@ -352,19 +237,184 @@ paths:
           content:
             application/json:
               schema:
-                type: object
-                properties:
-                  success:
-                    type: boolean
-                  message:
-                    type: string
+                $ref: '#/components/schemas/SuccessResponse'
 
+  # ===================
+  # OAUTH
+  # ===================
+  /oauth/{provider}:
+    get:
+      tags:
+        - OAuth
+      summary: Iniciar autenticación OAuth
+      description: Redirige al proveedor OAuth para autenticación (Google, GitHub)
+      parameters:
+        - in: path
+          name: provider
+          required: true
+          schema:
+            type: string
+            enum: [google, github]
+          description: Proveedor OAuth
+      responses:
+        '302':
+          description: Redirección al proveedor OAuth
+
+  /oauth/callback:
+    get:
+      tags:
+        - OAuth
+      summary: Callback de OAuth
+      description: Procesa la respuesta del proveedor OAuth y autentica al usuario
+      parameters:
+        - in: query
+          name: code
+          schema:
+            type: string
+          description: Código de autorización del proveedor
+        - in: query
+          name: state
+          schema:
+            type: string
+          description: Estado de la sesión OAuth
+      responses:
+        '302':
+          description: Redirección después de autenticación exitosa
+        '400':
+          description: Error en la autenticación OAuth
+
+  /oauth/link/{provider}:
+    post:
+      tags:
+        - OAuth
+      summary: Vincular proveedor OAuth a cuenta existente
+      description: Permite a un usuario autenticado vincular una cuenta de proveedor OAuth
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: provider
+          required: true
+          schema:
+            type: string
+            enum: [google, github]
+          description: Proveedor OAuth a vincular
+      responses:
+        '200':
+          description: URL de vinculación generada
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OAuthLinkResponse'
+
+  /oauth/link-callback:
+    get:
+      tags:
+        - OAuth
+      summary: Callback de vinculación OAuth
+      description: Procesa la vinculación de proveedor OAuth a cuenta existente
+      responses:
+        '302':
+          description: Redirección después de vinculación
+
+  /oauth/linked-accounts:
+    get:
+      tags:
+        - OAuth
+      summary: Obtener cuentas vinculadas
+      description: Retorna las cuentas OAuth vinculadas al usuario actual
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Lista de cuentas vinculadas
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LinkedAccountsResponse'
+
+  /oauth/unlink/{provider}:
+    delete:
+      tags:
+        - OAuth
+      summary: Desvincular proveedor OAuth
+      description: Desvincula un proveedor OAuth de la cuenta del usuario
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: provider
+          required: true
+          schema:
+            type: string
+            enum: [google, github]
+          description: Proveedor OAuth a desvincular
+      responses:
+        '200':
+          description: Proveedor desvinculado exitosamente
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SuccessResponse'
+
+  # ===================
+  # USUARIO
+  # ===================
+  /user/stats:
+    get:
+      tags:
+        - User
+      summary: Obtener estadísticas del usuario
+      description: Retorna estadísticas completas del usuario incluyendo puntajes, rachas y precisión
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Estadísticas del usuario
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserStatsResponse'
+
+  /user/data:
+    get:
+      tags:
+        - User
+      summary: Obtener datos del usuario
+      description: Retorna información completa del perfil del usuario
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Datos del usuario
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserDataResponse'
+
+  /user/reset-session:
+    post:
+      tags:
+        - User
+      summary: Resetear sesión de juego
+      description: Resetea el puntaje actual y la racha para iniciar una nueva sesión de juego
+      responses:
+        '200':
+          description: Sesión reseteada exitosamente
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SuccessResponse'
+
+  # ===================
+  # ADMINISTRACIÓN
+  # ===================
   /users:
     get:
       tags:
         - Admin
       summary: Obtener lista de usuarios
-      description: Retorna la lista de todos los usuarios registrados
+      description: Retorna la lista de todos los usuarios registrados (solo admins)
       security:
         - bearerAuth: []
       responses:
@@ -373,30 +423,20 @@ paths:
           content:
             application/json:
               schema:
-                type: object
-                properties:
-                  success:
-                    type: boolean
-                  data:
-                    type: array
-                    items:
-                      type: object
-                      properties:
-                        id:
-                          type: string
-                        email:
-                          type: string
-                        username:
-                          type: string
-                        role:
-                          type: string
+                $ref: '#/components/schemas/UsersListResponse'
+        '403':
+          description: Acceso denegado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
 
   /scores:
     get:
       tags:
         - Admin
       summary: Obtener puntajes de usuarios
-      description: Retorna los puntajes de todos los usuarios
+      description: Retorna los puntajes de todos los usuarios (solo admins)
       security:
         - bearerAuth: []
       responses:
@@ -405,31 +445,14 @@ paths:
           content:
             application/json:
               schema:
-                type: object
-                properties:
-                  success:
-                    type: boolean
-                  data:
-                    type: array
-                    items:
-                      type: object
-                      properties:
-                        user_id:
-                          type: string
-                        username:
-                          type: string
-                        score:
-                          type: integer
-                        last_played:
-                          type: string
-                          format: date-time
+                $ref: '#/components/schemas/ScoresListResponse'
 
   /users/{userId}/role:
     patch:
       tags:
         - Admin
       summary: Cambiar rol de un usuario
-      description: Modifica el rol de un usuario específico
+      description: Modifica el rol de un usuario específico (solo admins)
       security:
         - bearerAuth: []
       parameters:
@@ -444,150 +467,14 @@ paths:
         content:
           application/json:
             schema:
-              type: object
-              properties:
-                role:
-                  type: string
-                  description: Nuevo rol del usuario
-                  example: "admin"
+              $ref: '#/components/schemas/ChangeRoleRequest'
       responses:
         '200':
           description: Rol actualizado exitosamente
           content:
             application/json:
               schema:
-                type: object
-                properties:
-                  success:
-                    type: boolean
-                    example: true
-                  message:
-                    type: string
-                    example: "Rol actualizado correctamente"
-
-  /user/stats:
-    get:
-      tags:
-        - Authentication
-      summary: Obtener estadísticas del usuario
-      description: Retorna las estadísticas del usuario autenticado, incluyendo puntajes y respuestas.
-      security:
-        - bearerAuth: []
-      responses:
-        '200':
-          description: Estadísticas del usuario
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  success:
-                    type: boolean
-                  data:
-                    type: object
-                    properties:
-                      currentScore:
-                        type: integer
-                        description: Puntaje actual del usuario
-                      highestScore:
-                        type: integer
-                        description: Mejor puntaje del usuario
-                      lastScore:
-                        type: integer
-                        description: Último puntaje del usuario
-                      answerTime:
-                        type: integer
-                        description: Tiempo promedio de respuesta en milisegundos
-                      correctAnswers:
-                        type: integer
-                        description: Número de respuestas correctas
-                      incorrectAnswers:
-                        type: integer
-                        description: Número de respuestas incorrectas
-                      totalQuestions:
-                        type: integer
-                        description: Total de preguntas respondidas
-                      accuracy:
-                        type: string
-                        description: Precisión en porcentaje
-
-  /user/data:
-    get:
-      tags:
-        - Authentication
-      summary: Obtener datos del usuario
-      description: Retorna la información del usuario autenticado, incluyendo nombre de usuario, etiqueta, email, y más.
-      security:
-        - bearerAuth: []
-      responses:
-        '200':
-          description: Datos del usuario
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  success:
-                    type: boolean
-                  data:
-                    type: object
-                    properties:
-                      id:
-                        type: string
-                        description: ID del usuario
-                      username:
-                        type: string
-                        description: Nombre de usuario
-                      user_tag:
-                        type: string
-                        description: Etiqueta del usuario
-                      email:
-                        type: string
-                        description: Correo electrónico del usuario
-                      image_url:
-                        type: string
-                        description: URL de la imagen del usuario (puede ser nulo)
-                      supabase_user_id:
-                        type: string
-                        description: ID del usuario en Supabase
-                      role:
-                        type: string
-                        description: Rol del usuario
-                      created_at:
-                        type: string
-                        format: date-time
-                        description: Fecha de creación de la cuenta
-
-  /gameover:
-    post:
-      tags:
-        - Game
-      summary: Finalizar el juego y resetear puntaje
-      description: Resetea el puntaje del usuario y devuelve el estado del juego.
-      security:
-        - bearerAuth: []
-      responses:
-        '200':
-          description: Juego finalizado exitosamente
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  success:
-                    type: boolean
-                  message:
-                    type: string
-                    description: Mensaje de confirmación
-                  data:
-                    type: object
-                    properties:
-                      previousScore:
-                        type: integer
-                        description: Puntaje anterior antes del reset
-                      highestScore:
-                        type: integer
-                        description: Mejor puntaje del usuario
+                $ref: '#/components/schemas/SuccessResponse'
 
 components:
   securitySchemes:
@@ -595,9 +482,487 @@ components:
       type: http
       scheme: bearer
       bearerFormat: JWT
+      description: Token JWT obtenido durante el login
+
   schemas:
-    QuoteResponse:
+    # ===================
+    # RESPUESTAS BÁSICAS
+    # ===================
+    SuccessResponse:
       type: object
       properties:
         success:
           type: boolean
+          example: true
+        message:
+          type: string
+          example: "Operación exitosa"
+
+    ErrorResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+          example: false
+        error:
+          type: string
+          example: "Mensaje de error"
+
+    HealthCheckResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+          example: true
+        message:
+          type: string
+          example: "API funcionando correctamente"
+        timestamp:
+          type: string
+          format: date-time
+        version:
+          type: string
+          example: "0.6.2"
+
+    SessionStatusResponse:
+      type: object
+      properties:
+        status:
+          type: string
+          example: "active"
+        data:
+          type: object
+          properties:
+            isAnonymous:
+              type: boolean
+              example: true
+            timeRemaining:
+              type: integer
+              example: 7200
+              description: Tiempo restante en segundos
+            shouldWarn:
+              type: boolean
+              example: false
+            sessionExpires:
+              type: string
+              format: date-time
+
+    # ===================
+    # JUEGO
+    # ===================
+    QuestionsResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+          example: true
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/Question'
+
+    Question:
+      type: object
+      properties:
+        id:
+          type: integer
+          example: 102
+        quote:
+          type: string
+          example: "A darle átomos!"
+        character:
+          type: string
+          example: "Hombre Radioactivo"
+
+    RandomQuoteResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+          example: true
+        data:
+          type: object
+          properties:
+            id:
+              type: integer
+              example: 102
+              description: ID único de la frase
+            quote:
+              type: string
+              example: "A darle átomos!"
+              description: Frase del personaje
+            options:
+              type: array
+              description: Lista de personajes posibles
+              items:
+                $ref: '#/components/schemas/Character'
+              example:
+                - id: 3
+                  name: "Helen Lovejoy"
+                - id: 1
+                  name: "Bart Simpson"
+                - id: 35
+                  name: "Hombre Radioactivo"
+                - id: 2
+                  name: "Homero Simpson"
+
+    Character:
+      type: object
+      properties:
+        id:
+          type: integer
+          example: 1
+        name:
+          type: string
+          example: "Bart Simpson"
+
+    AnswerRequest:
+      type: object
+      required:
+        - answer
+      properties:
+        answer:
+          type: integer
+          description: ID del personaje seleccionado
+          example: 35
+        time:
+          type: integer
+          description: Tiempo de respuesta en milisegundos
+          example: 3500
+
+    AnswerResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+          example: true
+        result:
+          type: object
+          properties:
+            correct:
+              type: boolean
+              example: true
+            score:
+              type: integer
+              example: 4
+              description: Puntos obtenidos por esta respuesta
+            currentStreak:
+              type: integer
+              example: 6
+              description: Racha actual de respuestas correctas
+            time:
+              type: integer
+              example: 3500
+            message:
+              type: string
+              example: "¡Correct!"
+
+    CharacterQuotesResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+          example: true
+        data:
+          type: object
+          properties:
+            character:
+              $ref: '#/components/schemas/Character'
+            totalQuotes:
+              type: integer
+              example: 15
+            quotes:
+              type: array
+              items:
+                type: object
+                properties:
+                  id:
+                    type: integer
+                  quote:
+                    type: string
+
+    CharactersResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+          example: true
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/Character'
+
+    GameOverResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+          example: true
+        message:
+          type: string
+          example: "Juego finalizado"
+        data:
+          type: object
+          properties:
+            previousScore:
+              type: integer
+              example: 45
+            highestScore:
+              type: integer
+              example: 67
+
+    # ===================
+    # AUTENTICACIÓN
+    # ===================
+    LoginRequest:
+      type: object
+      required:
+        - email
+        - password
+      properties:
+        email:
+          type: string
+          format: email
+          example: "usuario@example.com"
+        password:
+          type: string
+          example: "password123"
+
+    LoginResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+          example: true
+        message:
+          type: string
+          example: "Login exitoso"
+        token:
+          type: string
+          example: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
+        data:
+          $ref: '#/components/schemas/UserProfile'
+
+    RegisterRequest:
+      type: object
+      required:
+        - email
+        - username
+        - password
+      properties:
+        email:
+          type: string
+          format: email
+          example: "nuevo@example.com"
+        username:
+          type: string
+          example: "nuevoUsuario"
+        password:
+          type: string
+          example: "password123"
+
+    RegisterResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+          example: true
+        message:
+          type: string
+          example: "Usuario registrado exitosamente"
+        token:
+          type: string
+          example: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
+        data:
+          $ref: '#/components/schemas/UserProfile'
+
+    # ===================
+    # OAUTH
+    # ===================
+    OAuthLinkResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+          example: true
+        linkingUrl:
+          type: string
+          example: "https://accounts.google.com/oauth/authorize?..."
+
+    LinkedAccountsResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+          example: true
+        data:
+          type: array
+          items:
+            type: object
+            properties:
+              provider:
+                type: string
+                example: "google"
+              email:
+                type: string
+                example: "usuario@gmail.com"
+              linkedAt:
+                type: string
+                format: date-time
+
+    # ===================
+    # USUARIO
+    # ===================
+    UserProfile:
+      type: object
+      properties:
+        id:
+          type: string
+          example: "123e4567-e89b-12d3-a456-426614174000"
+        username:
+          type: string
+          example: "usuario123"
+        user_tag:
+          type: string
+          example: "@usuario123"
+        email:
+          type: string
+          example: "usuario@example.com"
+        role:
+          type: string
+          example: "user"
+        created_at:
+          type: string
+          format: date-time
+
+    UserStatsResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+          example: true
+        data:
+          type: object
+          properties:
+            currentScore:
+              type: integer
+              example: 45
+              description: Puntaje actual de la sesión
+            highestScore:
+              type: integer
+              example: 120
+              description: Mejor puntaje histórico
+            lastScore:
+              type: integer
+              example: 67
+              description: Último puntaje guardado
+            answerTime:
+              type: number
+              format: float
+              example: 4.5
+              description: Tiempo promedio de respuesta
+            correctAnswers:
+              type: integer
+              example: 150
+              description: Total de respuestas correctas
+            incorrectAnswers:
+              type: integer
+              example: 23
+              description: Total de respuestas incorrectas
+            highestScoreCorrectAnswers:
+              type: integer
+              example: 30
+              description: Respuestas correctas en la sesión del mejor puntaje
+            bestStreak:
+              type: integer
+              example: 25
+              description: Mejor racha histórica
+            currentStreak:
+              type: integer
+              example: 0
+              description: Racha actual (resetea al entrar al juego)
+            totalQuestions:
+              type: integer
+              example: 173
+              description: Total de preguntas respondidas
+            accuracy:
+              type: string
+              example: "86.71%"
+              description: Precisión en porcentaje
+
+    UserDataResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+          example: true
+        data:
+          allOf:
+            - $ref: '#/components/schemas/UserProfile'
+            - type: object
+              properties:
+                image_url:
+                  type: integer
+                  nullable: true
+                  example: 1
+                  description: ID de imagen de perfil
+                supabase_user_id:
+                  type: string
+                  example: "123e4567-e89b-12d3-a456-426614174000"
+
+    # ===================
+    # ADMINISTRACIÓN
+    # ===================
+    UsersListResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+          example: true
+        data:
+          type: array
+          items:
+            type: object
+            properties:
+              id:
+                type: string
+              username:
+                type: string
+              email:
+                type: string
+              role:
+                type: string
+
+    ScoresListResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+          example: true
+        data:
+          type: array
+          items:
+            type: object
+            properties:
+              user_id:
+                type: string
+              username:
+                type: string
+              score:
+                type: integer
+              highest_score:
+                type: integer
+              last_played:
+                type: string
+                format: date-time
+
+    ChangeRoleRequest:
+      type: object
+      required:
+        - role
+      properties:
+        role:
+          type: string
+          enum: [user, admin]
+          example: "admin"
+          description: Nuevo rol del usuario

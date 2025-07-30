@@ -68,6 +68,20 @@ The application gracefully handles missing services - databases and external ser
 - Token management with automatic refresh
 - Secure cookie-based session persistence
 
+#### API Documentation System
+- **Conditional Documentation**: Environment-aware documentation display using Swagger UI
+- **Development Mode**: Full API documentation with all endpoints (23 routes)
+- **Production Mode**: Limited documentation showing only public, game, and admin routes (10 routes)
+- **Implementation**: `src/routes/docsConditional.js` handles automatic environment detection and serves appropriate OpenAPI specs
+- **Documentation Files**:
+  - `src/routes/apiRoutesDoc.yaml`: Complete OpenAPI 3.0 specification for development
+  - `src/routes/apiRoutesDocProduction.yaml`: Filtered specification for production deployment
+- **Access Points**: 
+  - Main page with embedded documentation
+  - `/api/v1/docs` for standalone Swagger UI
+  - `/api/v1/docs.json` for raw OpenAPI JSON spec
+  - `/api/v1/docs-info` for environment and documentation metadata
+
 ## Testing & Quality
 
 ### Test Strategy
@@ -106,6 +120,13 @@ The trivia content comes from CSV files:
 - **GitHub Actions**: Automated CI/CD pipeline
 
 ## Pending Tasks & Future Development
+
+### Completed Features ✅
+- **Conditional API Documentation**: Environment-aware documentation system implemented with production/development modes
+- **Comprehensive Streak System**: Full tracking for current streaks, best streaks, and session management
+- **OAuth Account Linking**: Users can link/unlink multiple OAuth providers (Google, GitHub)
+- **Anonymous User Redis Support**: Complete Redis-based scoring and session management for guests
+- **Game Session Reset**: Proper score and streak reset functionality across user types
 
 ### Incomplete Features
 - **AI API Route**: Create route for AI integration

@@ -231,6 +231,10 @@
         <div class="score-container">
             <span class="score-label">Puntaje:</span>
             <span class="score-value" id="currentScore">0</span>
+            <span class="streak-container" id="streakContainer" style="margin-left: 20px; display: none;">
+                <span style="font-size: 1.2em;">🔥</span>
+                <span class="score-value" id="currentStreak">0</span>
+            </span>
         </div>
         
         <div class="quote-container">
@@ -357,14 +361,32 @@
                     const currentScore = parseInt(scoreSpan.textContent);
                     scoreSpan.textContent = currentScore + pointsEarned;
                     
+                    // Actualizar racha
+                    const currentStreak = data.result.currentStreak || 0;
+                    const streakContainer = document.getElementById('streakContainer');
+                    const streakSpan = document.getElementById('currentStreak');
+                    
+                    if (currentStreak > 0) {
+                        streakSpan.textContent = currentStreak;
+                        streakContainer.style.display = 'inline-block';
+                        streakContainer.style.animation = 'pulse 0.5s';
+                    }
+                    
                     messageDiv.textContent += ` +${pointsEarned} points!`;
+                    if (currentStreak > 1) {
+                        messageDiv.textContent += ` 🔥 Racha: ${currentStreak}!`;
+                    }
                     
                     setTimeout(() => {
                         getNewQuestion();
-                        loadUserStats();
+                        // No llamar loadUserStats() aquí porque ya actualizamos el score localmente
+                        // y solo causaría una sobrescritura innecesaria
                     }, 1500);
                 } else {
-                    // En caso de respuesta incorrecta
+                    // En caso de respuesta incorrecta - resetear racha
+                    const streakContainer = document.getElementById('streakContainer');
+                    streakContainer.style.display = 'none';
+                    
                     messageDiv.textContent += ' ¡Juego terminado!';
                     
                     // Deshabilitar completamente la interacción con la pregunta actual
@@ -423,11 +445,26 @@
             }
         });
 
-        // También puedes llamar a loadUserStats aquí si deseas cargar las estadísticas al inicio
-        document.addEventListener('DOMContentLoaded', loadUserStats);
+        // Función para resetear la sesión del juego (racha actual)
+        async function resetGameSession() {
+            try {
+                await fetch('/api/v1/user/reset-session', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    }
+                });
+            } catch (error) {
+                console.error('Error resetting game session:', error);
+            }
+        }
 
-        // Cargar primera pregunta al iniciar
-        getNewQuestion();
+        // Inicialización de la página
+        document.addEventListener('DOMContentLoaded', function() {
+            resetGameSession(); // Resetear racha actual al entrar
+            loadUserStats();
+            getNewQuestion();
+        });
     </script>
 </body>
 </html>

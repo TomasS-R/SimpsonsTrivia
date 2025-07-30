@@ -125,8 +125,28 @@ class RedisManager {
             const result = {};
             
             for (const key of keys) {
-                const value = await this.get(key);
-                result[key] = value ? JSON.parse(value) : null;
+                try {
+                    // Solo intentar obtener claves que sean strings (no listas, hashes, etc.)
+                    const type = await this.redisClient.type(key);
+                    if (type === 'string') {
+                        const value = await this.get(key);
+                        // Solo intentar JSON.parse si el valor parece ser JSON
+                        if (value && (value.startsWith('{') || value.startsWith('['))) {
+                            try {
+                                result[key] = JSON.parse(value);
+                            } catch {
+                                result[key] = value; // Si no es JSON válido, usar el valor crudo
+                            }
+                        } else {
+                            result[key] = value;
+                        }
+                    } else {
+                        result[key] = `[${type.toUpperCase()} TYPE]`;
+                    }
+                } catch (keyError) {
+                    console.warn(`Error processing key ${key}:`, keyError.message);
+                    result[key] = '[ERROR]';
+                }
             }
             
             return result;

@@ -5,7 +5,7 @@
   "main": "../src/routes/routes.js",
   "scripts": {
     "test": "jest",
-    "dev": "npm run test && nodemon --env-file=.env src/app.js",
+    "dev": "npm run test && nodemon --watch src --watch .env --ext js,json,ejs,yaml,env --env-file=.env src/app.js",
     "lint": "eslint . --max-warnings 0",
     "start": "node src/app.js"
   },

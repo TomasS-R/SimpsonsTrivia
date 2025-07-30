@@ -526,8 +526,8 @@ async function updateUserScore(userId, score, time) {
             // Si no existe, crea un nuevo registro con los valores iniciales
             await databaseManager.query(`
                 INSERT INTO ${userTables.scores.tableName} 
-                (user_id, score, highest_score, last_score, correct_answers)
-                VALUES ($1, $2, $2, $2, 1)
+                (user_id, score, highest_score, last_score, correct_answers, highest_score_correct_answers, best_streak, current_streak, total_questions)
+                VALUES ($1, $2, $2, $2, 1, 1, 1, 1, 1)
             `, [userId, score]);
             
             if (time) {
@@ -543,10 +543,22 @@ async function updateUserScore(userId, score, time) {
             SET 
                 score = COALESCE(score, 0) + $1,
                 correct_answers = COALESCE(correct_answers, 0) + 1,
+                current_streak = COALESCE(current_streak, 0) + 1,
+                total_questions = COALESCE(total_questions, 0) + 1,
                 highest_score = CASE 
                     WHEN COALESCE(score, 0) + $1 > COALESCE(highest_score, 0) 
                     THEN COALESCE(score, 0) + $1 
                     ELSE highest_score 
+                END,
+                highest_score_correct_answers = CASE 
+                    WHEN COALESCE(score, 0) + $1 > COALESCE(highest_score, 0) 
+                    THEN COALESCE(correct_answers, 0) + 1 
+                    ELSE highest_score_correct_answers 
+                END,
+                best_streak = CASE 
+                    WHEN COALESCE(current_streak, 0) + 1 > COALESCE(best_streak, 0) 
+                    THEN COALESCE(current_streak, 0) + 1 
+                    ELSE best_streak 
                 END
             WHERE user_id = $2
         `, [score, userId]);
@@ -584,22 +596,41 @@ async function updateUserScoreFailed(userId) {
         if (currentScore.rows[0]) {
             const scoreValue = currentScore.rows[0].score;
             
-            // Actualizamos reseteando el score y guardando el último puntaje
-            const result = await databaseManager.query(`
-                UPDATE ${userTables.scores.tableName}
-                SET 
-                    last_score = $1,
-                    score = 0,
-                    highest_score = CASE 
-                        WHEN $1 > highest_score THEN $1 
-                        ELSE highest_score 
-                    END,
-                    incorrect_answers = COALESCE(incorrect_answers, 0) + 1,
-                    updated_at = CURRENT_TIMESTAMP
-                WHERE user_id = $2
-                RETURNING score, last_score, highest_score, incorrect_answers
-            `, [scoreValue, userId]);
-            return result;
+            // Solo actualizar last_score si el score actual es mayor a 0
+            if (scoreValue > 0) {
+                // Actualizamos reseteando el score y guardando el último puntaje
+                const result = await databaseManager.query(`
+                    UPDATE ${userTables.scores.tableName}
+                    SET 
+                        last_score = $1,
+                        score = 0,
+                        current_streak = 0,
+                        highest_score = CASE 
+                            WHEN $1 > highest_score THEN $1 
+                            ELSE highest_score 
+                        END,
+                        incorrect_answers = COALESCE(incorrect_answers, 0) + 1,
+                        total_questions = COALESCE(total_questions, 0) + 1,
+                        updated_at = CURRENT_TIMESTAMP
+                    WHERE user_id = $2
+                    RETURNING score, last_score, highest_score, incorrect_answers
+                `, [scoreValue, userId]);
+                return result;
+            } else {
+                // Si el score es 0, solo actualizar contadores sin cambiar last_score
+                const result = await databaseManager.query(`
+                    UPDATE ${userTables.scores.tableName}
+                    SET 
+                        score = 0,
+                        current_streak = 0,
+                        incorrect_answers = COALESCE(incorrect_answers, 0) + 1,
+                        total_questions = COALESCE(total_questions, 0) + 1,
+                        updated_at = CURRENT_TIMESTAMP
+                    WHERE user_id = $1
+                    RETURNING score, last_score, highest_score, incorrect_answers
+                `, [userId]);
+                return result;
+            }
         }
 
         return null;
@@ -619,7 +650,10 @@ async function getUserStats(userId) {
                 COALESCE(avg_answer, 0) as avg_answer,
                 COALESCE(correct_answers, 0) as correct_answers,
                 COALESCE(incorrect_answers, 0) as incorrect_answers,
-                (COALESCE(correct_answers, 0) + COALESCE(incorrect_answers, 0)) as total_questions
+                COALESCE(highest_score_correct_answers, 0) as highest_score_correct_answers,
+                COALESCE(best_streak, 0) as best_streak,
+                COALESCE(current_streak, 0) as current_streak,
+                COALESCE(total_questions, 0) as total_questions
             FROM ${userTables.scores.tableName}
             WHERE user_id = $1
         `, [userId]);
@@ -631,6 +665,9 @@ async function getUserStats(userId) {
             avg_answer: 0,
             correct_answers: 0,
             incorrect_answers: 0,
+            highest_score_correct_answers: 0,
+            best_streak: 0,
+            current_streak: 0,
             total_questions: 0
         };
     } catch (e) {
@@ -757,6 +794,20 @@ async function getUserByEmail(email) {
   }
 }
 
+async function resetGameSession(userId) {
+    try {
+        const result = await databaseManager.query(`
+            UPDATE ${userTables.scores.tableName}
+            SET current_streak = 0, score = 0
+            WHERE user_id = $1
+        `, [userId]);
+        return result;
+    } catch (error) {
+        console.error('Error resetting game session:', error);
+        throw error;
+    }
+}
+
 module.exports = {
     createTables,
     verifyBucket,
@@ -782,5 +833,6 @@ module.exports = {
     getUserStats,
     getUserData,
     createUserOAuth,
-    getUserByEmail
+    getUserByEmail,
+    resetGameSession
 }

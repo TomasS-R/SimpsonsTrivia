@@ -1,0 +1,488 @@
+openapi: 3.0.0
+servers:
+  - description: API Simpsons Trivia Flyio server
+    url: https://simpsons-trivia.fly.dev/api/v1
+  - description: API Simpsons Trivia localhost
+    url: http://localhost:3001/api/v1
+
+info:
+  description: API para el juego de trivia de Los Simpson - Versión limitada para producción
+  version: "0.6.2"
+  title: Simpsons Trivia API
+  contact:
+    email: tomas.saintromain@gmail.com
+  license:
+    name: MIT
+    url: 'https://opensource.org/licenses/MIT'
+
+tags:
+  - name: Public
+    description: Endpoints públicos que no requieren autenticación
+  - name: Game
+    description: Endpoints relacionados con el juego de trivia
+  - name: Admin
+    description: Endpoints protegidos solo para administradores
+
+paths:
+  # ===================
+  # ENDPOINTS PÚBLICOS
+  # ===================
+  /healthcheck:
+    get:
+      tags:
+        - Public
+      summary: Verificar estado de la API
+      description: Verifica si la API está funcionando correctamente y muestra información del sistema
+      responses:
+        '200':
+          description: Estado de la API
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HealthCheckResponse'
+
+  # ===================
+  # ENDPOINTS DE JUEGO
+  # ===================
+  /quote/questions:
+    get:
+      tags:
+        - Game
+      summary: Obtener preguntas de trivia
+      description: Retorna una lista de preguntas disponibles para el juego de trivia
+      responses:
+        '200':
+          description: Lista de preguntas
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/QuestionsResponse'
+
+  /quote/random:
+    get:
+      tags:
+        - Game
+      summary: Obtener pregunta aleatoria
+      description: Retorna una frase aleatoria con opciones de personajes para responder
+      responses:
+        '200':
+          description: Pregunta aleatoria con opciones
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RandomQuoteResponse'
+
+  /quotes/{id}/answer:
+    post:
+      tags:
+        - Game
+      summary: Enviar respuesta a una pregunta
+      description: Verifica si la respuesta es correcta, actualiza puntaje y racha del usuario
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+          description: ID de la pregunta
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AnswerRequest'
+      responses:
+        '200':
+          description: Resultado de la respuesta
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AnswerResponse'
+
+  /quotes/bycharacter/{characterId}:
+    get:
+      tags:
+        - Game
+      summary: Obtener frases por personaje
+      description: Retorna todas las frases de un personaje específico
+      parameters:
+        - in: path
+          name: characterId
+          required: true
+          schema:
+            type: integer
+          description: ID del personaje
+      responses:
+        '200':
+          description: Frases del personaje
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CharacterQuotesResponse'
+
+  /characters:
+    get:
+      tags:
+        - Game
+      summary: Obtener lista de personajes
+      description: Retorna la lista de todos los personajes disponibles
+      responses:
+        '200':
+          description: Lista de personajes
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CharactersResponse'
+
+  /gameover:
+    post:
+      tags:
+        - Game
+      summary: Finalizar juego y guardar último puntaje
+      description: Finaliza la sesión de juego, guarda el último puntaje y resetea el puntaje actual
+      responses:
+        '200':
+          description: Juego finalizado exitosamente
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GameOverResponse'
+
+  # ===================
+  # ADMINISTRACIÓN
+  # ===================
+  /users:
+    get:
+      tags:
+        - Admin
+      summary: Obtener lista de usuarios
+      description: Retorna la lista de todos los usuarios registrados (solo admins)
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Lista de usuarios
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UsersListResponse'
+        '403':
+          description: Acceso denegado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /scores:
+    get:
+      tags:
+        - Admin
+      summary: Obtener puntajes de usuarios
+      description: Retorna los puntajes de todos los usuarios (solo admins)
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Lista de puntajes
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ScoresListResponse'
+
+  /users/{userId}/role:
+    patch:
+      tags:
+        - Admin
+      summary: Cambiar rol de un usuario
+      description: Modifica el rol de un usuario específico (solo admins)
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: userId
+          required: true
+          schema:
+            type: string
+          description: ID del usuario
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ChangeRoleRequest'
+      responses:
+        '200':
+          description: Rol actualizado exitosamente
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SuccessResponse'
+
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+      description: Token JWT obtenido durante el login
+
+  schemas:
+    # ===================
+    # RESPUESTAS BÁSICAS
+    # ===================
+    SuccessResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+          example: true
+        message:
+          type: string
+          example: "Operación exitosa"
+
+    ErrorResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+          example: false
+        error:
+          type: string
+          example: "Mensaje de error"
+
+    HealthCheckResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+          example: true
+        message:
+          type: string
+          example: "API funcionando correctamente"
+        timestamp:
+          type: string
+          format: date-time
+        version:
+          type: string
+          example: "0.6.2"
+
+    # ===================
+    # JUEGO
+    # ===================
+    QuestionsResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+          example: true
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/Question'
+
+    Question:
+      type: object
+      properties:
+        id:
+          type: integer
+          example: 102
+        quote:
+          type: string
+          example: "A darle átomos!"
+        character:
+          type: string
+          example: "Hombre Radioactivo"
+
+    RandomQuoteResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+          example: true
+        data:
+          type: object
+          properties:
+            id:
+              type: integer
+              example: 102
+              description: ID único de la frase
+            quote:
+              type: string
+              example: "A darle átomos!"
+              description: Frase del personaje
+            options:
+              type: array
+              description: Lista de personajes posibles
+              items:
+                $ref: '#/components/schemas/Character'
+              example:
+                - id: 3
+                  name: "Helen Lovejoy"
+                - id: 1
+                  name: "Bart Simpson"
+                - id: 35
+                  name: "Hombre Radioactivo"
+                - id: 2
+                  name: "Homero Simpson"
+
+    Character:
+      type: object
+      properties:
+        id:
+          type: integer
+          example: 1
+        name:
+          type: string
+          example: "Bart Simpson"
+
+    AnswerRequest:
+      type: object
+      required:
+        - answer
+      properties:
+        answer:
+          type: integer
+          description: ID del personaje seleccionado
+          example: 35
+        time:
+          type: integer
+          description: Tiempo de respuesta en milisegundos
+          example: 3500
+
+    AnswerResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+          example: true
+        result:
+          type: object
+          properties:
+            correct:
+              type: boolean
+              example: true
+            score:
+              type: integer
+              example: 4
+              description: Puntos obtenidos por esta respuesta
+            currentStreak:
+              type: integer
+              example: 6
+              description: Racha actual de respuestas correctas
+            time:
+              type: integer
+              example: 3500
+            message:
+              type: string
+              example: "¡Correct!"
+
+    CharacterQuotesResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+          example: true
+        data:
+          type: object
+          properties:
+            character:
+              $ref: '#/components/schemas/Character'
+            totalQuotes:
+              type: integer
+              example: 15
+            quotes:
+              type: array
+              items:
+                type: object
+                properties:
+                  id:
+                    type: integer
+                  quote:
+                    type: string
+
+    CharactersResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+          example: true
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/Character'
+
+    GameOverResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+          example: true
+        message:
+          type: string
+          example: "Juego finalizado"
+        data:
+          type: object
+          properties:
+            previousScore:
+              type: integer
+              example: 45
+            highestScore:
+              type: integer
+              example: 67
+
+    # ===================
+    # ADMINISTRACIÓN
+    # ===================
+    UsersListResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+          example: true
+        data:
+          type: array
+          items:
+            type: object
+            properties:
+              id:
+                type: string
+              username:
+                type: string
+              email:
+                type: string
+              role:
+                type: string
+
+    ScoresListResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+          example: true
+        data:
+          type: array
+          items:
+            type: object
+            properties:
+              user_id:
+                type: string
+              username:
+                type: string
+              score:
+                type: integer
+              highest_score:
+                type: integer
+              last_played:
+                type: string
+                format: date-time
+
+    ChangeRoleRequest:
+      type: object
+      required:
+        - role
+      properties:
+        role:
+          type: string
+          enum: [user, admin]
+          example: "admin"
+          description: Nuevo rol del usuario

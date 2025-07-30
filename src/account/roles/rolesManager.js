@@ -1,6 +1,7 @@
 class RoleManager {
   constructor() {
     this.roles = {
+      ANON: 'anon',
       USER: 'user',
       ADMIN: 'admin',
       MODERATOR: 'moderator',
@@ -8,6 +9,7 @@ class RoleManager {
     };
 
     this.roleHierarchy = {
+      [this.roles.ANON]: 0,
       [this.roles.USER]: 1,
       [this.roles.MODERATOR]: 2,
       [this.roles.ADMIN]: 3,

@@ -110,12 +110,133 @@
             max-width: 1200px;
         }
         
+        .docs-info {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 20px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+        
+        .docs-info h3 {
+            margin: 0 0 10px 0;
+            font-size: 1.3em;
+        }
+        
+        .docs-info p {
+            margin: 0;
+            opacity: 0.9;
+        }
+        
+        .environment-badge {
+            display: inline-block;
+            padding: 5px 15px;
+            border-radius: 20px;
+            font-size: 0.9em;
+            font-weight: bold;
+            text-transform: uppercase;
+            margin-left: 10px;
+        }
+        
+        .dev-badge {
+            background: #28a745;
+            color: white;
+        }
+        
+        .prod-badge {
+            background: #dc3545;
+            color: white;
+        }
+        
         .donut {
             display: inline-block;
             margin: 0 5px;
             font-size: 1.2em;
         }
         
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.7);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+        }
+        
+        .modal-content {
+            background-color: white;
+            border-radius: 15px;
+            padding: 30px;
+            max-width: 500px;
+            margin: 20px;
+            text-align: center;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.3);
+            animation: fadeIn 0.3s ease;
+        }
+        
+        @keyframes fadeIn {
+            from {opacity: 0; transform: scale(0.9);}
+            to {opacity: 1; transform: scale(1);}
+        }
+        
+        .modal-content h3 {
+            color: var(--simpson-red);
+            margin-bottom: 20px;
+            font-size: 1.5em;
+        }
+        
+        .modal-content p {
+            line-height: 1.6;
+            margin-bottom: 25px;
+            color: #555;
+            font-size: 1.1em;
+        }
+        
+        .modal-buttons {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+        
+        .modal-button {
+            padding: 12px 25px;
+            border: none;
+            border-radius: 25px;
+            font-size: 1.1em;
+            font-weight: bold;
+            cursor: pointer;
+            transition: transform 0.2s, box-shadow 0.2s;
+            min-width: 120px;
+        }
+        
+        .btn-continue {
+            background-color: var(--simpson-green);
+            color: white;
+        }
+        
+        .btn-continue:hover {
+            background-color: #5ca832;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+        }
+        
+        .btn-register {
+            background-color: var(--simpson-blue);
+            color: white;
+        }
+        
+        .btn-register:hover {
+            background-color: #2d7bc6;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+        }
+
         @media (max-width: 768px) {
             h1 {
                 font-size: 2.5em;
@@ -129,6 +250,15 @@
             .button {
                 width: 80%;
             }
+            
+            .modal-content {
+                margin: 10px;
+                padding: 20px;
+            }
+            
+            .modal-buttons {
+                flex-direction: column;
+            }
         }
     </style>
 </head>
@@ -138,8 +268,21 @@
     </div>
     
     <% if (isDevelopment) { %>
+    <!-- Modal de advertencia para usuarios anónimos -->
+    <div id="guestWarningModal" class="modal-overlay" style="display: none;">
+        <div class="modal-content">
+            <h3>⚠️ Usuario Invitado</h3>
+            <p>Estás por jugar como usuario invitado. Tu resultado <strong>no se guardará</strong> si no te registras o inicias sesión.</p>
+            <p>¿Deseas continuar como invitado o prefieres registrarte/iniciar sesión?</p>
+            <div class="modal-buttons">
+                <button class="modal-button btn-continue" onclick="continueAsGuest()">Continuar como invitado</button>
+                <button class="modal-button btn-register" onclick="goToRegister()">Registrarse/Iniciar sesión</button>
+            </div>
+        </div>
+    </div>
+
     <div class="buttons-container">
-        <button class="button play-button" onclick="window.location.href='/api/v1/play'">¡Jugar Trivia!</button>
+        <button class="button play-button" onclick="checkUserAndPlay()">¡Jugar Trivia!</button>
         <% if (isAuthenticated) { %>
             <button class="button account-button" onclick="window.location.href='/api/v1/profile'">Mi Perfil</button>
         <% } else { %>
@@ -149,7 +292,71 @@
     <% } %>
     
     <div class="api-docs">
+        <div class="docs-info">
+            <h3>📖 Documentación de la API 
+                <span class="environment-badge <%= isDevelopment ? 'dev-badge' : 'prod-badge' %>">
+                    <%= isDevelopment ? 'Desarrollo' : 'Producción' %>
+                </span>
+            </h3>
+            <p>
+                <% if (isDevelopment) { %>
+                    Documentación completa disponible - Todas las rutas y funcionalidades
+                <% } else { %>
+                    Documentación limitada - Solo rutas públicas, de juego y administrativas
+                <% } %>
+            </p>
+        </div>
         <div id="swagger-ui"></div>
     </div>
+
+    <script>
+        // Función para verificar si el usuario es anónimo
+        async function checkUserAuthentication() {
+            try {
+                const response = await fetch('/api/v1/session-status');
+                const data = await response.json();
+                
+                // Si la respuesta indica que el usuario es anónimo o no autenticado
+                if (!data.success || data.data?.isAnonymous !== false) {
+                    return false; // Usuario anónimo
+                }
+                return true; // Usuario autenticado
+            } catch (error) {
+                console.log('User is anonymous');
+                return false; // Asumir anónimo si hay error
+            }
+        }
+
+        // Función que se ejecuta cuando el usuario hace clic en "Jugar"
+        async function checkUserAndPlay() {
+            const isAuthenticated = await checkUserAuthentication();
+            
+            if (!isAuthenticated) {
+                // Mostrar modal de advertencia para usuarios anónimos
+                document.getElementById('guestWarningModal').style.display = 'flex';
+            } else {
+                // Usuario autenticado, ir directamente al juego
+                window.location.href = '/api/v1/play';
+            }
+        }
+
+        // Funciones del modal
+        function continueAsGuest() {
+            document.getElementById('guestWarningModal').style.display = 'none';
+            window.location.href = '/api/v1/play';
+        }
+
+        function goToRegister() {
+            window.location.href = '/api/v1/account';
+        }
+
+        // Cerrar modal si se hace clic fuera de él
+        document.addEventListener('click', function(event) {
+            const modal = document.getElementById('guestWarningModal');
+            if (event.target === modal) {
+                modal.style.display = 'none';
+            }
+        });
+    </script>
 </body>
 </html>

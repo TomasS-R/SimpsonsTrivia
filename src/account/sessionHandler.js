@@ -137,21 +137,32 @@ const handleUserSession = async (req, res, next) => {
   }
 };
 
-// Enviar mensaje con el estado de la sesión si esta por expirar
+// Enviar mensaje con el estado de la sesión si esta por expirar - SIN CREAR usuarios anónimos
 const sessionStatusController = async (req, res) => {
   try {
-    // Intentar obtener usuario del token
-    let user;
+    // Solo verificar si hay token, NO crear uno nuevo
+    let user = null;
+    let isAuthenticated = false;
+    
     if (req.cookies?.accessToken) {
-      const { data: { user: sessionUser } } = await supabaseConection.auth.getUser(
-        req.cookies.accessToken
-      );
-      user = sessionUser;
+      try {
+        const { data: { user: sessionUser } } = await supabaseConection.auth.getUser(
+          req.cookies.accessToken
+        );
+        user = sessionUser;
+        
+        // Verificar si es un usuario registrado real
+        if (user && !user.is_anonymous) {
+          isAuthenticated = true;
+        }
+      } catch (error) {
+        console.log('Token inválido en session-status:', error.message);
+      }
     }
 
-    if (!user || user.is_anonymous) {
-      // Solo verificar TTL si hay un usuario anónimo
-      if (user?.id) {
+    if (!isAuthenticated) {
+      // Usuario no autenticado o anónimo
+      if (user?.id && user.is_anonymous) {
         const redisKey = `anonymous:${user.id}`;
         const ttl = await redisManager.ttl(redisKey);
 
@@ -159,6 +170,7 @@ const sessionStatusController = async (req, res) => {
           status: 'success',
           data: {
             isAnonymous: true,
+            isAuthenticated: false,
             timeRemaining: ttl,
             shouldWarn: ttl <= (15 * 60), // 15 minutos
             sessionExpires: new Date(Date.now() + (ttl * 1000)).toISOString()
@@ -178,7 +190,8 @@ const sessionStatusController = async (req, res) => {
         status: 'success',
         data: {
           isAnonymous: false,
-          isAuthenticated: true
+          isAuthenticated: true,
+          userId: user.id
         }
       });
     }

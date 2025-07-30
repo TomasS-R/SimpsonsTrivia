@@ -142,7 +142,7 @@ dist
 tasksProject.md
 
 # Obtain quotes
-frases.csv
+/scrapQuotes/*
 
 # No ignorar este archivo
 !config.js

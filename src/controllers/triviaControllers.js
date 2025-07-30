@@ -6,7 +6,6 @@ const { supabaseConection } = require('../account/authSupabase');
 const { createClient } = require('@supabase/supabase-js');
 const config = require('../../config');
 const queriesRedis = require('../dbFiles/queriesRedis');
-const redisManager = require('../dbFiles/redisManager');
 
 // Funcion para registrar un usuario
 async function registerUserReq (req, res) {
@@ -569,11 +568,14 @@ const supabaseAuth = async (req, res, next) => {
   
   // Si no hay token, configurar como usuario anónimo y continuar
   if (!token) {
-    req.user = { 
-      isAnonymous: true,
-      id: req.sessionID || 'anonymous-' + Math.random().toString(36).substring(2, 15)
-    };
-    console.log('No token found, setting anonymous user');
+    // Si ya hay un usuario anónimo configurado, no crear otro
+    if (!req.user || !req.user.isAnonymous) {
+      req.user = { 
+        isAnonymous: true,
+        role: 'anon',
+        id: req.sessionID || 'anonymous-' + Math.random().toString(36).substring(2, 15)
+      };
+    }
     return next();
   }
   
@@ -582,11 +584,14 @@ const supabaseAuth = async (req, res, next) => {
 
     if (error || !data) {
       // Token inválido, tratar como usuario anónimo
-      req.user = { 
-        isAnonymous: true,
-        id: req.sessionID || 'anonymous-' + Math.random().toString(36).substring(2, 15)
-      };
-      console.log('Invalid token, setting anonymous user');
+      if (!req.user || !req.user.isAnonymous) {
+        req.user = { 
+          isAnonymous: true,
+          role: 'anon',
+          id: req.sessionID || 'anonymous-' + Math.random().toString(36).substring(2, 15)
+        };
+        console.log('Invalid token, setting anonymous user');
+      }
       return next();
     }
 
@@ -613,25 +618,51 @@ const supabaseAuth = async (req, res, next) => {
       next();
     } catch (dbError) {
       console.warn('Error procesando usuario:', dbError.message);
-      req.user = { 
-        isAnonymous: true,
-        id: req.sessionID || 'anonymous-' + Math.random().toString(36).substring(2, 15)
-      };
+      if (!req.user || !req.user.isAnonymous) {
+        req.user = { 
+          isAnonymous: true,
+          role: 'anon',
+          id: req.sessionID || 'anonymous-' + Math.random().toString(36).substring(2, 15)
+        };
+      }
       next();
     }
   } catch (error) {
     console.error('Error en supabaseAuth:', error);
-    req.user = { 
-      isAnonymous: true,
-      id: req.sessionID || 'anonymous-' + Math.random().toString(36).substring(2, 15)
-    };
+    if (!req.user || !req.user.isAnonymous) {
+      req.user = { 
+        isAnonymous: true,
+        role: 'anon',
+        id: req.sessionID || 'anonymous-' + Math.random().toString(36).substring(2, 15)
+      };
+    }
     next();
   }
 };
 
 const logoutUser = async (req, res) => {
   try {
-    console.log('Cerrando sesión para usuario:', req.user?.id || 'desconocido');
+    // Intentar obtener información del usuario de múltiples fuentes
+    let userInfo = 'usuario desconocido';
+    let isAnonymous = false;
+    
+    if (req.user) {
+      // Verificar si es anónimo
+      isAnonymous = req.user.isAnonymous || false;
+      
+      // Extraer información del usuario según la estructura
+      if (req.user.user?.email) {
+        userInfo = req.user.user.email;
+      } else if (req.user.user?.id) {
+        userInfo = req.user.user.id;
+      } else if (req.user.dataUser?.id) {
+        userInfo = req.user.dataUser.id;
+      } else if (req.user.id) {
+        userInfo = req.user.id;
+      }
+    }
+    
+    console.log(`Cerrando sesión para ${isAnonymous ? 'usuario anónimo' : 'usuario registrado'}: ${userInfo}`);
     
     // Primero limpiar cookies
     res.clearCookie('accessToken');
@@ -645,8 +676,13 @@ const logoutUser = async (req, res) => {
       return res.status(400).json({ success: false, error: error.message });
     }
     
-    console.log('Sesión cerrada correctamente');
-    return res.status(200).json({ success: true, message: 'Logout successful' });
+    console.log(`Sesión cerrada correctamente para: ${userInfo}`);
+    return res.status(200).json({ 
+      success: true, 
+      message: 'Logout successful',
+      user: userInfo,
+      wasAnonymous: isAnonymous
+    });
   } catch (error) {
     console.error('Error en logoutUser:', error);
     return res.status(500).json({ success: false, error: 'Internal server error' });
@@ -691,6 +727,7 @@ async function answerQuestion(req, res) {
 
     const isCorrect = await queries.checkAnswer(quoteId, answer);
     let scoreToAdd = 0;
+    let currentStreak = 0;
 
     if (isCorrect) {
       scoreToAdd = calculateScore(time);
@@ -699,16 +736,26 @@ async function answerQuestion(req, res) {
         const userID = user.id
         await queries.updateUserScore(userID, scoreToAdd, time);
         await queries.lastScoreUser(userID);
+        
+        // Obtener la racha actual después de la actualización
+        const stats = await queries.getUserStats(userID);
+        currentStreak = stats.current_streak;
       } else {
         const sessionId = user?.id || req.sessionID;
-        await queriesRedis.updateUserScore(sessionId, scoreToAdd);
+        const result = await queriesRedis.updateUserScore(sessionId, scoreToAdd);
+        currentStreak = result.currentStreak;
         (async () => {
-          await redisManager.debugRedis('*');
+          await queriesRedis.getTriviaKeys();
         })();
       }
     } else {
       if (user && !user.isAnonymous) {
         await queries.updateUserScoreFailed(user.id);
+        currentStreak = 0; // Se resetea la racha al fallar
+      } else {
+        const sessionId = user?.id || req.sessionID;
+        await queriesRedis.updateUserScoreFailed(sessionId);
+        currentStreak = 0; // Se resetea la racha al fallar
       }
     }
 
@@ -717,6 +764,7 @@ async function answerQuestion(req, res) {
       result: {
         correct: isCorrect,
         score: isCorrect ? scoreToAdd : 0,
+        currentStreak: currentStreak,
         time: time,
         message: isCorrect ? '¡Correct!' : '¡Incorrect! Game over!'
       }
@@ -733,8 +781,17 @@ async function answerQuestion(req, res) {
 
 async function getUserStats(req, res) {
   try {
-    const userId = req.user.user.id;
-    const stats = await queries.getUserStats(userId);
+    let stats;
+    
+    if (req.user && !req.user.isAnonymous) {
+      // Usuario registrado - usar PostgreSQL
+      const userId = req.user.user.id;
+      stats = await queries.getUserStats(userId);
+    } else {
+      // Usuario anónimo - usar Redis
+      const sessionId = req.user?.id || req.sessionID;
+      stats = await queriesRedis.getUserStats(sessionId);
+    }
 
     const accuracy = stats.total_questions > 0
       ? ((stats.correct_answers / stats.total_questions) * 100).toFixed(2)
@@ -749,6 +806,9 @@ async function getUserStats(req, res) {
         answerTime: stats.avg_answer,
         correctAnswers: stats.correct_answers,
         incorrectAnswers: stats.incorrect_answers,
+        highestScoreCorrectAnswers: stats.highest_score_correct_answers,
+        bestStreak: stats.best_streak,
+        currentStreak: stats.current_streak,
         totalQuestions: stats.total_questions,
         accuracy: `${accuracy}%`
       }
@@ -758,6 +818,31 @@ async function getUserStats(req, res) {
     res.status(500).json({
       success: false,
       error: 'Error retrieving user statistics'
+    });
+  }
+}
+
+async function resetGameSession(req, res) {
+  try {
+    if (req.user && !req.user.isAnonymous) {
+      // Usuario registrado - resetear en PostgreSQL
+      const userId = req.user.user.id;
+      await queries.resetGameSession(userId);
+    } else {
+      // Usuario anónimo - resetear en Redis
+      const sessionId = req.user?.id || req.sessionID;
+      await queriesRedis.resetGameSession(sessionId);
+    }
+
+    res.json({
+      success: true,
+      message: 'Game session reset successfully'
+    });
+  } catch (error) {
+    console.error('Error in resetGameSession:', error);
+    res.status(500).json({
+      success: false,
+      error: 'Error resetting game session'
     });
   }
 }
@@ -1148,6 +1233,7 @@ module.exports = {
   protectedRoute,
   answerQuestion,
   getUserStats,
+  resetGameSession,
   userDataProfile,
   gameOverRefreshPage,
   processOAuthToken,

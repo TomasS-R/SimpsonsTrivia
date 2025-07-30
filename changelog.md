@@ -1,6 +1,6 @@
 # Changelog
 
-## Version 0.6.2 (en proceso): - 2025- - -
+## Version 0.6.2: - 2025-07-29 -
 
 ### Agregado:
    - Se realizo la configuracion, adicion y creacion de un bucket storage para almacenar las imagenes de los usuarios en el archivo [queries](./src/dbFiles/queries.js) y se agrego la ejecucion en [app](./src/app.js).
@@ -10,6 +10,15 @@
    - Linking de las cuentas de usuarios de terceros OAuth google y github un usuario puede linkear sus cuentas
    - Nuevas rutas de linking accounts en [routes](./src/routes/routes.js)
    - Nuevo archivo para usar CLAUDE code en el proyecto.
+   - Nuevos campos en la tabla scores: `best_streak` (mejor racha histórica), `current_streak` (racha actual de sesión) y mantenimiento del campo `total_questions` en [userTables](./src/dbFiles/creatingTables/userTables.js).
+   - Sistema completo de tracking de rachas para usuarios registrados y anónimos con persistencia en PostgreSQL y Redis respectivamente.
+   - Función `resetGameSession()` en [queriesRedis](./src/dbFiles/queriesRedis.js) y [queries](./src/dbFiles/queries.js) para resetear puntaje y racha al iniciar nueva sesión de juego.
+   - Múltiples funciones Redis expandidas en [queriesRedis](./src/dbFiles/queriesRedis.js): `updateUserScoreFailed()`, `getCurrentStreak()`, `getBestStreak()`, `getHighestScore()`, `getLastScore()`, `getUserStats()`, `deleteAnonymousUser()`, `getTriviaKeys()` para manejo completo de usuarios anónimos.
+   - Nueva ruta `POST /api/v1/user/reset-session` en [routes](./src/routes/routes.js) para resetear sesión de juego.
+   - Indicador visual de racha con emoji 🔥 en la interfaz del juego [trivia](./src/views/trivia.ejs).
+   - Sistema de documentación condicional de la API implementado en [docsConditional](./src/routes/docsConditional.js) que muestra documentación completa en desarrollo y limitada en producción.
+   - Archivo de documentación limitada [apiRoutesDocProduction](./src/routes/apiRoutesDocProduction.yaml) que contiene solo rutas públicas, de juego y administrativas para entorno de producción.
+   - Rol `ANON` agregado al sistema de roles en [rolesManager](./src/account/roles/rolesManager.js) con jerarquía 0 para usuarios anónimos, permitiendo manejo consistente de permisos.
 
 ### Modificado:
    - Se arreglo el error "Error obtain user role: Error: Role not found" que ocurria cuando un usuario anonimo empezaba a jugar. El error se encontraba en la funcion supabaseAuth del archivo [triviaControllers](./src/controllers/triviaControllers.js). Se modifico la funcion para manejar correctamente los usuarios anonimos y evitar el error de rol no encontrado.
@@ -21,6 +30,22 @@
    - Mejorada la interfaz de los archivos [ejs](./src/views/).
    - Restructurado la seccion de OAuth ahora se encuentra la informacion de los proveedores en [oauthSystem](./src/account/oauthSystem/).
    - Modificado el README con detalles de configuracion y otras mejoras.
+   - Mejorado el sistema de gestión de puntajes para usuarios anónimos en [queriesRedis](./src/dbFiles/queriesRedis.js) con namespacing de claves Redis usando prefijo `trivia:` para evitar conflictos con otras aplicaciones.
+   - Corregido el manejo de tipos de datos Redis en [redisManager](./src/dbFiles/redisManager.js) función `getAllKeys()` para evitar errores `WRONGTYPE Operation against a key holding the wrong kind of value`.
+   - Arreglado el reseteo de puntaje en usuarios anónimos cambiando de `set` a `incrby` para correcta persistencia de scores en Redis.
+   - Optimizada la interfaz de usuario en [trivia](./src/views/trivia.ejs) eliminando llamadas innecesarias a `loadUserStats()` que sobrescribían el puntaje incrementado localmente.
+   - Mejorado el manejo de rachas y puntajes con lógica específica para preservar `last_score` solo cuando es mayor a 0 en [triviaControllers](./src/controllers/triviaControllers.js).
+   - Actualizada la función `getUserStats()` en [triviaControllers](./src/controllers/triviaControllers.js) para soportar correctamente tanto usuarios registrados como anónimos.
+   - Mejorada la interfaz principal [index](./src/views/index.ejs) con indicadores visuales de entorno (desarrollo/producción) y mensajes informativos sobre el alcance de la documentación.
+   - Reescrito completamente el archivo [apiRoutesDoc](./src/routes/apiRoutesDoc.yaml) con documentación OpenAPI 3.0 comprensiva, schemas detallados y ejemplos para todos los endpoints actuales.
+   - Optimizado el sistema de rutas en [routes](./src/routes/routes.js) para integrar el sistema de documentación condicional y detectar automáticamente el entorno de ejecución.
+   - Corregido problema de duplicación de usuarios anónimos modificando el flujo en [index](./src/views/index.ejs) para usar `/session-status` en lugar de `/user/stats` al verificar autenticación, evitando creación innecesaria de usuarios.
+   - Solucionado error de rol `Cannot read properties of undefined (reading 'role')` en [roleMiddleware](./src/account/roles/roleMiddleware.js) agregando manejo específico para usuarios anónimos con optional chaining y validaciones de estructura.
+   - Mejorado el sistema de logout en [triviaControllers](./src/controllers/triviaControllers.js) agregando middleware `sessionHandler.verifyUserSession` a la ruta de logout para obtener información correcta del usuario que cierra sesión.
+   - Optimizado `sessionStatusController` en [sessionHandler](./src/account/sessionHandler.js) para que NO cree usuarios anónimos innecesariamente, solo verifique si existen.
+   - Actualizada ruta `/play` en [routes](./src/routes/routes.js) para usar `handleUserSession` en lugar de `verifyUserSession`, asegurando creación de un solo usuario anónimo cuando sea necesario.
+   - Mejorada integración de limpieza de Redis en [deleteUsersAuth](./src/account/oauthSystem/deleteUsersAuth.js) para eliminar datos de usuarios anónimos de Redis antes de eliminarlos de Supabase Auth.
+   - Ahora se detectan los cambios del archivo env y se reinicia el proyecto automaticamente.
 
 ## Version 0.6.1: - 2024-12-26 -
 

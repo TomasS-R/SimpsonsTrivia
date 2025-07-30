@@ -346,6 +346,14 @@
                     <div class="stat-value" id="lastScore">0</div>
                 </div>
                 <div class="stat-card">
+                    <div class="stat-label">Respuestas Correctas (Mejor)</div>
+                    <div class="stat-value" id="highestScoreCorrectAnswers">0</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-label">Mejor Racha</div>
+                    <div class="stat-value" id="bestStreak">0</div>
+                </div>
+                <div class="stat-card">
                     <div class="stat-label">Respuestas Correctas</div>
                     <div class="stat-value" id="correctAnswers">0</div>
                 </div>
@@ -444,6 +452,8 @@
                 if (data.success) {
                     document.getElementById('highestScore').textContent = data.data.highestScore || 0;
                     document.getElementById('lastScore').textContent = data.data.lastScore || 0;
+                    document.getElementById('highestScoreCorrectAnswers').textContent = data.data.highestScoreCorrectAnswers || 0;
+                    document.getElementById('bestStreak').textContent = data.data.bestStreak || 0;
                     document.getElementById('correctAnswers').textContent = data.data.correctAnswers || 0;
                     document.getElementById('incorrectAnswers').textContent = data.data.incorrectAnswers || 0;
                     document.getElementById('totalQuestions').textContent = data.data.totalQuestions || 0;

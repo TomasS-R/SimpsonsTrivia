@@ -5,7 +5,7 @@ const config = require('../../config');
 // Limiter para API pública
 const publicApiLimiter = rateLimit({
     windowMs: 15 * 60 * 1000,
-    max: 100,
+    max: 1000,
     message: 'Too many requests from this IP, please try again later.'
 });
 
@@ -20,7 +20,7 @@ const authenticatedApiLimiter = rateLimit({
 // Limiter específico para el servidor donde se aloje el proyecto
 const internalApiLimiter = rateLimit({
     windowMs: config.rateLimitWindowMs || 15 * 60 * 1000,
-    max: config.rateLimitMaxRequests || 10000,
+    max: config.rateLimitMaxRequests || 100000,
     message: 'Internal server rate limit exceeded.',
     skip: (req) => {
         const internalIPs = config.internalIps?.split(',') || [];
