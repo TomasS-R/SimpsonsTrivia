@@ -16,7 +16,7 @@
 [![Render](https://img.shields.io/static/v1?style=for-the-badge&message=Render&color=555&logo=Render&logoColor=3333&label=)](https://render.com/)
 [![Flyio](https://img.shields.io/static/v1?style=for-the-badge&message=Fly.io&color=555&logo=Fly.io&logoColor=3333&label=)](https://Fly.io/)
 [![Docker](https://img.shields.io/static/v1?style=for-the-badge&message=Docker&color=555&logo=Docker&logoColor=3333&label=)](https://docker.com/)
-[![Sentry](https://img.shields.io/static/v1?style=for-the-badge&message=Sentry&color=555&logo=Sentry&logoColor=3333&label=)](https://sentry.com/)
+[![Sentry](https://img.shields.io/static/v1?style=for-the-badge&message=Sentry&color=555&logo=Sentry&logoColor=3333&label=)](https://sentry.io/)
 [![Grafana](https://img.shields.io/static/v1?style=for-the-badge&message=Grafana&color=555&logo=Grafana&logoColor=3333&label=)](https://grafana.com/)
 
 ![OpenSource](https://img.shields.io/badge/-open%20source-informational?style=for-the-badge)
